@@ -155,3 +155,28 @@ export const notification = pgTable("notification", {
   channel: varchar("channel", { length: 10 }).notNull(), // 'app' | 'email'
   sentAt: timestamp("sent_at", { withTimezone: true }),
 });
+
+// -- Auth.js technical storage (MS2) -------------------------------------
+// NOT part of the TO ch.7 business datamodel — these two tables are Auth.js's
+// own required storage for the magic-link flow (TO 9.1/9.2: one-time,
+// short-lived tokens; session lookup). The "user" Auth.js normally wants is
+// mapped onto the existing `account` table by a custom adapter
+// (src/lib/auth-adapter.ts) instead of introducing a second, redundant users
+// table the TO never specified.
+export const verificationToken = pgTable(
+  "verification_token",
+  {
+    identifier: varchar("identifier", { length: 320 }).notNull(), // email
+    token: varchar("token", { length: 255 }).notNull(), // hashed token
+    expires: timestamp("expires", { withTimezone: true }).notNull(),
+  },
+  (t) => [uniqueIndex("verification_token_identifier_token_idx").on(t.identifier, t.token)]
+);
+
+export const session = pgTable("session", {
+  sessionToken: varchar("session_token", { length: 255 }).primaryKey(),
+  accountId: uuid("account_id")
+    .notNull()
+    .references(() => account.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { withTimezone: true }).notNull(),
+});
