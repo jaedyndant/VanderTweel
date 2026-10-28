@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793176756826,
+      "tag": "0000_baseline_ms1_ms2_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793176917935,
+      "tag": "0001_ms3_villa_payment_progress_update_file_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793177013529,
+      "tag": "0002_ms3_seed_project_villas_buyers_data",
+      "breakpoints": true
+    }
+  ]
+}

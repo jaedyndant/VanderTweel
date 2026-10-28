@@ -24,14 +24,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (!user.email) return false;
       return isKnownAccountEmail(user.email);
     },
-    // Stamp the account's role onto the session so every surface/middleware
-    // check has it without a second DB round trip per request.
-    async session({ session: sessionPayload }) {
+    // Stamp the account's role (and id, for MS3's per-buyer data scoping) onto
+    // the session so every surface/middleware check has it without a second
+    // DB round trip per request.
+    async session({ session: sessionPayload, user }) {
       if (sessionPayload.user?.email) {
         const role = await getAccountRole(sessionPayload.user.email);
         if (role) {
           (sessionPayload.user as typeof sessionPayload.user & { role: string }).role = role;
         }
+      }
+      if (user?.id) {
+        (sessionPayload.user as typeof sessionPayload.user & { id: string }).id = user.id;
       }
       return sessionPayload;
     },
