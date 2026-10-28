@@ -10,7 +10,7 @@ Zie `/docs` (Technisch Ontwerp en Plan van Aanpak) voor architectuur, datamodel 
 ```bash
 npm install
 cp .env.example .env.local   # vul lokale waarden in, of `vercel env pull`
-npx drizzle-kit push         # schema naar je dev-database
+npm run db:migrate           # genummerde migraties toepassen (drizzle/)
 npm run dev
 ```
 

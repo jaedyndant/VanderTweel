@@ -50,6 +50,16 @@ export const villa = pgTable(
     status: varchar("status", { length: 30 }).notNull().default("planned"),
     model3dUrl: text("model_3d_url"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    // MS3: additieve brochure/koper-attributen (TO hfst. 7 tekende de relaties af,
+    // deze velden waren nodig om de echte Cemagi-cijfers te tonen zonder de
+    // tabel-structuur/relaties te wijzigen — zie migratie 0001).
+    typeLabel: varchar("type_label", { length: 80 }), // bv. "One-bedroom loft"
+    outdoorM2: numeric("outdoor_m2", { precision: 8, scale: 2 }),
+    leaseYears: integer("lease_years"),
+    pricePackage: varchar("price_package", { length: 60 }),
+    priceTotalUsd: numeric("price_total_usd", { precision: 12, scale: 2 }),
+    buildStarted: timestamp("build_started", { withTimezone: true }),
+    handoverExpected: timestamp("handover_expected", { withTimezone: true }),
   },
   (t) => [index("villa_project_id_idx").on(t.projectId)]
 );
@@ -101,6 +111,10 @@ export const paymentMilestone = pgTable(
     dueLabel: varchar("due_label", { length: 120 }).notNull(), // bv. "Maand 4"
     status: varchar("status", { length: 20 }).notNull().default("open"), // 'open' | 'paid'
     paidAt: timestamp("paid_at", { withTimezone: true }),
+    sequence: integer("sequence").notNull().default(0), // MS3: volgorde in het schema
+    amountUsd: numeric("amount_usd", { precision: 12, scale: 2 }), // MS3: echte Cemagi-cijfers
+    note: text("note"), // MS3: toelichting bij de termijn
+    expectedAt: timestamp("expected_at", { withTimezone: true }), // MS3: verwachte datum, nog niet betaald
   },
   (t) => [index("payment_milestone_villa_id_idx").on(t.villaId)]
 );
@@ -115,6 +129,9 @@ export const progressTask = pgTable(
     percentWeight: numeric("percent_weight", { precision: 5, scale: 2 }).notNull(),
     doneAt: timestamp("done_at", { withTimezone: true }),
     doneBy: uuid("done_by").references(() => account.id),
+    sequence: integer("sequence").notNull().default(0), // MS3: bouwvolgorde van de fases
+    detail: text("detail"), // MS3: korte omschrijving van de fase
+    period: varchar("period", { length: 60 }), // MS3: verwachte periode, bv. "Jun - Jul 2026"
   },
   (t) => [index("progress_task_villa_id_idx").on(t.villaId)]
 );
@@ -128,6 +145,9 @@ export const update = pgTable(
     authorId: uuid("author_id").notNull().references(() => account.id),
     body: text("body").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    title: varchar("title", { length: 200 }), // MS3: koptekst van het teamberichten
+    category: varchar("category", { length: 40 }), // MS3: bv. "Construction" | "Payment" | "Paperwork"
+    authorRoleLabel: varchar("author_role_label", { length: 60 }), // MS3: weergavenaam van de afzender
   },
   (t) => [index("update_villa_id_idx").on(t.villaId)]
 );
@@ -142,6 +162,8 @@ export const file = pgTable(
     kind: varchar("kind", { length: 20 }).notNull(), // 'photo' | 'doc'
     url: text("url").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    label: varchar("label", { length: 200 }), // MS3: documentnaam, bv. "Building permit (PBG)"
+    note: text("note"), // MS3: toelichting, bv. ondertekeningsdatum
   },
   (t) => [index("file_villa_id_idx").on(t.villaId)]
 );

@@ -1,0 +1,108 @@
+{
+  "source": "Real reference data scraped live from the client-provided demo https://bali-villa-portal.vercel.app (buyer view, Villa 3 / Emma Larsen) on 2026-10-26. Use this as the seed data for MS3 — these are the actual Cemagi Atelier brochure/build figures, not placeholders.",
+  "project": { "name": "Cemagi Atelier", "slug": "cemagi-atelier", "brandLocked": true },
+  "villa_A": {
+    "buyer_name": "Emma Larsen",
+    "buyer_email": "buyer@cemagiatelier.test",
+    "villa_code": "Villa 3",
+    "type": "One-bedroom loft",
+    "plot_m2": 75,
+    "plot_note": "83 m2 with parking",
+    "built_area_m2": 80.46,
+    "outdoor_m2": 38.18,
+    "outdoor_note": "pool",
+    "lease_years": 29,
+    "price_package": "Premium package",
+    "price_total_usd": 155000,
+    "built_percent": 36,
+    "status_label": "On schedule",
+    "current_phase_label": "Upper floor and roof slab",
+    "build_started": "2026-06-01",
+    "handover_expected": "2027-07-31",
+    "handover_month_of": "14 of 14",
+    "payments": [
+      { "label": "Reservation", "percent": 10, "amount_usd": 15500, "status": "paid", "paid_at": "2026-01-12", "note": "escrow at the notary" },
+      { "label": "Land transfer", "percent": 30, "amount_usd": 46500, "status": "paid", "paid_at": "2026-03-03", "note": "lease deed signed" },
+      { "label": "Construction start", "percent": 10, "amount_usd": 15500, "status": "paid", "paid_at": "2026-05-28", "note": "building permit shown first" },
+      { "label": "Month 1, foundation", "percent": 10, "amount_usd": 15500, "status": "paid", "paid_at": "2026-07-02", "note": "verified 30 jun" },
+      { "label": "Month 4, ground floor", "percent": 10, "amount_usd": 15500, "status": "paid", "paid_at": "2026-10-01", "note": "verified 26 sep" },
+      { "label": "Month 7, roof slab", "percent": 10, "amount_usd": 15500, "status": "open", "expected": "2026-12-01", "note": "after roof verification, 14 days to pay after the invoice" },
+      { "label": "Month 10, plaster and services", "percent": 10, "amount_usd": 15500, "status": "open", "expected": "2027-03-01" },
+      { "label": "Month 12, interior", "percent": 5, "amount_usd": 7750, "status": "open", "expected": "2027-05-01" },
+      { "label": "Month 14, handover", "percent": 5, "amount_usd": 7750, "status": "open", "expected": "2027-07-01", "note": "after the defects list is cleared" }
+    ],
+    "progress_phases": [
+      { "phase": "Site works and foundation", "detail": "Levelling, footings and ground beams", "period": "Jun - Jul 2026", "percent_weight": 10, "done": true },
+      { "phase": "Ground floor structure", "detail": "Columns, walls, first floor slab", "period": "Jul - Sep 2026", "percent_weight": 15, "done": true },
+      { "phase": "Upper floor and roof slab", "detail": "Bedroom level, stair, roof slab", "period": "Sep - Nov 2026", "percent_weight": 15, "done": false },
+      { "phase": "Curved shell, walls and plaster", "detail": "Arched facade formed and rendered", "period": "Nov 2026 - Jan 2027", "percent_weight": 15, "done": false },
+      { "phase": "Electrical, plumbing, pool system", "detail": "Wiring, water, drainage, pool pump", "period": "Dec 2026 - Feb 2027", "percent_weight": 15, "done": false },
+      { "phase": "Stone, teak and interior", "detail": "Andesite, sukabumi, river-stone bath, kitchen", "period": "Feb - May 2027", "percent_weight": 15, "done": false },
+      { "phase": "Pool, garden and snagging", "detail": "Pool test, planting, defects list", "period": "May - Jul 2027", "percent_weight": 10, "done": false },
+      { "phase": "Handover", "detail": "Joint inspection, keys, warranty documents", "period": "Jul 2027", "percent_weight": 5, "done": false }
+    ],
+    "documents": [
+      { "label": "Reservation and escrow agreement", "note": "Signed 12 Jan 2026" },
+      { "label": "Lease agreement, Indonesian and English", "note": "Notarial deed, 3 Mar 2026" },
+      { "label": "Building permit (PBG)", "note": "22 Sep 2026" },
+      { "label": "Drawings and specification, rev. C", "note": "2 Oct 2026" },
+      { "label": "Payment schedule", "note": "Part of the lease agreement" }
+    ],
+    "updates": [
+      { "author_role": "Site manager", "date": "2026-10-17", "category": "Construction", "title": "Roof slab formwork is up, pour planned for Tuesday", "body": "The upper floor slab has cured and the formwork for the roof slab is complete. Rebar is tied and inspected. We pour on Tuesday morning if the weather holds, about 28 m3 of concrete. After ten days of curing we strip the formwork and the engineer verifies the structure, which releases the month 7 payment." },
+      { "author_role": "Finance", "date": "2026-10-10", "category": "Payment", "title": "Month 7 payment comes after the roof check", "body": "The month 7 payment, 10% or $15,500, is invoiced once the engineer has signed off the roof slab. You will see the invoice here and by email, with 14 days to pay." },
+      { "author_role": "Site manager", "date": "2026-10-02", "category": "Construction", "title": "Stair set, pool pump room moved 40 cm", "body": "The stair to the bedroom level is in. One small change: the pool pump room moved 40 cm towards the garden so the pipe run to the filter is shorter. No cost, no change to the terrace. The revised drawing is in your documents." },
+      { "author_role": "Project coordinator", "date": "2026-09-22", "category": "Paperwork", "title": "Building permit uploaded", "body": "The building permit (PBG) for the row is in your documents. The certificate of fitness (SLF) follows after completion. Nothing you need to do." },
+      { "author_role": "Site manager", "date": "2026-09-14", "category": "Construction", "title": "Rebar on site, no lost days", "body": "Steel for the roof slab was delivered on Saturday. Dry week, the team worked every day." }
+    ]
+  },
+  "villa_B_for_isolation_test": {
+    "note": "Second buyer/villa, NOT scraped from the real demo (the real demo only exposes Villa 3 to its buyer by design, which is correct behaviour). Used purely to prove cross-buyer isolation in MS3 tests: this buyer must never see villa_A's data and vice versa. Keep it internally consistent with the same project/pricing logic.",
+    "buyer_name": "Marcus Oduya",
+    "buyer_email": "buyer2@cemagiatelier.test",
+    "villa_code": "Villa 1",
+    "type": "Two-bedroom loft",
+    "plot_m2": 95,
+    "plot_note": "104 m2 with parking",
+    "built_area_m2": 112.3,
+    "outdoor_m2": 52.0,
+    "outdoor_note": "pool",
+    "lease_years": 29,
+    "price_package": "Signature package",
+    "price_total_usd": 210000,
+    "built_percent": 10,
+    "status_label": "On schedule",
+    "current_phase_label": "Site works and foundation",
+    "build_started": "2026-09-01",
+    "handover_expected": "2027-11-30",
+    "handover_month_of": "2 of 14",
+    "payments": [
+      { "label": "Reservation", "percent": 10, "amount_usd": 21000, "status": "paid", "paid_at": "2026-07-01", "note": "escrow at the notary" },
+      { "label": "Land transfer", "percent": 30, "amount_usd": 63000, "status": "paid", "paid_at": "2026-08-15", "note": "lease deed signed" },
+      { "label": "Construction start", "percent": 10, "amount_usd": 21000, "status": "open", "expected": "2026-11-15" },
+      { "label": "Month 1, foundation", "percent": 10, "amount_usd": 21000, "status": "open", "expected": "2026-12-01" },
+      { "label": "Month 4, ground floor", "percent": 10, "amount_usd": 21000, "status": "open", "expected": "2027-02-01" },
+      { "label": "Month 7, roof slab", "percent": 10, "amount_usd": 21000, "status": "open", "expected": "2027-05-01" },
+      { "label": "Month 10, plaster and services", "percent": 10, "amount_usd": 21000, "status": "open", "expected": "2027-08-01" },
+      { "label": "Month 12, interior", "percent": 5, "amount_usd": 10500, "status": "open", "expected": "2027-10-01" },
+      { "label": "Month 14, handover", "percent": 5, "amount_usd": 10500, "status": "open", "expected": "2027-11-01" }
+    ],
+    "progress_phases": [
+      { "phase": "Site works and foundation", "detail": "Levelling, footings and ground beams", "period": "Sep - Nov 2026", "percent_weight": 10, "done": false },
+      { "phase": "Ground floor structure", "detail": "Columns, walls, first floor slab", "period": "Nov 2026 - Jan 2027", "percent_weight": 15, "done": false },
+      { "phase": "Upper floor and roof slab", "detail": "Bedroom level, stair, roof slab", "period": "Jan - Mar 2027", "percent_weight": 15, "done": false },
+      { "phase": "Curved shell, walls and plaster", "detail": "Arched facade formed and rendered", "period": "Mar - May 2027", "percent_weight": 15, "done": false },
+      { "phase": "Electrical, plumbing, pool system", "detail": "Wiring, water, drainage, pool pump", "period": "Apr - Jun 2027", "percent_weight": 15, "done": false },
+      { "phase": "Stone, teak and interior", "detail": "Andesite, sukabumi, river-stone bath, kitchen", "period": "Jun - Sep 2027", "percent_weight": 15, "done": false },
+      { "phase": "Pool, garden and snagging", "detail": "Pool test, planting, defects list", "period": "Sep - Nov 2027", "percent_weight": 10, "done": false },
+      { "phase": "Handover", "detail": "Joint inspection, keys, warranty documents", "period": "Nov 2027", "percent_weight": 5, "done": false }
+    ],
+    "documents": [
+      { "label": "Reservation and escrow agreement", "note": "Signed 1 Jul 2026" },
+      { "label": "Lease agreement, Indonesian and English", "note": "Notarial deed, 15 Aug 2026" }
+    ],
+    "updates": [
+      { "author_role": "Project coordinator", "date": "2026-10-20", "category": "Paperwork", "title": "Land transfer complete", "body": "The lease deed is signed and registered. Construction start payment will follow once the building permit is issued." }
+    ]
+  }
+}
