@@ -69,7 +69,10 @@ export async function notifyBuyersForVilla({
           text: summary,
         });
         sentAt = new Date();
-      } catch {
+      } catch (err) {
+        // Logged, not swallowed: a failed send must be diagnosable from
+        // Vercel logs, not just invisible as a null sentAt in the DB.
+        console.error("[notify] sendEmail failed", err);
         sentAt = null;
       }
     }
