@@ -67,7 +67,10 @@ export const villa = pgTable(
 // -- buyer (koper) ------------------------------------------------------
 export const buyer = pgTable("buyer", {
   id: uuid("id").defaultRandom().primaryKey(),
-  accountId: uuid("account_id").notNull().references(() => account.id),
+  // One buyer profile per account -- multiple villas go through buyer_villa
+  // (n:m), not through multiple buyer rows. Unique constraint added
+  // 2026-10-28 after a real duplicate-row bug (see drizzle/0005).
+  accountId: uuid("account_id").notNull().unique().references(() => account.id),
   name: varchar("name", { length: 200 }).notNull(),
   country: varchar("country", { length: 100 }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
