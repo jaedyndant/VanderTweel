@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import PollRefresh from "@/components/poll-refresh";
 
 // Per-request session check — never prerender/cache this layout statically.
 export const instant = false;
@@ -18,6 +19,7 @@ export default async function KoperLayout({ children }: { children: ReactNode })
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
+      <PollRefresh />
       <header className="sticky top-0 z-10 border-b border-neutral-200 bg-white">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
           <span className="text-sm font-semibold tracking-tight">Cemagi Atelier</span>
