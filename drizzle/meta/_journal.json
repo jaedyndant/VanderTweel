@@ -36,6 +36,13 @@
       "when": 1793353200000,
       "tag": "0004_ms4_pm_project_link",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793362800000,
+      "tag": "0005_fix_duplicate_buyer_add_constraint",
+      "breakpoints": true
     }
   ]
 }
