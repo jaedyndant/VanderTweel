@@ -8,11 +8,12 @@
 // authorization via getAuthorizedOfficeVilla before writing anything.
 
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/db/client";
 import { progressTask, paymentMilestone, update, file } from "@/db/schema";
 import { getAuthorizedOfficeVilla, type OfficeRole } from "@/lib/office-data";
+import { notifyBuyersForVilla } from "@/lib/notify";
 
 async function requireOfficeSession(): Promise<{ accountId: string; role: OfficeRole }> {
   const session = await auth();
@@ -38,6 +39,17 @@ export async function toggleProgressTaskAction(taskId: string, villaCode: string
     .update(progressTask)
     .set({ doneAt: task.doneAt ? null : new Date(), doneBy: task.doneAt ? null : accountId })
     .where(eq(progressTask.id, taskId));
+
+  // MS5 coupling: a progress toggle is only worth notifying on when it just
+  // became done (not when it's being un-done, which is a correction, not news).
+  if (!task.doneAt) {
+    await notifyBuyersForVilla({
+      villaId: villaRow.id,
+      sourceType: "progress",
+      sourceId: taskId,
+      summary: `${villaCode}: "${task.phase}" is now complete.`,
+    });
+  }
 
   revalidatePath(`/office/villas/${villaCode}/voortgang`);
   revalidatePath(`/office/villas/${villaCode}`);
@@ -65,6 +77,16 @@ export async function markPaymentPaidAction(milestoneId: string, villaCode: stri
     .update(paymentMilestone)
     .set({ status: nowPaid ? "paid" : "open", paidAt: nowPaid ? new Date() : null })
     .where(eq(paymentMilestone.id, milestoneId));
+
+  // MS5 coupling: only notify on marking paid, not on reverting a mistake.
+  if (nowPaid) {
+    await notifyBuyersForVilla({
+      villaId: villaRow.id,
+      sourceType: "payment",
+      sourceId: milestoneId,
+      summary: `${villaCode}: payment milestone "${milestone.dueLabel}" (${milestone.percent}%) has been received.`,
+    });
+  }
 
   revalidatePath(`/office/villas/${villaCode}/betalingen`);
   revalidatePath(`/office/villas/${villaCode}`);
@@ -95,6 +117,22 @@ export async function createUpdateAction(formData: FormData) {
     authorRoleLabel: roleLabel,
   });
 
+  const [insertedUpdate] = await db
+    .select({ id: update.id })
+    .from(update)
+    .where(eq(update.villaId, villaRow.id))
+    .orderBy(desc(update.createdAt))
+    .limit(1);
+
+  if (insertedUpdate) {
+    await notifyBuyersForVilla({
+      villaId: villaRow.id,
+      sourceType: "update",
+      sourceId: insertedUpdate.id,
+      summary: `${villaCode}: new update${title ? ` — ${title}` : ""}: ${body}`,
+    });
+  }
+
   revalidatePath(`/office/villas/${villaCode}/updates`);
   revalidatePath("/koper/voortgang");
 }
@@ -116,6 +154,22 @@ export async function addFileAction(formData: FormData) {
   const kind = String(formData.get("kind") ?? "doc").trim() || "doc";
 
   await db.insert(file).values({ villaId: villaRow.id, uploadedBy: accountId, kind, url, label, note });
+
+  const [insertedFile] = await db
+    .select({ id: file.id })
+    .from(file)
+    .where(eq(file.villaId, villaRow.id))
+    .orderBy(desc(file.createdAt))
+    .limit(1);
+
+  if (insertedFile) {
+    await notifyBuyersForVilla({
+      villaId: villaRow.id,
+      sourceType: "file",
+      sourceId: insertedFile.id,
+      summary: `${villaCode}: new ${kind === "photo" ? "photo" : "document"} added${label ? ` — ${label}` : ""}.`,
+    });
+  }
 
   revalidatePath(`/office/villas/${villaCode}/bestanden`);
   revalidatePath("/koper/betaalschema");
