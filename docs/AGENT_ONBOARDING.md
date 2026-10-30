@@ -4,6 +4,10 @@ This file is the single source of truth for any AI agent (or human) joining
 this project. Read this before touching code. If anything here conflicts
 with what you were told elsewhere, this file + `/docs` win.
 
+For the agreed 30 October MS3/MS4/MS5 frontend integration branch, CI rollout
+and isolated staging acceptance plan, also read
+[INTEGRATION_MS3_MS4_MS5.md](INTEGRATION_MS3_MS4_MS5.md).
+
 ## 1. What this project is
 
 Max van der Tweel develops Cemagi Atelier: five loft villas with pool on
