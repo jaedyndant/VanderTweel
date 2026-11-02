@@ -1,47 +1,51 @@
-"use client";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { connection } from "next/server";
+import { auth } from "@/lib/auth";
+import { LoginForm } from "./login-form";
+import {
+  authenticatedLoginDestination,
+  safeLoginCallback,
+} from "./login-routing";
+import "./login.css";
 
-import { useState } from "react";
+export const metadata: Metadata = {
+  title: "Inloggen · Van der Tweel",
+  robots: { index: false, follow: false },
+};
 
-// TO 9.1: email/magic-link only, no password field, no role picker on this
-// screen — the role is decided server-side from the pre-seeded account.
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+type LoginPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    await fetch("/api/auth/signin/resend", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ email, callbackUrl: "/" }),
-    });
-    setSent(true);
-  }
-
-  if (sent) {
-    return (
-      <main style={{ padding: 32, fontFamily: "system-ui" }}>
-        <p>Check je e-mail voor de inloglink.</p>
-      </main>
-    );
-  }
+// Session cookies and searchParams are request-time data. Keep them below
+// Suspense with cacheComponents enabled, never in a shared cached function.
+async function LoginContent({ searchParams }: LoginPageProps) {
+  // Auth.js may generate CSRF randomness before reading cookies. Defer the
+  // entire call until a real request, not merely the eventual cookie read.
+  await connection();
+  const [session, query] = await Promise.all([auth(), searchParams]);
+  const callback = safeLoginCallback(query.callbackUrl);
+  const role = (session?.user as { role?: unknown } | undefined)?.role;
+  const destination = authenticatedLoginDestination(role, callback);
+  if (destination) redirect(destination);
 
   return (
-    <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 360 }}>
+    <LoginForm
+      callbackUrl={callback ?? "/login"}
+      initialError={Boolean(query.error)}
+    />
+  );
+}
+
+export default function LoginPage(props: LoginPageProps) {
+  return (
+    <main className="login-page" lang="nl">
       <h1>Inloggen</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          required
-          placeholder="E-mailadres"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ width: "100%", padding: 8, marginBottom: 12 }}
-        />
-        <button type="submit" style={{ width: "100%", padding: 8 }}>
-          Stuur inloglink
-        </button>
-      </form>
+      <Suspense fallback={<p role="status">Inloggen voorbereiden…</p>}>
+        <LoginContent {...props} />
+      </Suspense>
     </main>
   );
 }
