@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { randomBytes } from "crypto";
+import { encode } from "next-auth/jwt";
 import { db } from "@/db/client";
-import { account, session as sessionTable } from "@/db/schema";
+import { account } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 // TEMPORARY, pre-launch only. Lets us demo the real deployed screens without
@@ -27,22 +27,30 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "no such account" }, { status: 404 });
   }
 
-  const sessionToken = randomBytes(32).toString("hex");
-  const expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
-  await db.insert(sessionTable).values({
-    sessionToken,
-    accountId: row.id,
-    expires,
+  const sessionMaxAgeSeconds = 2 * 60 * 60; // 2 hours, matches the old dev-login expiry
+  const isHttps = req.nextUrl.protocol === "https:";
+  const cookieName = isHttps ? "__Secure-authjs.session-token" : "authjs.session-token";
+
+  const token = await encode({
+    secret: process.env.AUTH_SECRET!,
+    salt: cookieName,
+    maxAge: sessionMaxAgeSeconds,
+    token: {
+      sub: row.id,
+      accountId: row.id,
+      email: row.email,
+      role: row.role,
+    },
   });
 
   const landing = row.role === "buyer" ? "/koper" : "/office";
   const res = NextResponse.redirect(new URL(landing, req.nextUrl.origin));
-  res.cookies.set("__Secure-authjs.session-token", sessionToken, {
+  res.cookies.set(cookieName, token, {
     httpOnly: true,
-    secure: true,
+    secure: isHttps,
     sameSite: "lax",
     path: "/",
-    expires,
+    maxAge: sessionMaxAgeSeconds,
   });
   return res;
 }
