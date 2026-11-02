@@ -10,7 +10,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       from: process.env.AUTH_EMAIL_FROM,
     }),
   ],
-  session: { strategy: "database" },
+  // JWT, not "database": middleware runs on every /koper and /office request
+  // in the Edge runtime, and a database session strategy means middleware
+  // does a Postgres round trip (via the Neon HTTP driver) on every single
+  // request. In production that surfaced as real HANGING_PROMISE_REJECTION /
+  // AdapterError failures under normal traffic. JWT keeps the session (role +
+  // id) signed into the cookie after the one DB read at sign-in, so
+  // middleware never touches the database again until the token expires.
+  session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
     verifyRequest: "/login/check-email",
@@ -24,18 +31,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (!user.email) return false;
       return isKnownAccountEmail(user.email);
     },
-    // Stamp the account's role (and id, for MS3's per-buyer data scoping) onto
-    // the session so every surface/middleware check has it without a second
-    // DB round trip per request.
-    async session({ session: sessionPayload, user }) {
-      if (sessionPayload.user?.email) {
-        const role = await getAccountRole(sessionPayload.user.email);
-        if (role) {
-          (sessionPayload.user as typeof sessionPayload.user & { role: string }).role = role;
-        }
+    // Only runs the DB lookup on the initial sign-in (when `user` is
+    // present, right after the magic link is consumed). Every later request
+    // just decodes the already-signed token — no DB call, so middleware
+    // reading the session is DB-free.
+    async jwt({ token, user }) {
+      if (user?.email) {
+        const role = await getAccountRole(user.email);
+        if (role) token.role = role;
+        token.accountId = user.id;
       }
-      if (user?.id) {
-        (sessionPayload.user as typeof sessionPayload.user & { id: string }).id = user.id;
+      return token;
+    },
+    async session({ session: sessionPayload, token }) {
+      if (token.role) {
+        (sessionPayload.user as typeof sessionPayload.user & { role: string }).role =
+          token.role as string;
+      }
+      if (token.accountId) {
+        (sessionPayload.user as typeof sessionPayload.user & { id: string }).id =
+          token.accountId as string;
       }
       return sessionPayload;
     },
