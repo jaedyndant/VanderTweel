@@ -1,63 +1,51 @@
-"use client";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { connection } from "next/server";
+import { auth } from "@/lib/auth";
+import { LoginForm } from "./login-form";
+import {
+  authenticatedLoginDestination,
+  safeLoginCallback,
+} from "./login-routing";
+import "./login.css";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+export const metadata: Metadata = {
+  title: "Inloggen · Van der Tweel",
+  robots: { index: false, follow: false },
+};
 
-// TO 9.1: email/magic-link only, no password field, no role picker on this
-// screen — the role is decided server-side from the pre-seeded account.
-//
-// Uses next-auth/react's signIn() instead of a hand-rolled fetch: a raw POST
-// to /api/auth/signin/resend requires the Auth.js CSRF cookie to already be
-// set, but GET /login never set it, so every real submission failed with
-// MissingCSRF server-side while this page still showed "check your email"
-// unconditionally -- a false-positive success with no email ever sent
-// (found via a real Resend-sandbox delivery test, 2026-11-02). signIn()
-// fetches /api/auth/csrf itself before posting, and its result tells us
-// whether the send actually succeeded.
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+type LoginPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSubmitting(true);
-    setError(null);
-    const result = await signIn("resend", { email, redirect: false, callbackUrl: "/" });
-    setSubmitting(false);
-    if (!result || result.error) {
-      setError("Inloggen is niet gelukt. Controleer het e-mailadres en probeer het opnieuw.");
-      return;
-    }
-    setSent(true);
-  }
-
-  if (sent) {
-    return (
-      <main style={{ padding: 32, fontFamily: "system-ui" }}>
-        <p>Check je e-mail voor de inloglink.</p>
-      </main>
-    );
-  }
+// Session cookies and searchParams are request-time data. Keep them below
+// Suspense with cacheComponents enabled, never in a shared cached function.
+async function LoginContent({ searchParams }: LoginPageProps) {
+  // Auth.js may generate CSRF randomness before reading cookies. Defer the
+  // entire call until a real request, not merely the eventual cookie read.
+  await connection();
+  const [session, query] = await Promise.all([auth(), searchParams]);
+  const callback = safeLoginCallback(query.callbackUrl);
+  const role = (session?.user as { role?: unknown } | undefined)?.role;
+  const destination = authenticatedLoginDestination(role, callback);
+  if (destination) redirect(destination);
 
   return (
-    <main style={{ padding: 32, fontFamily: "system-ui", maxWidth: 360 }}>
+    <LoginForm
+      callbackUrl={callback ?? "/login"}
+      initialError={Boolean(query.error)}
+    />
+  );
+}
+
+export default function LoginPage(props: LoginPageProps) {
+  return (
+    <main className="login-page" lang="nl">
       <h1>Inloggen</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          required
-          placeholder="E-mailadres"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ width: "100%", padding: 8, marginBottom: 12 }}
-        />
-        <button type="submit" disabled={submitting} style={{ width: "100%", padding: 8 }}>
-          {submitting ? "Versturen..." : "Stuur inloglink"}
-        </button>
-        {error && <p style={{ color: "#b91c1c", marginTop: 12 }}>{error}</p>}
-      </form>
+      <Suspense fallback={<p role="status">Inloggen voorbereiden…</p>}>
+        <LoginContent {...props} />
+      </Suspense>
     </main>
   );
 }

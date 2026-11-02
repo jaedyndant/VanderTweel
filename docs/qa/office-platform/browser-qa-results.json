@@ -1,0 +1,557 @@
+[
+  {
+    "page": "overview",
+    "viewport": 1440,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Overview"
+    ],
+    "h1": "A clear view of the whole.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 1440,
+    "width": 1440
+  },
+  {
+    "page": "villas",
+    "viewport": 1440,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Villas"
+    ],
+    "h1": "Every villa. Every detail.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 1440,
+    "width": 1440
+  },
+  {
+    "page": "buyers",
+    "viewport": 1440,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Clients"
+    ],
+    "h1": "People behind the places.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 1440,
+    "width": 1440
+  },
+  {
+    "page": "payments",
+    "viewport": 1440,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Payments"
+    ],
+    "h1": "Every payment, in view.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 1440,
+    "width": 1440
+  },
+  {
+    "page": "updates",
+    "viewport": 1440,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Site updates"
+    ],
+    "h1": "From site to owner.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 1440,
+    "width": 1440
+  },
+  {
+    "page": "documents",
+    "viewport": 1440,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Documents"
+    ],
+    "h1": "An orderly archive.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 1440,
+    "width": 1440
+  },
+  {
+    "page": "overview",
+    "viewport": 390,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Overview"
+    ],
+    "h1": "A clear view of the whole.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "page": "villas",
+    "viewport": 390,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Villas"
+    ],
+    "h1": "Every villa. Every detail.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "page": "buyers",
+    "viewport": 390,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Clients"
+    ],
+    "h1": "People behind the places.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "page": "payments",
+    "viewport": 390,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Payments"
+    ],
+    "h1": "Every payment, in view.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "page": "updates",
+    "viewport": 390,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Site updates"
+    ],
+    "h1": "From site to owner.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "page": "documents",
+    "viewport": 390,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Documents"
+    ],
+    "h1": "An orderly archive.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "page": "overview",
+    "viewport": 768,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Overview"
+    ],
+    "h1": "A clear view of the whole.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 768,
+    "width": 768
+  },
+  {
+    "page": "payments",
+    "viewport": 768,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Payments"
+    ],
+    "h1": "Every payment, in view.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 768,
+    "width": 768
+  },
+  {
+    "page": "progress",
+    "viewport": 768,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Villas"
+    ],
+    "h1": "Every step, considered.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 768,
+    "width": 768
+  },
+  {
+    "page": "overview",
+    "viewport": 320,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Overview"
+    ],
+    "h1": "A clear view of the whole.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 320,
+    "width": 320
+  },
+  {
+    "page": "payments",
+    "viewport": 320,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Payments"
+    ],
+    "h1": "Every payment, in view.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 320,
+    "width": 320
+  },
+  {
+    "page": "progress",
+    "viewport": 320,
+    "role": "developer",
+    "scenario": "normal",
+    "active": [
+      "Villas"
+    ],
+    "h1": "Every step, considered.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 320,
+    "width": 320
+  },
+  {
+    "page": "overview",
+    "viewport": 390,
+    "role": "pm",
+    "scenario": "normal",
+    "active": [
+      "Overview"
+    ],
+    "h1": "A clear view of the whole.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Your updates"
+    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "page": "villas",
+    "viewport": 390,
+    "role": "pm",
+    "scenario": "normal",
+    "active": [
+      "Villas"
+    ],
+    "h1": "Every villa. Every detail.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Your updates"
+    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "page": "progress",
+    "viewport": 390,
+    "role": "pm",
+    "scenario": "normal",
+    "active": [
+      "Villas"
+    ],
+    "h1": "Every step, considered.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Your updates"
+    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "page": "updates",
+    "viewport": 390,
+    "role": "pm",
+    "scenario": "normal",
+    "active": [
+      "Your updates"
+    ],
+    "h1": "From site to owner.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Your updates"
+    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "page": "overview",
+    "viewport": 320,
+    "role": "developer",
+    "scenario": "empty",
+    "active": [
+      "Overview"
+    ],
+    "h1": "A clear view of the whole.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 320,
+    "width": 320
+  },
+  {
+    "page": "payments",
+    "viewport": 320,
+    "role": "developer",
+    "scenario": "empty",
+    "active": [
+      "Payments"
+    ],
+    "h1": "Every payment, in view.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 320,
+    "width": 320
+  },
+  {
+    "page": "payments",
+    "viewport": 320,
+    "role": "developer",
+    "scenario": "missing",
+    "active": [
+      "Payments"
+    ],
+    "h1": "Every payment, in view.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 320,
+    "width": 320
+  },
+  {
+    "page": "overview",
+    "viewport": 320,
+    "role": "developer",
+    "scenario": "long",
+    "active": [
+      "Overview"
+    ],
+    "h1": "A clear view of the whole.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 320,
+    "width": 320
+  },
+  {
+    "page": "updates",
+    "viewport": 320,
+    "role": "developer",
+    "scenario": "long",
+    "active": [
+      "Site updates"
+    ],
+    "h1": "From site to owner.",
+    "nav": [
+      "Overview",
+      "Villas",
+      "Clients",
+      "Payments",
+      "Site updates",
+      "Documents"
+    ],
+    "overflow": false,
+    "scrollWidth": 320,
+    "width": 320
+  }
+]

@@ -1,0 +1,1033 @@
+/* Faithful client-only adaptation of the approved Van der Tweel demo.
+   Keep all selectors scoped: the website and back-office share this app. */
+.client-platform {
+  --paper: #f5f2ec;
+  --white: #fffefa;
+  --ink: #283d32;
+  --muted: #7b8078;
+  --line: #deded4;
+  --teak: #845b3c;
+  --green: #2f4a3b;
+  --pale: #e6eadf;
+  --body-copy: #687066;
+  --sidebar: #f0eee6;
+  --active-nav: #dfe5d8;
+  --badge-green: #e4eadc;
+  --badge-green-ink: #52704d;
+  --badge-amber: #f1e7d4;
+  --badge-amber-ink: #8a6632;
+  --badge-neutral: #edede7;
+  --badge-neutral-ink: #74786b;
+  --focus: #b18a62;
+  min-height: 100svh;
+  background: var(--paper);
+  color: var(--ink);
+  font:
+    14px / normal var(--font-client-sans, "DM Sans"),
+    sans-serif;
+  color-scheme: light;
+}
+.client-platform *,
+.client-platform *::before,
+.client-platform *::after {
+  box-sizing: border-box;
+}
+.client-platform button,
+.client-platform input,
+.client-platform select,
+.client-platform textarea {
+  font: inherit;
+}
+.client-platform button,
+.client-platform a {
+  touch-action: manipulation;
+}
+.client-platform button {
+  color: inherit;
+  cursor: pointer;
+}
+.client-platform button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.client-platform a {
+  color: inherit;
+  text-decoration: none;
+}
+.client-platform h1,
+.client-platform h2,
+.client-platform h3,
+.client-platform p {
+  margin: 0;
+}
+.client-platform h1,
+.client-platform h2,
+.client-platform h3 {
+  font-family: var(--font-client-serif, "Newsreader"), Georgia, serif;
+  font-weight: 400;
+  line-height: normal;
+}
+.client-platform h1 {
+  font-size: 64px;
+  line-height: 1.03;
+  letter-spacing: -2px;
+}
+.client-platform h2 {
+  font-size: 40px;
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+}
+.client-platform h3 {
+  font-size: 25px;
+}
+.client-platform p {
+  color: var(--body-copy);
+  line-height: 1.7;
+}
+.client-platform img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+}
+.client-platform button:focus-visible,
+.client-platform a:focus-visible,
+.client-platform [tabindex]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+.client-platform strong {
+  font-weight: 700;
+}
+.client-platform .brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  white-space: nowrap;
+}
+.client-platform .brand strong {
+  font:
+    25px / normal var(--font-client-serif, "Newsreader"),
+    Georgia,
+    serif;
+}
+.client-platform .brand small {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.client-platform .mark {
+  display: block;
+  width: 27px;
+  height: 33px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 19px 19px 0 0;
+  position: relative;
+}
+.client-platform .mark::after {
+  content: "";
+  position: absolute;
+  inset: 6px 6px 0;
+  border: 1px solid currentColor;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+}
+.client-platform .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: var(--green);
+  border: 1px solid var(--green);
+  color: white;
+  padding: 13px 20px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: normal;
+}
+.client-platform .btn:hover {
+  background: #405d49;
+}
+.client-platform .btn.light {
+  background: transparent;
+  color: var(--ink);
+  border-color: #c6cbbf;
+}
+.client-platform .btn.light:hover {
+  background: var(--pale);
+}
+.client-platform .btn.small {
+  padding: 9px 13px;
+  font-size: 11px;
+}
+.client-platform .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--teak);
+  margin-bottom: 20px;
+  overflow-wrap: anywhere;
+}
+.client-platform .fine {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.client-platform .shell {
+  display: grid;
+  grid-template-columns: 225px minmax(0, 1fr);
+  min-height: 100svh;
+}
+.client-platform .sidebar {
+  background: var(--sidebar);
+  border-right: 1px solid var(--line);
+  padding: 30px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+.client-platform .sidebar .brand strong {
+  font-size: 22px;
+}
+.client-platform .workspace-label {
+  border-block: 1px solid var(--line);
+  padding: 19px 0;
+  font-size: 11px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.client-platform .workspace-label small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+}
+.client-platform .side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.client-platform .side-nav a {
+  padding: 12px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 12px;
+  color: #71796f;
+}
+.client-platform .side-nav a.active {
+  background: var(--active-nav);
+  color: var(--green);
+  font-weight: 600;
+}
+.client-platform .side-nav a:hover {
+  background: #e5e7dd;
+}
+.client-platform .nav-icon {
+  width: 16px;
+  text-align: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.client-platform .side-bottom {
+  margin-top: auto;
+  padding-top: 40px;
+}
+.client-platform .person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.client-platform .avatar {
+  background: #dedfce;
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.client-platform .person small {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+  font-size: 9px;
+}
+.client-platform .main {
+  min-width: 0;
+}
+.client-platform .topbar {
+  min-height: 75px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 36px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.client-platform .topbar .badge {
+  margin-left: 10px;
+}
+.client-platform .topbar > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.client-platform .topbar-residence {
+  flex-shrink: 0;
+}
+.client-platform .content {
+  padding: 34px 36px 55px;
+  max-width: 1600px;
+  margin: auto;
+}
+.client-platform .page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+.client-platform .page-heading h1 {
+  font-size: 42px;
+  letter-spacing: -1px;
+}
+.client-platform .page-heading p {
+  font-size: 12px;
+  margin-top: 9px;
+}
+.client-platform .page-heading .eyebrow {
+  margin-bottom: 12px;
+}
+.client-platform .page-heading > .btn {
+  flex-shrink: 0;
+}
+.client-platform .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: var(--badge-green);
+  color: var(--badge-green-ink);
+  white-space: nowrap;
+  line-height: normal;
+}
+.client-platform .badge.amber {
+  color: var(--badge-amber-ink);
+  background: var(--badge-amber);
+}
+.client-platform .badge.neutral {
+  background: var(--badge-neutral);
+  color: var(--badge-neutral-ink);
+}
+.client-platform .dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 22px;
+}
+.client-platform .villa-visual {
+  position: relative;
+  min-height: 280px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--pale);
+}
+.client-platform .villa-visual img {
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+.client-platform .villa-visual::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(transparent, #13271dcc);
+}
+.client-platform .villa-caption {
+  position: absolute;
+  bottom: 25px;
+  left: 26px;
+  right: 20px;
+  color: white;
+  z-index: 1;
+}
+.client-platform .villa-caption h2 {
+  font-size: 32px;
+}
+.client-platform .villa-caption p {
+  color: #e1e5dc;
+  font-size: 11px;
+}
+.client-platform .panel {
+  min-width: 0;
+  background: var(--white);
+  border: 1px solid var(--line);
+  padding: 24px;
+  border-radius: 3px;
+}
+.client-platform .panel h3 {
+  font-size: 23px;
+}
+.client-platform .panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+.client-platform .panel-title > .text-link {
+  flex-shrink: 0;
+}
+.client-platform .panel-title h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.client-platform .panel-title .badge {
+  max-width: 100%;
+  white-space: normal;
+}
+.client-platform .label {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.6px;
+}
+.client-platform .big {
+  font:
+    38px / normal var(--font-client-serif, "Newsreader"),
+    Georgia,
+    serif;
+  margin: 12px 0;
+}
+.client-platform .percent-unit {
+  font-size: 20px;
+}
+.client-platform .progress {
+  height: 5px;
+  background: #e8e9e0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 14px 0;
+}
+.client-platform .progress i {
+  display: block;
+  height: 100%;
+  background: #637b55;
+  border-radius: 8px;
+}
+.client-platform .progress.teak i {
+  background: #9b7857;
+}
+.client-platform .row-between {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+}
+.client-platform .metric-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+}
+.client-platform .metric-pair > div + div {
+  border-left: 1px solid var(--line);
+  padding-left: 22px;
+}
+.client-platform .milestone-note {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  margin-top: 20px;
+}
+.client-platform .milestone-note p {
+  font-size: 11px;
+  margin: 6px 0 16px;
+}
+.client-platform .milestone-note .current-milestone {
+  font-size: 21px;
+  margin-top: 9px;
+}
+.client-platform .milestone-note .handover-line {
+  margin: 6px 0;
+}
+.client-platform .handover-arrow {
+  font-size: 24px;
+}
+.client-platform .lower-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 22px;
+  margin-top: 22px;
+}
+.client-platform .update {
+  display: flex;
+  gap: 16px;
+  padding: 15px 0;
+  border-top: 1px solid var(--line);
+  align-items: center;
+}
+.client-platform .update img {
+  width: 92px;
+  height: 72px;
+  flex-shrink: 0;
+}
+.client-platform .update > div {
+  min-width: 0;
+}
+.client-platform .update h4 {
+  font-weight: 500;
+  font-size: 12px;
+  line-height: normal;
+  margin: 7px 0;
+  overflow-wrap: anywhere;
+}
+.client-platform .update p {
+  font-size: 11px;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.client-platform .update small {
+  font-size: 9px;
+  color: var(--muted);
+}
+.client-platform .text-link {
+  font-size: 11px;
+  color: var(--teak);
+  border: 0;
+  background: none;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.client-platform .document {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 0;
+  border-top: 1px solid var(--line);
+}
+.client-platform .document .file-icon {
+  border: 1px solid var(--line);
+  padding: 10px;
+  font-size: 9px;
+  color: var(--teak);
+}
+.client-platform .document-copy {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.client-platform .document strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+}
+.client-platform .document small {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.client-platform .document button {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.client-platform .metrics {
+  display: grid;
+  gap: 15px;
+  margin-bottom: 23px;
+}
+.client-platform .payment-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.client-platform .metrics .panel {
+  padding: 20px;
+}
+.client-platform .metrics .big {
+  font-size: 32px;
+  overflow-wrap: anywhere;
+}
+.client-platform .metrics p {
+  font-size: 10px;
+}
+.client-platform .table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: thin;
+}
+.client-platform table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  text-align: left;
+}
+.client-platform th {
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 14px 12px;
+  background: #f5f4ee;
+  white-space: nowrap;
+}
+.client-platform td {
+  border-top: 1px solid #e8e9e1;
+  padding: 18px 12px;
+}
+.client-platform td .text-link {
+  white-space: nowrap;
+}
+.client-platform .ledger-sequence {
+  display: inline-block;
+  margin-right: 12px;
+}
+.client-platform .ledger-amount {
+  white-space: nowrap;
+}
+.client-platform .task {
+  border-top: 1px solid var(--line);
+  padding: 17px 0;
+  margin-top: 20px;
+}
+.client-platform .task p {
+  font-size: 11px;
+  margin: 8px 0 14px;
+}
+.client-platform .task strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.client-platform .timeline {
+  margin: 25px 0;
+}
+.client-platform .timeline-item {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+.client-platform .timeline-number {
+  border: 1px solid var(--line);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+}
+.client-platform .timeline-item.done .timeline-number {
+  background: var(--green);
+  color: white;
+}
+.client-platform .timeline-item h3 {
+  font:
+    14px / normal var(--font-client-sans, "DM Sans"),
+    sans-serif;
+  overflow-wrap: anywhere;
+}
+.client-platform .timeline-item p {
+  font-size: 11px;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+.client-platform .timeline-item > .badge {
+  align-self: start;
+}
+.client-platform .gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.client-platform .gallery img {
+  height: 220px;
+}
+.client-platform .gallery button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--white);
+  text-align: left;
+}
+.client-platform .gallery p {
+  padding: 14px;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.client-platform .design-gallery {
+  margin-top: 24px;
+}
+.client-platform .project-photos {
+  margin-top: 24px;
+}
+.client-platform .project-photos .fine {
+  padding: 8px 0;
+}
+.client-platform .floorplan {
+  background: #eae8df;
+  padding: 40px;
+  min-height: 350px;
+  display: grid;
+  place-items: center;
+}
+.client-platform .floorplan svg {
+  max-width: 570px;
+  width: 100%;
+  height: 320px;
+  font-family: var(--font-client-sans, "DM Sans"), sans-serif;
+}
+.client-platform .tabs {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+.client-platform .tabs button {
+  border: 1px solid var(--line);
+  background: transparent;
+  padding: 10px 20px;
+  font-size: 11px;
+}
+.client-platform .tabs button.active {
+  background: var(--green);
+  color: white;
+}
+.client-platform .material-list {
+  border-top: 1px solid var(--line);
+  margin-top: 28px;
+}
+.client-platform .material-list div {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+.client-platform .material-list strong {
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.client-platform .material-list span {
+  flex-shrink: 0;
+}
+.client-platform .package-description {
+  margin: 20px 0;
+}
+.client-platform .specification-action {
+  margin-top: 25px;
+}
+.client-platform dialog {
+  margin: auto;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 38px;
+  max-width: 580px;
+  width: calc(100% - 32px);
+  max-height: 90svh;
+  border-radius: 4px;
+  overflow-y: auto;
+}
+.client-platform dialog::backdrop {
+  background: #15261d88;
+  backdrop-filter: blur(3px);
+}
+.client-platform dialog h2 {
+  font-size: 34px;
+  margin-bottom: 18px;
+  overflow-wrap: anywhere;
+}
+.client-platform dialog p {
+  font-size: 12px;
+}
+.client-platform dialog img {
+  max-height: 60svh;
+  height: auto;
+  object-fit: contain;
+}
+.client-platform .close {
+  position: absolute;
+  right: 7px;
+  top: 3px;
+  border: 0;
+  background: none;
+  font-size: 24px;
+  width: 36px;
+  height: 36px;
+}
+.client-platform .modal-data {
+  border-block: 1px solid var(--line);
+  padding: 20px 0;
+  margin: 20px 0;
+  line-height: 2;
+}
+.client-platform .modal-data p {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.client-platform .modal-data strong {
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.client-platform .modal-action {
+  margin-top: 22px;
+}
+.client-platform .record-note {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.client-platform .empty {
+  padding: 30px 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+.client-platform .note {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 22px;
+  line-height: 1.6;
+}
+.client-platform .photo-unavailable {
+  display: grid;
+  place-items: center;
+  min-height: 72px;
+  background: var(--pale);
+  color: var(--muted);
+  font-size: 10px;
+}
+.client-platform .villa-visual .photo-unavailable {
+  height: 100%;
+  min-height: 280px;
+}
+.client-platform .update .photo-unavailable {
+  width: 92px;
+  flex-shrink: 0;
+}
+.client-platform .gallery .photo-unavailable {
+  min-height: 220px;
+}
+.client-platform .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.client-platform .skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 12px 18px;
+  z-index: 20;
+  background: var(--green);
+  color: white;
+  transform: translateY(-150%);
+}
+.client-platform .skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (max-width: 1000px) {
+  .client-platform .shell {
+    grid-template-columns: 185px minmax(0, 1fr);
+  }
+  .client-platform .sidebar {
+    padding: 28px 15px;
+  }
+  .client-platform .sidebar .brand strong {
+    font-size: 18px;
+  }
+  .client-platform .content {
+    padding: 28px 23px;
+  }
+  .client-platform .topbar {
+    padding-inline: 23px;
+  }
+  .client-platform .dashboard-grid,
+  .client-platform .lower-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .client-platform .villa-visual {
+    min-height: 300px;
+  }
+  .client-platform .gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Keep financial amounts intact in the narrower tablet content column. */
+  .client-platform .payment-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .client-platform .shell {
+    display: block;
+  }
+  .client-platform .sidebar {
+    padding: 18px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    gap: 15px;
+  }
+  .client-platform .sidebar .brand,
+  .client-platform .workspace-label,
+  .client-platform .side-bottom {
+    display: none;
+  }
+  .client-platform .side-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 4px;
+    scrollbar-width: thin;
+    padding: 4px;
+    margin: -4px;
+  }
+  .client-platform .side-nav a {
+    font-size: 10px;
+    padding: 10px;
+    white-space: nowrap;
+    gap: 7px;
+    min-height: 38px;
+    flex-shrink: 0;
+  }
+  .client-platform .topbar {
+    min-height: 51px;
+    padding: 10px 20px;
+    font-size: 10px;
+    gap: 10px;
+  }
+  .client-platform .topbar-residence {
+    display: none;
+  }
+  .client-platform .content {
+    padding: 26px 18px;
+  }
+  .client-platform .page-heading {
+    align-items: flex-start;
+  }
+  .client-platform .page-heading h1 {
+    font-size: 35px;
+  }
+  .client-platform .page-heading > .btn {
+    font-size: 10px;
+    padding: 10px;
+    gap: 8px;
+    max-width: 105px;
+  }
+  .client-platform .metrics {
+    gap: 10px;
+  }
+  .client-platform .payment-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .client-platform .metrics .panel {
+    padding: 15px;
+  }
+  .client-platform .metrics .big {
+    font-size: 28px;
+  }
+  .client-platform .panel {
+    padding: 20px;
+  }
+  .client-platform .gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .client-platform .gallery img {
+    height: 145px;
+  }
+  .client-platform .gallery .photo-unavailable {
+    min-height: 145px;
+  }
+  .client-platform .floorplan {
+    padding: 10px;
+  }
+  .client-platform .timeline-item {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+  .client-platform .timeline-item > .badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .client-platform h2 {
+    font-size: 34px;
+  }
+  .client-platform .metric-pair .big {
+    font-size: 32px;
+  }
+  .client-platform .table-wrap table {
+    min-width: 560px;
+  }
+  .client-platform dialog {
+    padding: 34px 24px 26px;
+  }
+}
+
+@media (max-width: 370px) {
+  .client-platform .page-heading {
+    gap: 12px;
+  }
+  .client-platform .page-heading > .btn {
+    max-width: 88px;
+  }
+  .client-platform .panel-title {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .client-platform .row-between {
+    flex-wrap: wrap;
+  }
+  .client-platform .metric-pair {
+    gap: 12px;
+  }
+  .client-platform .metric-pair > div + div {
+    padding-left: 12px;
+  }
+  .client-platform .update {
+    gap: 12px;
+  }
+  .client-platform .update img,
+  .client-platform .update .photo-unavailable {
+    width: 68px;
+  }
+  .client-platform .document {
+    gap: 10px;
+  }
+  .client-platform .document .file-icon {
+    padding: 8px;
+  }
+  .client-platform .modal-data p {
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-block: 8px;
+  }
+  .client-platform .modal-data strong {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .client-platform *,
+  .client-platform *::before,
+  .client-platform *::after {
+    scroll-behavior: auto !important;
+  }
+}

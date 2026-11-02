@@ -1,0 +1,62 @@
+[
+  {
+    "path": "/office",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice"
+  },
+  {
+    "path": "/office/villas",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fvillas"
+  },
+  {
+    "path": "/office/kopers",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fkopers"
+  },
+  {
+    "path": "/office/betalingen",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fbetalingen"
+  },
+  {
+    "path": "/office/updates",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fupdates"
+  },
+  {
+    "path": "/office/documenten",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fdocumenten"
+  },
+  {
+    "path": "/office/projecten/cemagi-atelier",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fprojecten%2Fcemagi-atelier"
+  },
+  {
+    "path": "/office/villas/Villa%2003",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fvillas%2FVilla%252003"
+  },
+  {
+    "path": "/office/villas/Villa%2003/voortgang",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fvillas%2FVilla%252003%2Fvoortgang"
+  },
+  {
+    "path": "/office/villas/Villa%2003/betalingen",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fvillas%2FVilla%252003%2Fbetalingen"
+  },
+  {
+    "path": "/office/villas/Villa%2003/updates",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fvillas%2FVilla%252003%2Fupdates"
+  },
+  {
+    "path": "/office/villas/Villa%2003/bestanden",
+    "status": 307,
+    "location": "/login?callbackUrl=%2Foffice%2Fvillas%2FVilla%252003%2Fbestanden"
+  }
+]
