@@ -1,0 +1,82 @@
+.office-route-root {
+  min-height: 100svh;
+  background: #f5f2ec;
+  color: #283d32;
+  font-family: var(--font-client-sans), sans-serif;
+}
+
+.office-route-state {
+  display: grid;
+  min-height: 100svh;
+  align-content: center;
+  padding: 48px 24px;
+}
+
+.office-route-state > section {
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 48px);
+  border: 1px solid #deded4;
+  border-radius: 3px;
+  background: #fffefa;
+}
+
+.office-route-state .office-state-eyebrow {
+  margin: 0 0 18px;
+  color: #845b3c;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.office-route-state h1,
+.office-route-state h2 {
+  margin: 0 0 16px;
+  font-family: var(--font-client-serif), Georgia, serif;
+  font-size: clamp(32px, 5vw, 42px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+}
+
+.office-route-state p {
+  color: #687066;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.office-route-state a,
+.office-route-state button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 24px;
+  padding: 12px 20px;
+  border: 1px solid #2f4a3b;
+  border-radius: 2px;
+  color: #fffefa;
+  background: #2f4a3b;
+  font: inherit;
+  font-size: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.office-route-state :is(a, button):hover {
+  background: #405d49;
+}
+
+.office-route-state :is(a, button):focus-visible {
+  outline: 3px solid #b18a62;
+  outline-offset: 4px;
+}
+
+.office-route-state .office-state-placeholder {
+  height: 8px;
+  margin: 24px 0 0;
+  border-radius: 20px;
+  background: #e6eadf;
+}

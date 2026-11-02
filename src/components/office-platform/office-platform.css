@@ -1,0 +1,1182 @@
+/* Exact approved demo language. All office rules are scoped so the client app
+   and public website keep their own layouts. */
+.office-platform {
+  --op-paper: #f5f2ec;
+  --op-white: #fffefa;
+  --op-ink: #283d32;
+  --op-muted: #7b8078;
+  --op-line: #deded4;
+  --op-teak: #845b3c;
+  --op-green: #2f4a3b;
+  --op-pale: #e6eadf;
+  --op-body: #687066;
+  --op-focus: #b18a62;
+  background: var(--op-paper);
+  color: var(--op-ink);
+  font:
+    14px / normal var(--font-client-sans, "DM Sans"),
+    sans-serif;
+  min-height: 100svh;
+  color-scheme: light;
+}
+.office-platform *,
+.office-platform *::before,
+.office-platform *::after {
+  box-sizing: border-box;
+}
+.office-platform button,
+.office-platform input,
+.office-platform textarea,
+.office-platform select {
+  font: inherit;
+}
+.office-platform button,
+.office-platform a {
+  touch-action: manipulation;
+}
+.office-platform button {
+  color: inherit;
+  cursor: pointer;
+}
+.office-platform button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.office-platform a {
+  color: inherit;
+  text-decoration: none;
+}
+.office-platform h1,
+.office-platform h2,
+.office-platform h3,
+.office-platform p {
+  margin: 0;
+}
+.office-platform h1,
+.office-platform h2,
+.office-platform h3 {
+  font-family: var(--font-client-serif, "Newsreader"), Georgia, serif;
+  font-weight: 400;
+}
+.office-platform p {
+  line-height: 1.7;
+  color: var(--op-body);
+}
+.office-platform button:focus-visible,
+.office-platform a:focus-visible,
+.office-platform [tabindex]:focus-visible,
+.office-platform input:focus-visible,
+.office-platform textarea:focus-visible,
+.office-platform select:focus-visible {
+  outline: 3px solid var(--op-focus);
+  outline-offset: 4px;
+}
+.office-platform :disabled:hover {
+  filter: none;
+}
+.office-platform .op-shell {
+  display: grid;
+  grid-template-columns: 225px minmax(0, 1fr);
+  min-height: 100svh;
+}
+.office-platform .op-sidebar {
+  min-width: 0;
+  background: #f0eee6;
+  border-right: 1px solid var(--op-line);
+  padding: 30px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+.office-platform .op-brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.office-platform .op-brand strong {
+  font:
+    22px / normal var(--font-client-serif, "Newsreader"),
+    Georgia,
+    serif;
+  white-space: nowrap;
+}
+.office-platform .op-brand small {
+  display: block;
+  font-size: 7px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+.office-platform .op-mark {
+  display: block;
+  width: 9px;
+  flex-shrink: 0;
+  height: 33px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 19px 19px 0 0;
+  position: relative;
+}
+.office-platform .op-mark::after {
+  content: "";
+  position: absolute;
+  inset: 6px 1px 0;
+  border: 1px solid currentColor;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+}
+.office-platform .op-workspace {
+  border-block: 1px solid var(--op-line);
+  padding: 19px 0;
+  font-size: 11px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-workspace > span {
+  color: var(--op-muted);
+  display: block;
+  font-size: 8px;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+.office-platform .op-workspace strong {
+  font-weight: 400;
+  display: block;
+}
+.office-platform .op-workspace small {
+  display: block;
+  color: var(--op-muted);
+  font-size: 9px;
+}
+.office-platform .op-nav {
+  display: grid;
+  gap: 5px;
+}
+.office-platform .op-nav a {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  color: var(--op-body);
+  min-height: 44px;
+}
+.office-platform .op-nav svg {
+  flex-shrink: 0;
+}
+.office-platform .op-nav a:hover {
+  background: #e5e7dd;
+}
+.office-platform .op-nav a.is-active {
+  background: #dfe5d8;
+  color: var(--op-green);
+  font-weight: 600;
+}
+.office-platform .op-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 35px;
+  min-width: 0;
+}
+.office-platform .op-person > div {
+  min-width: 0;
+}
+.office-platform .op-avatar {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #d9dfd0;
+  font-size: 9px;
+}
+.office-platform .op-person strong {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-person small {
+  display: block;
+  color: var(--op-muted);
+  font-size: 9px;
+  margin-top: 4px;
+}
+.office-platform .op-main-wrap {
+  min-width: 0;
+}
+.office-platform .op-topbar {
+  min-height: 75px;
+  border-bottom: 1px solid var(--op-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 36px;
+  font-size: 11px;
+  color: var(--op-muted);
+}
+.office-platform .op-topbar > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-topbar i {
+  font-style: normal;
+  padding: 0 9px;
+  color: var(--op-teak);
+}
+.office-platform .op-topbar strong {
+  font-weight: 400;
+}
+.office-platform .op-topbar .op-badge {
+  flex-shrink: 0;
+}
+.office-platform .op-content {
+  padding: 34px 36px 55px;
+  max-width: 1600px;
+  margin: auto;
+  outline: none;
+}
+.office-platform .op-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+.office-platform .op-heading > div {
+  min-width: 0;
+}
+.office-platform .op-heading h1 {
+  font-size: 42px;
+  line-height: 1.03;
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-heading p {
+  margin-top: 13px;
+  font-size: 12px;
+}
+.office-platform .op-heading > .op-btn {
+  flex-shrink: 0;
+}
+.office-platform .op-eyebrow {
+  color: var(--op-teak);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 13px 20px;
+  background: var(--op-green);
+  color: #fff;
+  border: 1px solid var(--op-green);
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.office-platform .op-btn:not(:disabled):hover {
+  background: #405d49;
+}
+.office-platform .op-btn-light {
+  background: transparent;
+  color: var(--op-ink);
+  border-color: #c6cbbf;
+}
+.office-platform .op-btn-light:not(:disabled):hover {
+  background: var(--op-pale);
+}
+.office-platform .op-btn-small {
+  padding: 9px 13px;
+  font-size: 11px;
+}
+.office-platform .op-text-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--op-teak);
+  font-size: 11px;
+  line-height: 1.6;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.office-platform .op-text-link:hover {
+  color: var(--op-green);
+}
+.office-platform .op-panel {
+  min-width: 0;
+  background: var(--op-white);
+  border: 1px solid var(--op-line);
+  border-radius: 3px;
+  padding: 24px;
+}
+.office-platform .op-panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.office-platform .op-panel-title h2 {
+  font-size: 23px;
+  line-height: 1.2;
+  min-width: 0;
+}
+.office-platform .op-panel-title > .op-text-link {
+  flex-shrink: 0;
+}
+.office-platform .op-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 23px;
+}
+.office-platform .op-metrics-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.office-platform .op-metric {
+  padding: 20px;
+}
+.office-platform .op-metric-label {
+  color: var(--op-muted);
+  font-size: 10px;
+  letter-spacing: 0.3px;
+}
+.office-platform .op-metric-value {
+  font:
+    32px / 1.2 var(--font-client-serif, "Newsreader"),
+    Georgia,
+    serif;
+  margin: 8px 0 14px;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-metric small {
+  display: block;
+  color: var(--op-body);
+  font-size: 9px;
+  line-height: 1.65;
+}
+.office-platform .op-lower-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 22px;
+  margin-top: 22px;
+}
+.office-platform .op-badge {
+  display: inline-block;
+  padding: 5px 9px;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 1.4;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.office-platform .op-badge-green {
+  background: #e4eadc;
+  color: #52704d;
+}
+.office-platform .op-badge-amber {
+  background: #f1e7d4;
+  color: #8a6632;
+}
+.office-platform .op-badge-neutral {
+  background: #edede7;
+  color: #74786b;
+}
+.office-platform .op-table-wrap {
+  position: relative;
+  max-width: 100%;
+  overflow: auto;
+  overscroll-behavior-x: contain;
+}
+.office-platform .op-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  text-align: left;
+}
+.office-platform .op-table th {
+  padding: 14px 12px;
+  color: var(--op-muted);
+  background: #f5f4ee;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.office-platform .op-table td {
+  padding: 18px 12px;
+  border-top: 1px solid #e8e9e1;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+.office-platform .op-table tbody tr:hover {
+  background: #f4f5ed;
+}
+.office-platform .op-table small {
+  display: block;
+  margin-top: 4px;
+  color: var(--op-muted);
+  font-size: 9px;
+}
+.office-platform .op-table strong {
+  font-weight: 500;
+}
+.office-platform .op-table .op-btn {
+  white-space: nowrap;
+}
+.office-platform .op-villa-table {
+  min-width: 610px;
+}
+.office-platform .op-villa-table td:first-child {
+  width: 21%;
+}
+.office-platform .op-villa-table td:nth-child(2) {
+  width: 19%;
+}
+.office-platform .op-villa-table td:nth-child(3) {
+  width: 17%;
+}
+.office-platform .op-villa-table td:last-child {
+  text-align: right;
+}
+.office-platform .op-payment-table {
+  min-width: 570px;
+}
+.office-platform .op-payment-table td:first-child {
+  width: 40%;
+}
+.office-platform .op-payment-table td:nth-child(3) {
+  white-space: nowrap;
+}
+.office-platform .op-progress {
+  height: 5px;
+  background: #e8e9e0;
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+}
+.office-platform .op-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #637b55;
+}
+.office-platform .op-table .op-progress {
+  width: 100px;
+  margin: 6px 0 0;
+}
+.office-platform .op-progress-summary {
+  max-width: 600px;
+  padding-bottom: 20px;
+}
+.office-platform .op-progress-summary > span {
+  font:
+    32px / 1.2 var(--font-client-serif, "Newsreader"),
+    Georgia,
+    serif;
+}
+.office-platform .op-filter-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.office-platform .op-filter-row:empty {
+  display: none;
+}
+.office-platform .op-filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.office-platform .op-filter-buttons button {
+  background: transparent;
+  border: 1px solid #c6cbbf;
+  border-radius: 3px;
+  padding: 8px 14px;
+  font-size: 10px;
+  min-height: 34px;
+}
+.office-platform .op-filter-buttons button:hover {
+  background: var(--op-pale);
+}
+.office-platform .op-filter-buttons button.is-active {
+  color: white;
+  background: var(--op-green);
+  border-color: var(--op-green);
+}
+.office-platform .op-ledger-filters {
+  margin-bottom: 18px;
+}
+.office-platform .op-search {
+  margin-left: auto;
+  width: 240px;
+  max-width: 100%;
+}
+.office-platform input,
+.office-platform textarea,
+.office-platform select {
+  color: var(--op-ink);
+  background: var(--op-white);
+  border: 1px solid #d7dbcf;
+  padding: 12px;
+  border-radius: 2px;
+  font-size: 12px;
+  max-width: 100%;
+  min-width: 0;
+}
+.office-platform input::placeholder,
+.office-platform textarea::placeholder {
+  color: var(--op-muted);
+  opacity: 1;
+}
+.office-platform .op-search input {
+  width: 100%;
+}
+.office-platform .op-inline-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+}
+.office-platform .op-inline-field label,
+.office-platform .op-project-selector label {
+  font-size: 11px;
+  color: var(--op-body);
+}
+.office-platform .op-inline-field select {
+  max-width: 330px;
+}
+.office-platform .op-project-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.office-platform .op-project-selector select {
+  width: 230px;
+}
+.office-platform .op-project-selector a {
+  margin-left: auto;
+}
+.office-platform .op-task-preview {
+  border-top: 1px solid var(--op-line);
+  padding: 17px 0;
+}
+.office-platform .op-task-preview strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.office-platform .op-task-preview p {
+  font-size: 11px;
+  margin: 8px 0 14px;
+}
+.office-platform .op-task-preview:last-child {
+  padding-bottom: 0;
+}
+.office-platform .op-update {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 20px 0;
+  border-top: 1px solid var(--op-line);
+}
+.office-platform .op-update:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.office-platform .op-update:last-child {
+  padding-bottom: 0;
+}
+.office-platform .op-update > div:last-child {
+  min-width: 0;
+}
+.office-platform .op-update-mark {
+  flex: 0 0 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  color: var(--op-teak);
+  background: #f0eee6;
+  border: 1px solid var(--op-line);
+}
+.office-platform .op-update-mark svg {
+  width: 20px;
+  height: 20px;
+}
+.office-platform .op-update small {
+  color: var(--op-muted);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.7;
+}
+.office-platform .op-update h3 {
+  margin: 6px 0 7px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.office-platform .op-update h3 button {
+  font: inherit;
+  text-align: left;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.office-platform .op-update h3 button:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.office-platform .op-update p {
+  font-size: 11px;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.office-platform .op-update-list-compact .op-update-mark {
+  display: none;
+}
+.office-platform .op-update-list-compact .op-update {
+  padding: 16px 0;
+}
+.office-platform .op-update-list-compact .op-update:first-child {
+  padding-top: 0;
+}
+.office-platform .op-file {
+  display: flex;
+  gap: 17px;
+  align-items: center;
+  padding: 19px 0;
+  border-bottom: 1px solid var(--op-line);
+}
+.office-platform .op-file:first-child {
+  padding-top: 0;
+}
+.office-platform .op-file:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.office-platform .op-file-icon {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 43px;
+  flex-shrink: 0;
+  border: 1px solid #b8c0af;
+  font-size: 8px;
+  color: #73816b;
+}
+.office-platform .op-file-copy {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-file strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.office-platform .op-file small {
+  display: block;
+  color: var(--op-muted);
+  font-size: 10px;
+  margin-top: 6px;
+}
+.office-platform .op-file > .op-text-link {
+  flex-shrink: 0;
+}
+.office-platform .op-owner-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.office-platform .op-empty {
+  padding: 30px 0;
+  font-size: 12px;
+}
+.office-platform .op-villa-links {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--op-line);
+  margin: -5px 0 25px;
+  padding-bottom: 12px;
+}
+.office-platform .op-villa-links a {
+  padding: 9px 13px;
+  font-size: 11px;
+  border-radius: 2px;
+}
+.office-platform .op-villa-links a:hover {
+  background: var(--op-pale);
+}
+.office-platform .op-villa-links a.is-active {
+  background: #dfe5d8;
+  color: var(--op-green);
+  font-weight: 500;
+}
+.office-platform .op-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 17px;
+  padding: 23px 0;
+  border-top: 1px solid var(--op-line);
+}
+.office-platform .op-task-number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  height: 32px;
+  border: 1px solid #c6cbbf;
+  border-radius: 50%;
+  font-size: 10px;
+}
+.office-platform .op-task-number.is-complete {
+  background: #e4eadc;
+  border-color: #e4eadc;
+  color: #52704d;
+}
+.office-platform .op-task-copy {
+  flex: 1;
+  min-width: 0;
+}
+.office-platform .op-task-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.office-platform .op-task-heading h3 {
+  font:
+    500 12px / 1.5 var(--font-client-sans, "DM Sans"),
+    sans-serif;
+}
+.office-platform .op-task p {
+  margin: 8px 0;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-task small {
+  color: var(--op-muted);
+  font-size: 9px;
+}
+.office-platform .op-task > button {
+  flex-shrink: 0;
+}
+.office-platform .op-metadata {
+  margin: 20px 0;
+  padding: 20px 0;
+  border-block: 1px solid var(--op-line);
+  font-size: 12px;
+}
+.office-platform .op-metadata > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 20px;
+  margin: 12px 0;
+}
+.office-platform .op-metadata > div:first-child {
+  margin-top: 0;
+}
+.office-platform .op-metadata > div:last-child {
+  margin-bottom: 0;
+}
+.office-platform .op-metadata dt {
+  color: var(--op-muted);
+  min-width: 0;
+  flex: 0 1 42%;
+}
+.office-platform .op-metadata dd {
+  margin: 0;
+  text-align: right;
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-dialog {
+  color: var(--op-ink);
+  background: var(--op-paper);
+  border: 1px solid var(--op-line);
+  border-radius: 4px;
+  padding: 38px;
+  max-width: 580px;
+  width: calc(100% - 32px);
+  max-height: 90svh;
+  margin: auto;
+  box-shadow: 0 25px 90px #15261d33;
+}
+.office-platform .op-dialog::backdrop {
+  background: #15261d88;
+  backdrop-filter: blur(3px);
+}
+.office-platform .op-dialog h2 {
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  margin-bottom: 18px;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-dialog p {
+  font-size: 12px;
+}
+.office-platform .op-close {
+  position: absolute;
+  top: 9px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: none;
+  font-size: 24px;
+  line-height: 1;
+}
+.office-platform .op-dialog fieldset {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+.office-platform .op-dialog form label {
+  display: block;
+  font-size: 11px;
+  margin: 20px 0 8px;
+}
+.office-platform .op-dialog form input,
+.office-platform .op-dialog form select,
+.office-platform .op-dialog form textarea {
+  width: 100%;
+}
+.office-platform .op-dialog textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+.office-platform .op-dialog .op-submit {
+  margin-top: 24px;
+}
+.office-platform .op-dialog-actions {
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.office-platform .op-record-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-confirm-copy {
+  margin-top: 15px;
+}
+.office-platform .op-form-hint {
+  font-size: 10px !important;
+  color: var(--op-muted);
+  margin-top: 10px;
+}
+.office-platform .op-form-error {
+  color: #924a32;
+  padding: 12px;
+  background: #f5e8df;
+  border: 1px solid #e5cabc;
+  margin-top: 15px;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-muted {
+  color: var(--op-muted);
+}
+.office-platform .op-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 17px;
+  margin-bottom: 24px;
+  border: 1px solid #c9d5bd;
+  border-radius: 2px;
+  background: #e4eadc;
+  color: #3c5a36;
+  font-size: 12px;
+}
+.office-platform .op-notice button {
+  background: none;
+  border: 0;
+  font-size: 20px;
+}
+.office-platform .op-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.office-platform .op-skip-link {
+  position: absolute;
+  z-index: 100;
+  top: 10px;
+  left: 10px;
+  padding: 12px 18px;
+  background: var(--op-green);
+  color: white;
+  transform: translateY(-150%);
+}
+.office-platform .op-skip-link:focus {
+  transform: none;
+}
+@media (max-width: 1000px) {
+  .office-platform .op-shell {
+    grid-template-columns: 185px minmax(0, 1fr);
+  }
+  .office-platform .op-sidebar {
+    padding: 28px 15px;
+  }
+  .office-platform .op-brand strong {
+    font-size: 18px;
+  }
+  .office-platform .op-brand small {
+    font-size: 6px;
+    letter-spacing: 1.6px;
+  }
+  .office-platform .op-content {
+    padding: 28px 23px 50px;
+  }
+  .office-platform .op-topbar {
+    padding-inline: 23px;
+  }
+  .office-platform .op-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .office-platform .op-lower-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .office-platform .op-heading {
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .office-platform .op-heading > .op-btn {
+    max-width: 150px;
+  }
+  .office-platform .op-task {
+    flex-wrap: wrap;
+  }
+  .office-platform .op-task > button {
+    margin-left: 49px;
+  }
+}
+@media (max-width: 700px) {
+  .office-platform .op-shell {
+    display: block;
+  }
+  .office-platform .op-sidebar {
+    padding: 12px 18px;
+    gap: 15px;
+    border-right: 0;
+    border-bottom: 1px solid var(--op-line);
+  }
+  .office-platform .op-sidebar > .op-brand,
+  .office-platform .op-workspace,
+  .office-platform .op-person {
+    display: none;
+  }
+  .office-platform .op-nav {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 6px 0;
+    overscroll-behavior-x: contain;
+  }
+  .office-platform .op-nav a {
+    flex: 0 0 auto;
+    padding: 10px;
+    font-size: 10px;
+    gap: 7px;
+    white-space: nowrap;
+  }
+  .office-platform .op-nav svg {
+    width: 14px;
+    height: 14px;
+  }
+  .office-platform .op-topbar {
+    min-height: 51px;
+    padding: 12px 20px;
+    font-size: 10px;
+    gap: 10px;
+  }
+  .office-platform .op-topbar .op-badge {
+    font-size: 8px;
+    padding: 4px 7px;
+  }
+  .office-platform .op-content {
+    padding: 26px 18px 45px;
+  }
+  .office-platform .op-heading {
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  .office-platform .op-heading h1 {
+    font-size: 35px;
+  }
+  .office-platform .op-heading p {
+    font-size: 11px;
+  }
+  .office-platform .op-heading > .op-btn {
+    padding: 10px;
+    font-size: 10px;
+    gap: 8px;
+    max-width: 124px;
+  }
+  .office-platform .op-metrics {
+    gap: 10px;
+  }
+  .office-platform .op-panel {
+    padding: 20px;
+  }
+  .office-platform .op-metric {
+    padding: 15px;
+  }
+  .office-platform .op-metric-value {
+    font-size: 28px;
+  }
+  .office-platform .op-metric-label {
+    font-size: 9px;
+  }
+  .office-platform .op-panel-title {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .office-platform .op-panel-title h2 {
+    font-size: 23px;
+  }
+  .office-platform .op-search {
+    width: 100%;
+    margin-left: 0;
+  }
+  .office-platform .op-inline-field {
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .office-platform .op-inline-field select {
+    max-width: 100%;
+    width: 100%;
+  }
+  .office-platform .op-project-selector {
+    gap: 8px;
+  }
+  .office-platform .op-project-selector label {
+    width: 100%;
+  }
+  .office-platform .op-project-selector select {
+    width: 100%;
+  }
+  .office-platform .op-project-selector a {
+    margin-left: 0;
+  }
+  .office-platform .op-update {
+    gap: 12px;
+  }
+  .office-platform .op-update-mark {
+    flex-basis: 38px;
+    height: 42px;
+  }
+  .office-platform .op-file {
+    gap: 12px;
+  }
+  .office-platform .op-villa-links {
+    gap: 3px;
+  }
+  .office-platform .op-villa-links a {
+    padding: 10px;
+    min-height: 40px;
+  }
+  .office-platform .op-task {
+    gap: 12px;
+  }
+  .office-platform .op-task > button {
+    margin-left: 44px;
+  }
+  .office-platform .op-dialog {
+    padding: 34px 23px 25px;
+  }
+  .office-platform .op-dialog .op-metadata > div {
+    gap: 12px;
+  }
+  .office-platform .op-dialog-actions > * {
+    max-width: 100%;
+  }
+  .office-platform .op-btn-small {
+    min-height: 40px;
+  }
+}
+@media (max-width: 420px) {
+  .office-platform .op-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .office-platform .op-heading > .op-btn {
+    max-width: 100%;
+  }
+  .office-platform .op-metrics-three {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .office-platform .op-panel {
+    padding: 17px;
+  }
+  .office-platform .op-metric {
+    padding: 14px;
+  }
+  .office-platform .op-metric-value {
+    font-size: 26px;
+  }
+  .office-platform .op-topbar {
+    align-items: flex-start;
+  }
+  .office-platform .op-metadata {
+    font-size: 11px;
+  }
+  .office-platform .op-metadata > div {
+    gap: 12px;
+  }
+  .office-platform .op-dialog h2 {
+    font-size: 30px;
+  }
+  .office-platform .op-dialog-actions > .op-btn {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .office-platform *,
+  .office-platform *::before,
+  .office-platform *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
