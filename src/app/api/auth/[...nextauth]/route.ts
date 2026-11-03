@@ -22,10 +22,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Reading the form body here to key a second bucket on the target
-    // email, then reconstructing an equivalent request for the real
-    // handler (request bodies can only be read once).
-    const formData = await req.formData();
+    // Inspect a clone so Auth.js receives the original body, encoding,
+    // CSRF token and cookies. Rebuilding a URL-encoded request with
+    // FormData would produce multipart bytes under the original header.
+    let formData: FormData;
+    try {
+      formData = await req.clone().formData();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid sign-in request." },
+        { status: 400 }
+      );
+    }
     const email = formData.get("email");
     if (typeof email === "string" && email) {
       const emailOk = await checkRateLimit(`signin:email:${email.trim().toLowerCase()}`, 3, 600);
@@ -36,13 +44,6 @@ export async function POST(req: NextRequest) {
         );
       }
     }
-
-    const rebuilt = new Request(req.url, {
-      method: "POST",
-      headers: req.headers,
-      body: formData,
-    });
-    return handlers.POST(rebuilt as NextRequest);
   }
 
   return handlers.POST(req);
