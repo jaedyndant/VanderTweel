@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV === "development";
+
 // Security headers applied to every response. Next/Vercel set none of
 // these by default; without them the app has no clickjacking, MIME-sniffing
 // or referrer-leak protection at all.
@@ -13,17 +15,26 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   {
     key: "Content-Security-Policy",
-    // 'unsafe-inline' on style-src is required for Next's inline style
-    // injection (fonts/critical CSS); script-src has no 'unsafe-inline' or
-    // 'unsafe-eval'. img-src allows https for the self-hosted Unsplash
-    // reference photos and any future team-uploaded file URLs.
+    // Next's prerendered shells require inline bootstrap scripts. A per-request
+    // nonce is incompatible with the current Cache Components/PPR setup, so use
+    // Next's documented non-nonce policy without changing rendering behavior:
+    // https://nextjs.org/docs/app/guides/content-security-policy#without-nonces
+    // Tradeoff: 'unsafe-inline' permits arbitrary inline script blocks, not only
+    // Next's scripts. This is not strict XSS protection; adopting nonce-based
+    // CSP needs a separately planned dynamic-rendering change. Attribute event
+    // handlers remain blocked via script-src-attr in supporting browsers.
+    // React's development diagnostics require eval; production does not.
+    // Inline styles support Next's font/critical CSS injection. Images retain
+    // the existing HTTPS allowance for reference photos and uploaded file URLs.
     value: [
       "default-src 'self'",
-      "script-src 'self'",
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+      "script-src-attr 'none'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' https: data:",
       "font-src 'self' data:",
       "connect-src 'self'",
+      "object-src 'none'",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
