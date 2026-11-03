@@ -34,6 +34,7 @@ import type {
   OfficeVilla,
   PublishUpdateInput,
 } from "./types";
+import { OfficeSignOut } from "./office-sign-out";
 import "./office-platform.css";
 
 type Modal =
@@ -2007,9 +2008,12 @@ export function OfficePlatform({
             <span>
               Development office <i>/</i> <strong>{context}</strong>
             </span>
-            <Badge tone="neutral">
-              {data.role === "developer" ? "Developer" : "Project manager"}
-            </Badge>
+            <div className="op-account-controls">
+              <Badge tone="neutral">
+                {data.role === "developer" ? "Developer" : "Project manager"}
+              </Badge>
+              <OfficeSignOut />
+            </div>
           </div>
           <main id="office-main" className="op-content" tabIndex={-1}>
             {data.projects.length > 1 ? (

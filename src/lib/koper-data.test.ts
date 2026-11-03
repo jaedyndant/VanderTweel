@@ -20,6 +20,11 @@ describe("resolveAuthorizedVillaId — pure authorization gate (no DB)", () => {
     expect(resolveAuthorizedVillaId([VILLA_A], VILLA_A)).toBe(VILLA_A);
   });
 
+  it("switches to another linked villa but still rejects an unowned third villa", () => {
+    expect(resolveAuthorizedVillaId([VILLA_A, VILLA_B], VILLA_B)).toBe(VILLA_B);
+    expect(resolveAuthorizedVillaId([VILLA_A, VILLA_B], "unowned-villa")).toBeNull();
+  });
+
   it("NEVER resolves a requested id belonging to another buyer's villa", () => {
     // Buyer A's owned list never contains villa B — guessing/forging the id
     // in a URL must not grant access.

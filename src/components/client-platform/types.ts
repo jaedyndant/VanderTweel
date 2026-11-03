@@ -8,8 +8,15 @@ export type ClientPage =
   | "account";
 
 /** Only authorized, serializable buyer-facing fields cross this boundary. */
+export interface ClientVillaChoice {
+  id: string;
+  code: string;
+  projectName: string;
+}
+
 export interface ClientPlatformData {
   buyerName: string | null;
+  villaChoices: ClientVillaChoice[];
   account: { email: string; notifyEmail: boolean } | null;
   villa: {
     id: string;

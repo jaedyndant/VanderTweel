@@ -11,7 +11,7 @@ import {
 import "./login.css";
 
 export const metadata: Metadata = {
-  title: "Inloggen · Van der Tweel",
+  title: "Sign in · Van der Tweel",
   robots: { index: false, follow: false },
 };
 
@@ -41,9 +41,9 @@ async function LoginContent({ searchParams }: LoginPageProps) {
 
 export default function LoginPage(props: LoginPageProps) {
   return (
-    <main className="login-page" lang="nl">
-      <h1>Inloggen</h1>
-      <Suspense fallback={<p role="status">Inloggen voorbereiden…</p>}>
+    <main className="login-page" lang="en">
+      <h1>Sign in</h1>
+      <Suspense fallback={<p role="status">Preparing sign-in…</p>}>
         <LoginContent {...props} />
       </Suspense>
     </main>

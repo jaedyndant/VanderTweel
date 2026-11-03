@@ -2,7 +2,7 @@ import { db } from "@/db/client";
 import { auditLog } from "@/db/schema";
 
 /**
- * Minimal who/what/when trail for money- and document-adjacent writes.
+ * Minimal who/what/when trail for back-office writes.
  * Not full event sourcing — just enough that "who changed this and when"
  * is answerable without digging through Vercel function logs. Never
  * blocks the actual mutation: a logging failure here should not fail the

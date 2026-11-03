@@ -2,9 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/db/client", () => ({
-  db: { query: { project: { findFirst: vi.fn() } } },
+  db: { query: { project: { findFirst: vi.fn() }, account: { findFirst: vi.fn() } } },
 }));
 vi.mock("@/lib/koper-data", () => ({
+  getOwnedVillaChoicesForAccount: vi.fn(),
   getVillaOverview: vi.fn(),
   getVillaProgress: vi.fn(),
   getPaymentSchedule: vi.fn(),
@@ -12,6 +13,7 @@ vi.mock("@/lib/koper-data", () => ({
 
 import { db } from "@/db/client";
 import {
+  getOwnedVillaChoicesForAccount,
   getPaymentSchedule,
   getVillaOverview,
   getVillaProgress,
@@ -39,6 +41,9 @@ const villa = {
 beforeEach(() => {
   vi.resetAllMocks();
   vi.mocked(getVillaOverview).mockResolvedValue({ villa, buyerName: "Emma" });
+  vi.mocked(getOwnedVillaChoicesForAccount).mockResolvedValue([
+    { id: villa.id, code: villa.code, projectName: "Cemagi Atelier" },
+  ]);
   vi.mocked(getVillaProgress).mockResolvedValue({
     villa,
     tasks: [],
@@ -68,6 +73,7 @@ describe("client platform read model", () => {
     expect(db.query.project.findFirst).not.toHaveBeenCalled();
     expect(getVillaProgress).not.toHaveBeenCalled();
     expect(getPaymentSchedule).not.toHaveBeenCalled();
+    expect(getOwnedVillaChoicesForAccount).not.toHaveBeenCalled();
   });
 
   it("locks subsequent scoped queries to the authorized villa, including an implicit selection", async () => {
@@ -93,6 +99,44 @@ describe("client platform read model", () => {
     await expect(
       getClientPlatformData("buyer-a", "villa-a", "home"),
     ).resolves.toBeNull();
+  });
+
+  it("exposes only minimal, account-scoped residence choices", async () => {
+    const choices = [
+      { id: villa.id, code: villa.code, projectName: "Cemagi Atelier" },
+      { id: "villa-owned-2", code: "Villa 8", projectName: "Another owned project" },
+    ];
+    vi.mocked(getOwnedVillaChoicesForAccount).mockResolvedValue(choices);
+    const result = await getClientPlatformData("buyer-a", villa.id, "home");
+    expect(getOwnedVillaChoicesForAccount).toHaveBeenCalledWith("buyer-a");
+    expect(result?.villaChoices).toEqual(choices);
+    expect(result?.villaChoices.flatMap(Object.keys)).not.toContain("priceTotalUsd");
+  });
+
+  it("fails closed when the selected villa is no longer among the account's linked choices", async () => {
+    vi.mocked(getOwnedVillaChoicesForAccount).mockResolvedValue([
+      { id: "villa-owned-2", code: "Villa 8", projectName: "Cemagi Atelier" },
+    ]);
+    await expect(getClientPlatformData("buyer-a", villa.id, "home")).resolves.toBeNull();
+  });
+
+  it("keeps an explicit second residence selected on the account page", async () => {
+    const second = { ...villa, id: "villa-owned-2", code: "Villa 8" };
+    vi.mocked(getVillaOverview).mockResolvedValue({ villa: second, buyerName: "Emma" });
+    vi.mocked(getPaymentSchedule).mockResolvedValue({ villa: second, milestones: [], documents: [] });
+    vi.mocked(getOwnedVillaChoicesForAccount).mockResolvedValue([
+      { id: villa.id, code: villa.code, projectName: "Cemagi Atelier" },
+      { id: second.id, code: second.code, projectName: "Cemagi Atelier" },
+    ]);
+    vi.mocked(db.query.account.findFirst).mockResolvedValue({
+      id: "buyer-a", email: "owner@example.com", notifyEmail: false,
+      role: "buyer", lastLoginAt: null, createdAt: new Date(),
+    });
+    const result = await getClientPlatformData("buyer-a", second.id, "account");
+    expect(getVillaOverview).toHaveBeenCalledWith("buyer-a", second.id);
+    expect(getPaymentSchedule).toHaveBeenCalledWith("buyer-a", second.id);
+    expect(result?.villa.id).toBe(second.id);
+    expect(result?.account).toEqual({ email: "owner@example.com", notifyEmail: false });
   });
 
   it("never combines data returned for two different villas", async () => {
