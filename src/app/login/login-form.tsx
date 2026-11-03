@@ -4,7 +4,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { requestLoginLink } from "./request-login-link";
 
 const REQUEST_ERROR =
-  "De aanvraag kon niet worden bevestigd. Controleer het e-mailadres en probeer opnieuw. Blijft dit gebeuren, neem dan contact op met de beheerder.";
+  "We could not confirm your request. Check your email address and try again. If this continues, contact your project team.";
 
 // Email/magic-link only. Existing server authorization selects the role;
 // neither a role picker nor an account-existence claim belongs in this form.
@@ -39,9 +39,9 @@ export function LoginForm({
 
   return (
     <>
-      <p>Gebruik je e-mailadres om een inloglink aan te vragen.</p>
+      <p>Enter your email address to request a sign-in link.</p>
       <form onSubmit={submit} aria-busy={pending}>
-        <label htmlFor="login-email">E-mailadres</label>
+        <label htmlFor="login-email">Email address</label>
         <input
           id="login-email"
           type="email"
@@ -62,8 +62,8 @@ export function LoginForm({
         {accepted ? (
           <div className="login-accepted" role="status">
             <p>
-              Aanvraag ontvangen. Als aanmelden voor dit adres mogelijk is,
-              ontvang je een inloglink. Controleer ook je spammap.
+              Request received. If this address can sign in, you will receive a
+              sign-in link. Check your spam folder too.
             </p>
             <button
               type="button"
@@ -72,12 +72,12 @@ export function LoginForm({
                 setError(null);
               }}
             >
-              Ander e-mailadres gebruiken
+              Use another email address
             </button>
           </div>
         ) : (
           <button type="submit" disabled={pending}>
-            {pending ? "Inloglink aanvragen…" : "Stuur inloglink"}
+            {pending ? "Requesting sign-in link…" : "Send sign-in link"}
           </button>
         )}
       </form>

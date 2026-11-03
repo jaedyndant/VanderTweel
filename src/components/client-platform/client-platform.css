@@ -285,6 +285,48 @@
 .client-platform .topbar-residence {
   flex-shrink: 0;
 }
+.client-platform .residence-switcher {
+  display: grid;
+  gap: 5px;
+  width: 300px;
+  max-width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+.client-platform .residence-switcher label {
+  color: var(--body-copy);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.client-platform .residence-switcher select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--white);
+  color: var(--ink);
+  padding: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+.client-platform .residence-switcher select:hover {
+  border-color: var(--green);
+}
+.client-platform .residence-switcher select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.client-platform .residence-switcher select:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.client-platform .residence-switcher [role="status"] {
+  color: var(--body-copy);
+  font-size: 10px;
+  line-height: 1.5;
+}
 .client-platform .content {
   padding: 34px 36px 55px;
   max-width: 1600px;
@@ -916,6 +958,18 @@
   }
   .client-platform .topbar-residence {
     display: none;
+  }
+  .client-platform .topbar.has-residence-switcher {
+    align-items: stretch;
+    flex-direction: column;
+    padding-block: 14px;
+    gap: 12px;
+  }
+  .client-platform .residence-switcher {
+    width: 100%;
+  }
+  .client-platform .residence-switcher select {
+    font-size: 16px;
   }
   .client-platform .content {
     padding: 26px 18px;

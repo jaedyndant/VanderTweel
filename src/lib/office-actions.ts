@@ -8,8 +8,9 @@
 // authorization via getAuthorizedOfficeVilla before writing anything.
 
 import { revalidatePath } from "next/cache";
-import { eq, desc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
+import { recordAudit } from "@/lib/audit";
 import { db } from "@/db/client";
 import { progressTask, paymentMilestone, update, file } from "@/db/schema";
 import { getAuthorizedOfficeVilla, type OfficeRole } from "@/lib/office-data";
@@ -35,14 +36,26 @@ export async function toggleProgressTaskAction(taskId: string, villaCode: string
   const task = await db.query.progressTask.findFirst({ where: eq(progressTask.id, taskId) });
   if (!task || task.villaId !== villaRow.id) throw new Error("Task does not belong to this villa");
 
-  await db
+  const nowDone = !task.doneAt;
+  const [changedTask] = await db
     .update(progressTask)
-    .set({ doneAt: task.doneAt ? null : new Date(), doneBy: task.doneAt ? null : accountId })
-    .where(eq(progressTask.id, taskId));
+    .set({ doneAt: nowDone ? new Date() : null, doneBy: nowDone ? accountId : null })
+    .where(eq(progressTask.id, taskId))
+    .returning({ id: progressTask.id });
+  if (!changedTask) throw new Error("Task could not be updated");
+
+  // Audit at the write boundary so legacy/direct action calls are covered,
+  // and record the completed write even if notification processing fails.
+  await recordAudit(accountId, nowDone ? "progress.mark_done" : "progress.reopen", changedTask.id, {
+    villaId: villaRow.id,
+    villaCode,
+    previousStatus: task.doneAt ? "done" : "open",
+    nextStatus: nowDone ? "done" : "open",
+  });
 
   // MS5 coupling: a progress toggle is only worth notifying on when it just
   // became done (not when it's being un-done, which is a correction, not news).
-  if (!task.doneAt) {
+  if (nowDone) {
     await notifyBuyersForVilla({
       villaId: villaRow.id,
       sourceType: "progress",
@@ -73,10 +86,19 @@ export async function markPaymentPaidAction(milestoneId: string, villaCode: stri
   }
 
   const nowPaid = milestone.status !== "paid";
-  await db
+  const [changedMilestone] = await db
     .update(paymentMilestone)
     .set({ status: nowPaid ? "paid" : "open", paidAt: nowPaid ? new Date() : null })
-    .where(eq(paymentMilestone.id, milestoneId));
+    .where(eq(paymentMilestone.id, milestoneId))
+    .returning({ id: paymentMilestone.id });
+  if (!changedMilestone) throw new Error("Milestone could not be updated");
+
+  await recordAudit(accountId, nowPaid ? "payment.mark_paid" : "payment.reopen", changedMilestone.id, {
+    villaId: villaRow.id,
+    villaCode,
+    previousStatus: milestone.status,
+    nextStatus: nowPaid ? "paid" : "open",
+  });
 
   // MS5 coupling: only notify on marking paid, not on reverting a mistake.
   if (nowPaid) {
@@ -108,30 +130,28 @@ export async function createUpdateAction(formData: FormData) {
   const category = String(formData.get("category") ?? "").trim() || null;
   const roleLabel = role === "developer" ? "Developer" : "Project manager";
 
-  await db.insert(update).values({
+  const [insertedUpdate] = await db.insert(update).values({
     villaId: villaRow.id,
     authorId: accountId,
     title,
     body,
     category,
     authorRoleLabel: roleLabel,
+  }).returning({ id: update.id });
+  if (!insertedUpdate) throw new Error("Update could not be created");
+
+  await recordAudit(accountId, "update.create", insertedUpdate.id, {
+    villaId: villaRow.id,
+    villaCode,
+    category,
   });
 
-  const [insertedUpdate] = await db
-    .select({ id: update.id })
-    .from(update)
-    .where(eq(update.villaId, villaRow.id))
-    .orderBy(desc(update.createdAt))
-    .limit(1);
-
-  if (insertedUpdate) {
-    await notifyBuyersForVilla({
-      villaId: villaRow.id,
-      sourceType: "update",
-      sourceId: insertedUpdate.id,
-      summary: `${villaCode}: new update${title ? ` — ${title}` : ""}: ${body}`,
-    });
-  }
+  await notifyBuyersForVilla({
+    villaId: villaRow.id,
+    sourceType: "update",
+    sourceId: insertedUpdate.id,
+    summary: `${villaCode}: new update${title ? ` — ${title}` : ""}: ${body}`,
+  });
 
   revalidatePath(`/office/villas/${villaCode}/updates`);
   revalidatePath("/koper/voortgang");
@@ -153,23 +173,23 @@ export async function addFileAction(formData: FormData) {
   const note = String(formData.get("note") ?? "").trim() || null;
   const kind = String(formData.get("kind") ?? "doc").trim() || "doc";
 
-  await db.insert(file).values({ villaId: villaRow.id, uploadedBy: accountId, kind, url, label, note });
+  const [insertedFile] = await db.insert(file)
+    .values({ villaId: villaRow.id, uploadedBy: accountId, kind, url, label, note })
+    .returning({ id: file.id });
+  if (!insertedFile) throw new Error("File could not be created");
 
-  const [insertedFile] = await db
-    .select({ id: file.id })
-    .from(file)
-    .where(eq(file.villaId, villaRow.id))
-    .orderBy(desc(file.createdAt))
-    .limit(1);
+  await recordAudit(accountId, "file.share_link", insertedFile.id, {
+    villaId: villaRow.id,
+    villaCode,
+    kind,
+  });
 
-  if (insertedFile) {
-    await notifyBuyersForVilla({
-      villaId: villaRow.id,
-      sourceType: "file",
-      sourceId: insertedFile.id,
-      summary: `${villaCode}: new ${kind === "photo" ? "photo" : "document"} added${label ? ` — ${label}` : ""}.`,
-    });
-  }
+  await notifyBuyersForVilla({
+    villaId: villaRow.id,
+    sourceType: "file",
+    sourceId: insertedFile.id,
+    summary: `${villaCode}: new ${kind === "photo" ? "photo" : "document"} added${label ? ` — ${label}` : ""}.`,
+  });
 
   revalidatePath(`/office/villas/${villaCode}/bestanden`);
   revalidatePath("/koper/betaalschema");

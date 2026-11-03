@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { account, project } from "@/db/schema";
 import {
+  getOwnedVillaChoicesForAccount,
   getPaymentSchedule,
   getVillaOverview,
   getVillaProgress,
@@ -46,7 +47,7 @@ export const getClientPlatformData = cache(
     const needsProgress =
       page === "home" || page === "progress" || page === "updates";
     const needsFilesAndPayments = page !== "progress";
-    const [progress, payments, projectRow, accountRow] = await Promise.all([
+    const [progress, payments, projectRow, accountRow, villaChoices] = await Promise.all([
       needsProgress ? getVillaProgress(accountId, villa.id) : null,
       needsFilesAndPayments ? getPaymentSchedule(accountId, villa.id) : null,
       db.query.project.findFirst({
@@ -62,15 +63,18 @@ export const getClientPlatformData = cache(
             columns: { email: true, notifyEmail: true },
           })
         : null,
+      getOwnedVillaChoicesForAccount(accountId),
     ]);
 
     // A link may have been removed while the page was loading. Do not turn a
     // rejected scoped read into an apparently successful, partially empty page.
     if (needsProgress && progress?.villa.id !== villa.id) return null;
     if (needsFilesAndPayments && payments?.villa.id !== villa.id) return null;
+    if (!villaChoices.some((choice) => choice.id === villa.id)) return null;
 
     return {
       buyerName: overview.buyerName,
+      villaChoices,
       account: accountRow ? { email: accountRow.email, notifyEmail: accountRow.notifyEmail } : null,
       villa: {
         id: villa.id,

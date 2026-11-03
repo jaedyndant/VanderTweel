@@ -11,7 +11,7 @@
 
 import { asc, desc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { buyer, buyerVilla, villa, paymentMilestone, progressTask, update, file } from "@/db/schema";
+import { buyer, buyerVilla, villa, project, paymentMilestone, progressTask, update, file } from "@/db/schema";
 
 /**
  * Pure authorization gate — no DB access, fully unit-testable.
@@ -45,6 +45,21 @@ export async function getOwnedVillaIdsForAccount(accountId: string): Promise<str
     where: eq(buyerVilla.buyerId, buyerRow.id),
   });
   return links.map((l) => l.villaId);
+}
+
+/** Minimal switcher options, scoped in SQL to the authenticated account.
+ * Never populate this list from a project-wide villa query: another owner may
+ * have a villa in the same project. No financial or other buyer data is read.
+ */
+export async function getOwnedVillaChoicesForAccount(accountId: string) {
+  return db
+    .select({ id: villa.id, code: villa.code, projectName: project.name })
+    .from(buyer)
+    .innerJoin(buyerVilla, eq(buyerVilla.buyerId, buyer.id))
+    .innerJoin(villa, eq(villa.id, buyerVilla.villaId))
+    .innerJoin(project, eq(project.id, villa.projectId))
+    .where(eq(buyer.accountId, accountId))
+    .orderBy(asc(project.name), asc(villa.code), asc(villa.id));
 }
 
 /**

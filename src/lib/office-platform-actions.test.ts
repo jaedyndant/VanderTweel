@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+vi.mock("@/lib/audit", () => ({ recordAudit: vi.fn() }));
 vi.mock("@/lib/office-data", () => ({ getProjectsOverview: vi.fn(), getProjectDetail: vi.fn(), getVillaForOffice: vi.fn() }));
 vi.mock("@/lib/office-actions", () => ({
   toggleProgressTaskAction: vi.fn(), markPaymentPaidAction: vi.fn(), createUpdateAction: vi.fn(), addFileAction: vi.fn(),
@@ -9,6 +10,7 @@ vi.mock("@/lib/office-actions", () => ({
 
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { recordAudit } from "@/lib/audit";
 import { getProjectDetail, getProjectsOverview, getVillaForOffice } from "@/lib/office-data";
 import { addFileAction, createUpdateAction, markPaymentPaidAction, toggleProgressTaskAction } from "@/lib/office-actions";
 import { addFileLink, publishUpdate, togglePayment, toggleProgress } from "./office-platform-actions";
@@ -45,6 +47,15 @@ beforeEach(() => {
 });
 
 describe("office presentation action adapters", () => {
+  it("delegates auditing to the mutation actions without adding duplicate wrapper entries", async () => {
+    expect(await toggleProgress({ ...scope, taskId: "task-a", expectedDone: false })).toEqual({ ok: true });
+    expect(await togglePayment({ ...scope, milestoneId: "payment-a", expectedPaid: false })).toEqual({ ok: true });
+    expect(await publishUpdate(updateInput)).toEqual({ ok: true });
+    expect(await addFileLink(fileInput)).toEqual({ ok: true });
+    // The real mutation actions audit once; these adapter tests mock them.
+    expect(recordAudit).not.toHaveBeenCalled();
+  });
+
   it("rechecks the server session and never invokes existing actions for unauthorized roles", async () => {
     session("buyer");
     expect((await toggleProgress({ ...scope, taskId: "task-a", expectedDone: false })).ok).toBe(false);

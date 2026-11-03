@@ -43,5 +43,8 @@ export async function ClientRoute({
     );
   }
 
-  return <ClientPlatform data={data} page={page} />;
+  // A different residence must not inherit an open photo/payment dialog or
+  // other transient detail state from the previous residence. Poll refreshes
+  // of this same residence deliberately keep their existing UI state.
+  return <ClientPlatform key={data.villa.id} data={data} page={page} />;
 }

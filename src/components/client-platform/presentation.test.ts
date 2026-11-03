@@ -1,11 +1,34 @@
 import { describe, expect, it } from "vitest";
 import {
+  clientHref,
   csvCell,
   milestoneAmount,
   paymentSummary,
   safeDocumentUrl,
 } from "./presentation";
 import type { ClientMilestone } from "./types";
+
+describe("buyer residence navigation", () => {
+  it("keeps the selected residence on every owner page, including account", () => {
+    const pages = {
+      home: "/koper", villa: "/koper/villa", progress: "/koper/voortgang",
+      payments: "/koper/betaalschema", documents: "/koper/documenten",
+      updates: "/koper/updates", account: "/koper/account",
+    } as const;
+    for (const [page, path] of Object.entries(pages)) {
+      expect(clientHref(page as keyof typeof pages, "owned-villa-2")).toBe(`${path}?villa=owned-villa-2`);
+    }
+  });
+
+  it("encodes a residence identifier as a query value, never as navigation instructions", () => {
+    const villaId = "owned&villa=foreign /?#";
+    const href = clientHref("payments", villaId);
+    const url = new URL(href, "https://platform.test");
+    expect(url.pathname).toBe("/koper/betaalschema");
+    expect(url.searchParams.getAll("villa")).toEqual([villaId]);
+    expect(url.hash).toBe("");
+  });
+});
 
 const milestone = (
   overrides: Partial<ClientMilestone> = {},

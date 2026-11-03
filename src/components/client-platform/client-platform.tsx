@@ -14,6 +14,7 @@ import {
 } from "./presentation";
 import { signOutAction, updateNotificationPreference } from "@/lib/client-platform-actions";
 import type { ClientDocument, ClientPage, ClientPlatformData } from "./types";
+import { ResidenceSwitcher } from "./residence-switcher";
 import "./client-platform.css";
 
 const images = [
@@ -1107,12 +1108,16 @@ export function ClientPlatform({
           </div>
         </aside>
         <main className="main" id="client-main">
-          <div className="topbar">
+          <div className={`topbar${data.villaChoices.length > 1 ? " has-residence-switcher" : ""}`}>
             <span>Owner platform &nbsp; / &nbsp; {villa.projectName}</span>
-            <span className="topbar-residence">
-              {villa.code}
-              <Badge>Owner workspace</Badge>
-            </span>
+            {data.villaChoices.length > 1 ? (
+              <ResidenceSwitcher choices={data.villaChoices} selectedVillaId={villa.id} page={page} />
+            ) : (
+              <span className="topbar-residence">
+                {villa.code}
+                <Badge>Owner workspace</Badge>
+              </span>
+            )}
           </div>
           <div className="content">
             {body}

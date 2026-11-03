@@ -236,6 +236,27 @@
 .office-platform .op-topbar .op-badge {
   flex-shrink: 0;
 }
+.office-platform .op-account-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+.office-platform .op-signout {
+  flex-shrink: 0;
+  max-width: 200px;
+}
+.office-platform .op-signout .op-signout-button {
+  min-height: 44px;
+  padding: 10px 12px;
+  gap: 8px;
+  white-space: nowrap;
+}
+.office-platform .op-signout-error {
+  margin-top: 8px;
+  color: var(--op-ink);
+  font-size: 11px;
+}
 .office-platform .op-content {
   padding: 34px 36px 55px;
   max-width: 1600px;
@@ -1027,6 +1048,7 @@
     padding: 12px 20px;
     font-size: 10px;
     gap: 10px;
+    flex-wrap: wrap;
   }
   .office-platform .op-topbar .op-badge {
     font-size: 8px;

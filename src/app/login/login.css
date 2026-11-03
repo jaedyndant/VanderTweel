@@ -43,7 +43,8 @@
   opacity: 0.65;
 }
 .login-page input:focus-visible,
-.login-page button:focus-visible {
+.login-page button:focus-visible,
+.login-page a:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 3px;
 }
@@ -54,4 +55,14 @@
 }
 .login-page .login-accepted button {
   margin-top: 16px;
+}
+.login-page .login-return {
+  margin-top: 24px;
+}
+.login-page .login-return a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
