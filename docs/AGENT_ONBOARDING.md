@@ -126,11 +126,11 @@ agents/developers on one repo. It is not optional.
   assume because it works locally it's set remotely. Missing `AUTH_SECRET`
   fails silently as a generic "server configuration" error with no
   stack trace surfaced to the client.
-- There is a temporary, secret-gated `/api/dev-login` route (PR #4) that
-  exists only because no real Resend API key is wired up yet. It is a
-  deliberate backdoor, gated by `DEV_LOGIN_SECRET`, and must be deleted
-  once real magic-link email works end to end. Don't build on top of it,
-  don't copy the pattern elsewhere.
+- The temporary `/api/dev-login` backdoor (PR #4) has been **removed**
+  (2026-11-02, real magic-link email verified working end to end first).
+  `DEV_LOGIN_SECRET` was also deleted from Vercel. Don't reintroduce a
+  similar auth-bypass route for any future testing need — use a real
+  magic-link sign-in or a throwaway test session instead.
 
 ## 4. Current state (as of 2026-10-28)
 
