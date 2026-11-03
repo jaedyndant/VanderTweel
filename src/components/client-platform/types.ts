@@ -4,11 +4,13 @@ export type ClientPage =
   | "progress"
   | "payments"
   | "documents"
-  | "updates";
+  | "updates"
+  | "account";
 
 /** Only authorized, serializable buyer-facing fields cross this boundary. */
 export interface ClientPlatformData {
   buyerName: string | null;
+  account: { email: string; notifyEmail: boolean } | null;
   villa: {
     id: string;
     code: string;

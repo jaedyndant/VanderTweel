@@ -3,7 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { project } from "@/db/schema";
+import { account, project } from "@/db/schema";
 import {
   getPaymentSchedule,
   getVillaOverview,
@@ -46,13 +46,22 @@ export const getClientPlatformData = cache(
     const needsProgress =
       page === "home" || page === "progress" || page === "updates";
     const needsFilesAndPayments = page !== "progress";
-    const [progress, payments, projectRow] = await Promise.all([
+    const [progress, payments, projectRow, accountRow] = await Promise.all([
       needsProgress ? getVillaProgress(accountId, villa.id) : null,
       needsFilesAndPayments ? getPaymentSchedule(accountId, villa.id) : null,
       db.query.project.findFirst({
         where: eq(project.id, villa.projectId),
         columns: { name: true },
       }),
+      // Own-account fields only, looked up by this session's own accountId
+      // (never a caller-supplied id) -- same isolation rule as every other
+      // read in this adapter.
+      page === "account"
+        ? db.query.account.findFirst({
+            where: eq(account.id, accountId),
+            columns: { email: true, notifyEmail: true },
+          })
+        : null,
     ]);
 
     // A link may have been removed while the page was loading. Do not turn a
@@ -62,6 +71,7 @@ export const getClientPlatformData = cache(
 
     return {
       buyerName: overview.buyerName,
+      account: accountRow ? { email: accountRow.email, notifyEmail: accountRow.notifyEmail } : null,
       villa: {
         id: villa.id,
         code: villa.code,
