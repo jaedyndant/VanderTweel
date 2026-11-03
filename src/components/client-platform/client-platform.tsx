@@ -12,6 +12,7 @@ import {
   paymentSummary,
   safeDocumentUrl,
 } from "./presentation";
+import { signOutAction, updateNotificationPreference } from "@/lib/client-platform-actions";
 import type { ClientDocument, ClientPage, ClientPlatformData } from "./types";
 import "./client-platform.css";
 
@@ -30,6 +31,7 @@ const navigation: { page: ClientPage; icon: string; label: string }[] = [
   { page: "payments", icon: "▤", label: "Payments" },
   { page: "documents", icon: "▧", label: "Documents" },
   { page: "updates", icon: "◫", label: "Updates" },
+  { page: "account", icon: "◍", label: "Account" },
 ];
 type Modal =
   | { kind: "contact" }
@@ -71,6 +73,87 @@ function ProgressBar({
     >
       <i style={{ width: `${bounded}%` }} />
     </div>
+  );
+}
+
+function AccountPanel({
+  email,
+  notifyEmail,
+}: {
+  email: string | null;
+  notifyEmail: boolean;
+}) {
+  const [checked, setChecked] = useState(notifyEmail);
+  const [pending, setPending] = useState(false);
+  const [status, setStatus] = useState("");
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function toggle(next: boolean) {
+    setChecked(next);
+    setPending(true);
+    setStatus("");
+    const result = await updateNotificationPreference({ notifyEmail: next });
+    setPending(false);
+    if (result.ok) {
+      setStatus("Saved.");
+    } else {
+      setChecked(!next);
+      setStatus(result.error);
+    }
+  }
+
+  return (
+    <>
+      <Heading
+        eyebrow="Your account"
+        title="Sign-in and notifications."
+        description="Manage how your owner platform reaches you."
+      />
+      <section className="panel">
+        <div className="panel-title">
+          <h3>Signed in as</h3>
+        </div>
+        <p className="modal-data">
+          <span>Email</span>
+          <strong>{email ?? "Unavailable"}</strong>
+        </p>
+        <p className="fine">
+          Your sign-in email is set by the Van der Tweel team. Contact your
+          existing team contact to change it.
+        </p>
+      </section>
+      <section className="panel">
+        <div className="panel-title">
+          <h3>Notifications</h3>
+        </div>
+        <label className="toggle-row">
+          <input
+            type="checkbox"
+            checked={checked}
+            disabled={pending}
+            onChange={(event) => toggle(event.target.checked)}
+          />
+          <span>Email me when my team posts a construction, payment or document update</span>
+        </label>
+        {status && <p className="fine">{status}</p>}
+      </section>
+      <section className="panel">
+        <div className="panel-title">
+          <h3>Session</h3>
+        </div>
+        <button
+          type="button"
+          className="btn light"
+          disabled={signingOut}
+          onClick={() => {
+            setSigningOut(true);
+            void signOutAction();
+          }}
+        >
+          {signingOut ? "Signing out…" : "Sign out"}
+        </button>
+      </section>
+    </>
   );
 }
 
@@ -953,6 +1036,8 @@ export function ClientPlatform({
         </section>
       </>
     );
+  } else if (page === "account") {
+    body = <AccountPanel email={data.account?.email ?? null} notifyEmail={data.account?.notifyEmail ?? true} />;
   } else {
     body = (
       <>

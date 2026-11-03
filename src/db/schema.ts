@@ -23,6 +23,7 @@ export const account = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     email: varchar("email", { length: 320 }).notNull(),
     role: varchar("role", { length: 20 }).notNull(), // 'buyer' | 'pm' | 'developer'
+    notifyEmail: boolean("notify_email").default(true).notNull(),
     lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },

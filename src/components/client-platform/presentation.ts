@@ -7,6 +7,7 @@ const pages: Record<ClientPage, string> = {
   payments: "/koper/betaalschema",
   documents: "/koper/documenten",
   updates: "/koper/updates",
+  account: "/koper/account",
 };
 
 export function clientHref(page: ClientPage, villaId: string) {

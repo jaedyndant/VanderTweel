@@ -50,6 +50,13 @@
       "when": 1793980800000,
       "tag": "0006_ms8_rate_limit_and_audit_log",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793981000000,
+      "tag": "0007_account_notify_email",
+      "breakpoints": true
     }
   ]
 }
