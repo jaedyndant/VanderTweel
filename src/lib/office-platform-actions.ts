@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
+import { recordAudit } from "@/lib/audit";
 import { safeDocumentUrl } from "@/components/client-platform/presentation";
 import {
   addFileAction,
@@ -115,6 +116,9 @@ export async function togglePayment(input: TogglePaymentInput): Promise<OfficeAc
     if (payments.length !== 1) throw new InputError("This payment is no longer available. Refresh the page.");
     if ((payments[0].status === "paid") !== input.expectedPaid) throw new InputError("This payment has changed. Refresh the page before saving.");
     await markPaymentPaidAction(milestoneId, detail.villa.code);
+    await recordAudit(user.id, input.expectedPaid ? "payment.mark_paid" : "payment.reopen", milestoneId, {
+      villaCode: detail.villa.code,
+    });
   });
 }
 
@@ -155,5 +159,10 @@ export async function addFileLink(input: AddFileLinkInput): Promise<OfficeAction
     form.set("note", note);
     form.set("kind", input.kind);
     await addFileAction(form);
+    await recordAudit(user.id, "file.share_link", detail.villa.id, {
+      villaCode: detail.villa.code,
+      kind: input.kind,
+      label,
+    });
   });
 }

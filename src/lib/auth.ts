@@ -18,6 +18,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // id) signed into the cookie after the one DB read at sign-in, so
   // middleware never touches the database again until the token expires.
   session: { strategy: "jwt" },
+  // Explicit rather than relying on NextAuth v5 (beta) defaults, so a future
+  // dependency bump can't silently change cookie security under us.
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-authjs.session-token"
+          : "authjs.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   pages: {
     signIn: "/login",
     verifyRequest: "/login/check-email",

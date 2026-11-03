@@ -43,6 +43,13 @@
       "when": 1793362800000,
       "tag": "0005_fix_duplicate_buyer_add_constraint",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793980800000,
+      "tag": "0006_ms8_rate_limit_and_audit_log",
+      "breakpoints": true
     }
   ]
 }

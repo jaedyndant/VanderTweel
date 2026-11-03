@@ -205,3 +205,40 @@ export const session = pgTable("session", {
     .references(() => account.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { withTimezone: true }).notNull(),
 });
+
+// -- rate_limit_hit ------------------------------------------------------
+// DB-backed sliding-window rate limiter. No new infra (Upstash/Redis) —
+// Neon Postgres is already the shared store every serverless function
+// instance can see, which an in-memory counter cannot be (each Vercel
+// lambda cold-starts its own memory). One row per (bucketKey, windowStart);
+// hits within the same window increment count, see src/lib/rate-limit.ts.
+export const rateLimitHit = pgTable(
+  "rate_limit_hit",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    bucketKey: varchar("bucket_key", { length: 320 }).notNull(), // e.g. "signin:ip:1.2.3.4" or "signin:email:x@y.com"
+    windowStart: timestamp("window_start", { withTimezone: true }).notNull(),
+    count: integer("count").default(1).notNull(),
+  },
+  (t) => [uniqueIndex("rate_limit_hit_bucket_window_idx").on(t.bucketKey, t.windowStart)]
+);
+
+// -- audit_log -------------------------------------------------------------
+// Minimal who/what/when trail for money- and document-adjacent writes
+// (mark payment paid/reopen, share a file link). Not a full event-sourcing
+// system — just enough that "who changed this and when" is answerable
+// without digging through Vercel function logs.
+export const auditLog = pgTable(
+  "audit_log",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    actorAccountId: uuid("actor_account_id")
+      .notNull()
+      .references(() => account.id),
+    action: varchar("action", { length: 60 }).notNull(), // e.g. "payment.mark_paid"
+    targetId: uuid("target_id").notNull(),
+    meta: text("meta"), // small JSON string, e.g. previous/next status
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index("audit_log_actor_account_id_idx").on(t.actorAccountId)]
+);
