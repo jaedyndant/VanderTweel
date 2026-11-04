@@ -282,7 +282,8 @@
 .site-hero-full-content {
   position: relative;
   z-index: 2;
-  padding: 64px 0 96px;
+  padding-top: 64px;
+  padding-bottom: 96px;
 }
 .site-hero-full-content .site-eyebrow {
   color: #e9c6a0;
@@ -321,7 +322,8 @@
 }
 @media (max-width: 640px) {
   .site-hero-full-content {
-    padding: 48px 0 72px;
+    padding-top: 48px;
+    padding-bottom: 72px;
   }
 }
 .site-hero-grid {
