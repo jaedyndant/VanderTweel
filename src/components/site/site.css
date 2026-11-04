@@ -220,7 +220,7 @@
 }
 .site-btn-primary {
   background: var(--green);
-  color: var(--paper);
+  color: var(--paper) !important;
 }
 .site-btn-primary:hover {
   background: #26392f;
@@ -302,7 +302,7 @@
 }
 .site-btn-outline-dark {
   border: 1px solid rgba(245, 242, 236, 0.55);
-  color: var(--paper);
+  color: var(--paper) !important;
 }
 .site-btn-outline-dark:hover {
   border-color: var(--paper);
