@@ -1,16 +1,16 @@
-/* Exact approved demo language. All office rules are scoped so the client app
-   and public website keep their own layouts. */
+/* Approved editorial palette; office rules stay scoped away from the client app
+   and public website. */
 .office-platform {
   --op-paper: #f5f2ec;
   --op-white: #fffefa;
   --op-ink: #283d32;
-  --op-muted: #7b8078;
+  --op-muted: #626d62;
   --op-line: #deded4;
   --op-teak: #845b3c;
   --op-green: #2f4a3b;
   --op-pale: #e6eadf;
   --op-body: #687066;
-  --op-focus: #b18a62;
+  --op-focus: #845b3c;
   background: var(--op-paper);
   color: var(--op-ink);
   font:
@@ -374,7 +374,7 @@
 }
 .office-platform .op-metric-label {
   color: var(--op-muted);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.3px;
 }
 .office-platform .op-metric-value {
@@ -388,7 +388,7 @@
 .office-platform .op-metric small {
   display: block;
   color: var(--op-body);
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.65;
 }
 .office-platform .op-lower-grid {
@@ -400,7 +400,7 @@
 .office-platform .op-badge {
   display: inline-block;
   padding: 5px 9px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 400;
   line-height: 1.4;
   border-radius: 20px;
@@ -412,11 +412,14 @@
 }
 .office-platform .op-badge-amber {
   background: #f1e7d4;
-  color: #8a6632;
+  color: #805c2c;
 }
 .office-platform .op-badge-neutral {
   background: #edede7;
-  color: #74786b;
+  color: #626d62;
+}
+.office-platform .op-cell-label {
+  display: none;
 }
 .office-platform .op-table-wrap {
   position: relative;
@@ -427,14 +430,14 @@
 .office-platform .op-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11px;
+  font-size: 12px;
   text-align: left;
 }
 .office-platform .op-table th {
   padding: 14px 12px;
   color: var(--op-muted);
   background: #f5f4ee;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.8px;
   text-transform: uppercase;
@@ -453,7 +456,7 @@
   display: block;
   margin-top: 4px;
   color: var(--op-muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 .office-platform .op-table strong {
   font-weight: 500;
@@ -1014,45 +1017,30 @@
   .office-platform .op-shell {
     display: block;
   }
-  .office-platform .op-sidebar {
-    padding: 12px 18px;
-    gap: 15px;
-    border-right: 0;
-    border-bottom: 1px solid var(--op-line);
-  }
-  .office-platform .op-sidebar > .op-brand,
-  .office-platform .op-workspace,
-  .office-platform .op-person {
+  .office-platform .op-sidebar,
+  .office-platform .op-topbar {
     display: none;
   }
-  .office-platform .op-nav {
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    padding: 6px 0;
-    overscroll-behavior-x: contain;
+  .office-platform .op-shell {
+    min-height: calc(100svh - 73px);
   }
-  .office-platform .op-nav a {
-    flex: 0 0 auto;
-    padding: 10px;
-    font-size: 10px;
-    gap: 7px;
-    white-space: nowrap;
+  .office-platform .op-mobile-account {
+    border-top: 1px solid var(--op-line);
+    padding-top: 20px;
+    display: grid;
+    gap: 8px;
   }
-  .office-platform .op-nav svg {
-    width: 14px;
-    height: 14px;
+  .office-platform .op-mobile-account strong {
+    color: var(--op-ink);
+    font-size: 12px;
+    font-weight: 500;
   }
-  .office-platform .op-topbar {
-    min-height: 51px;
-    padding: 12px 20px;
-    font-size: 10px;
-    gap: 10px;
-    flex-wrap: wrap;
+  .office-platform .op-mobile-account .op-signout {
+    margin-top: 8px;
+    max-width: none;
   }
-  .office-platform .op-topbar .op-badge {
-    font-size: 8px;
-    padding: 4px 7px;
+  .office-platform .op-mobile-account .op-signout-button {
+    width: 100%;
   }
   .office-platform .op-content {
     padding: 26px 18px 45px;
@@ -1065,13 +1053,13 @@
     font-size: 35px;
   }
   .office-platform .op-heading p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .office-platform .op-heading > .op-btn {
     padding: 10px;
-    font-size: 10px;
+    font-size: 12px;
     gap: 8px;
-    max-width: 124px;
+    max-width: 160px;
   }
   .office-platform .op-metrics {
     gap: 10px;
@@ -1086,7 +1074,10 @@
     font-size: 28px;
   }
   .office-platform .op-metric-label {
-    font-size: 9px;
+    font-size: 11px;
+  }
+  .office-platform .op-metric small {
+    font-size: 11px;
   }
   .office-platform .op-panel-title {
     gap: 12px;
@@ -1155,6 +1146,156 @@
   }
   .office-platform .op-btn-small {
     min-height: 40px;
+  }
+}
+@media (max-width: 700px) {
+  .office-platform .op-btn,
+  .office-platform .op-filter-buttons button,
+  .office-platform .op-villa-links a,
+  .office-platform .op-text-link,
+  .office-platform .op-update h3 button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+  }
+  .office-platform .op-text-link {
+    white-space: normal;
+    text-align: left;
+  }
+  .office-platform .op-update h3 button {
+    font-size: 14px;
+  }
+  .office-platform .op-close,
+  .office-platform .op-notice button {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+  .office-platform input,
+  .office-platform textarea,
+  .office-platform select {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .office-platform .op-inline-field label,
+  .office-platform .op-project-selector label,
+  .office-platform .op-dialog form label {
+    font-size: 12px;
+  }
+  .office-platform .op-badge {
+    font-size: 11px;
+    white-space: normal;
+  }
+  .office-platform .op-task p,
+  .office-platform .op-task-preview p,
+  .office-platform .op-update p,
+  .office-platform .op-file small {
+    font-size: 12px;
+  }
+  .office-platform .op-task small,
+  .office-platform .op-update small,
+  .office-platform .op-form-hint {
+    font-size: 11px !important;
+  }
+  .office-platform .op-table-wrap {
+    overflow: visible;
+  }
+  .office-platform .op-stack-table,
+  .office-platform .op-stack-table tbody {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+  /* Keep column headers in the accessibility tree when rows become a stack. */
+  .office-platform .op-stack-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+  .office-platform .op-stack-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+    padding: 22px 0;
+    border-top: 1px solid var(--op-line);
+    background: none;
+  }
+  .office-platform .op-stack-table tbody tr:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .office-platform .op-stack-table tbody tr:last-child {
+    padding-bottom: 0;
+  }
+  .office-platform .op-stack-table tbody td {
+    display: block;
+    min-width: 0;
+    width: auto;
+    padding: 0;
+    border: 0;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.55;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .office-platform .op-stack-table tbody td:nth-child(n) {
+    width: auto;
+    text-align: left;
+    white-space: normal;
+  }
+  .office-platform .op-stack-table td:first-child {
+    grid-column: 1 / -1;
+    font-size: 16px;
+  }
+  .office-platform .op-content {
+    scroll-margin-top: 90px;
+  }
+  .office-platform .op-stack-table .op-cell-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--op-body);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+  }
+  .office-platform .op-stack-table small {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+  .office-platform .op-stack-table td:first-child .op-text-link {
+    font-size: 16px;
+    min-height: 44px;
+  }
+  .office-platform .op-stack-table .op-progress {
+    width: 100%;
+    max-width: 170px;
+    margin-top: 9px;
+  }
+  .office-platform .op-villa-table td:nth-child(4),
+  .office-platform .op-stack-table .op-cell-actions {
+    grid-column: 1 / -1;
+  }
+  .office-platform .op-cell-actions .op-btn {
+    width: 100%;
+  }
+  .office-platform .op-payment-table .op-cell-actions {
+    grid-column: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+  .office-platform .op-owner-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 20px;
   }
 }
 @media (max-width: 420px) {

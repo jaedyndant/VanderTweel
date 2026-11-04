@@ -35,6 +35,7 @@ import type {
   PublishUpdateInput,
 } from "./types";
 import { OfficeSignOut } from "./office-sign-out";
+import { MobilePlatformNav } from "../platform/mobile-platform-nav";
 import "./office-platform.css";
 
 type Modal =
@@ -296,24 +297,27 @@ function VillaTable({
       role="region"
       aria-label="Residence overview"
     >
-      <table className="op-table op-villa-table">
-        <thead>
-          <tr>
-            <th scope="col">Residence / owner</th>
-            <th scope="col">Build progress</th>
-            <th scope="col">Status</th>
-            <th scope="col">Current focus</th>
-            <th scope="col">
+      <table className="op-table op-stack-table op-villa-table" role="table">
+        <thead role="rowgroup">
+          <tr role="row">
+            <th role="columnheader" scope="col">Residence / owner</th>
+            <th role="columnheader" scope="col">Build progress</th>
+            <th role="columnheader" scope="col">Status</th>
+            <th role="columnheader" scope="col">Current focus</th>
+            <th role="columnheader" scope="col">
               <span className="op-sr-only">Actions</span>
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           {villas.map((villa) => {
             const task = nextTasks.get(villa.id);
             return (
-              <tr key={villa.id}>
-                <td>
+              <tr role="row" key={villa.id}>
+                <td role="cell">
+                  <span className="op-cell-label" aria-hidden="true">
+                    Residence / owner
+                  </span>
                   <button
                     type="button"
                     className="op-text-link"
@@ -323,7 +327,10 @@ function VillaTable({
                   </button>
                   <small>{villa.buyerName ?? "No owner assigned"}</small>
                 </td>
-                <td>
+                <td role="cell">
+                  <span className="op-cell-label" aria-hidden="true">
+                    Build progress
+                  </span>
                   <span>
                     {villa.progressPercent === null
                       ? "Not available"
@@ -334,7 +341,10 @@ function VillaTable({
                     label={`${villa.code} build progress`}
                   />
                 </td>
-                <td>
+                <td role="cell">
+                  <span className="op-cell-label" aria-hidden="true">
+                    Status
+                  </span>
                   <Badge
                     tone={
                       ["completed", "complete", "sold"].includes(villa.status)
@@ -345,14 +355,17 @@ function VillaTable({
                     {humanLabel(villa.status)}
                   </Badge>
                 </td>
-                <td>
+                <td role="cell">
+                  <span className="op-cell-label" aria-hidden="true">
+                    Current focus
+                  </span>
                   {task?.phase ??
                     (villa.progressPercent === 100
                       ? "All recorded tasks complete"
                       : "No open task recorded")}
                   <small>{task?.period ?? villa.projectName}</small>
                 </td>
-                <td>
+                <td role="cell" className="op-cell-actions">
                   <button
                     className="op-btn op-btn-light op-btn-small"
                     type="button"
@@ -780,6 +793,22 @@ export function OfficePlatform({
       ? "overview"
       : data.page;
 
+  const navigationLinks = allowedNavigation.map((item) => (
+    <Link
+      href={officeHref(item.page, projectId)}
+      className={activePage === item.page ? "is-active" : ""}
+      aria-current={activePage === item.page ? "page" : undefined}
+      key={item.page}
+    >
+      <Icon name={item.icon} />
+      <span>
+        {data.role === "pm" && item.page === "updates"
+          ? "Your updates"
+          : item.label}
+      </span>
+    </Link>
+  ));
+
   useEffect(() => {
     setModal(null);
     setError(null);
@@ -1162,29 +1191,40 @@ export function OfficePlatform({
               role="region"
               aria-label="Residence owners"
             >
-              <table className="op-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Owner</th>
-                    <th scope="col">Residence</th>
-                    <th scope="col">Location</th>
-                    <th scope="col">
+              <table className="op-table op-stack-table op-owner-table" role="table">
+                <thead role="rowgroup">
+                  <tr role="row">
+                    <th role="columnheader" scope="col">Owner</th>
+                    <th role="columnheader" scope="col">Residence</th>
+                    <th role="columnheader" scope="col">Location</th>
+                    <th role="columnheader" scope="col">
                       <span className="op-sr-only">Actions</span>
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody role="rowgroup">
                   {buyers.map((buyer) => (
-                    <tr key={buyer.id}>
-                      <td>
+                    <tr role="row" key={buyer.id}>
+                      <td role="cell">
+                        <span className="op-cell-label" aria-hidden="true">
+                          Owner
+                        </span>
                         <strong>{buyer.name}</strong>
                       </td>
-                      <td>
+                      <td role="cell">
+                        <span className="op-cell-label" aria-hidden="true">
+                          Residence
+                        </span>
                         {buyer.villas.map((villa) => villa.code).join(", ") ||
                           "No residence assigned"}
                       </td>
-                      <td>{buyer.country ?? "Not recorded"}</td>
-                      <td>
+                      <td role="cell">
+                        <span className="op-cell-label" aria-hidden="true">
+                          Location
+                        </span>
+                        {buyer.country ?? "Not recorded"}
+                      </td>
+                      <td role="cell" className="op-cell-actions">
                         <div className="op-owner-links">
                           {buyer.villas.map((villa) => (
                             <button
@@ -1297,25 +1337,36 @@ export function OfficePlatform({
               role="region"
               aria-label="Payment milestone ledger"
             >
-              <table className="op-table op-payment-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Milestone</th>
-                    <th scope="col">Share</th>
-                    <th scope="col">Amount</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Record</th>
+              <table className="op-table op-stack-table op-payment-table" role="table">
+                <thead role="rowgroup">
+                  <tr role="row">
+                    <th role="columnheader" scope="col">Milestone</th>
+                    <th role="columnheader" scope="col">Share</th>
+                    <th role="columnheader" scope="col">Amount</th>
+                    <th role="columnheader" scope="col">Status</th>
+                    <th role="columnheader" scope="col">Record</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody role="rowgroup">
                   {visiblePayments.map((payment) => (
-                    <tr key={payment.id}>
-                      <td>
+                    <tr role="row" key={payment.id}>
+                      <td role="cell">
+                        <span className="op-cell-label" aria-hidden="true">
+                          Milestone
+                        </span>
                         <strong>{payment.dueLabel}</strong>
                         <small>{payment.villaCode}</small>
                       </td>
-                      <td>{numberLabel(payment.percent)}%</td>
-                      <td>
+                      <td role="cell">
+                        <span className="op-cell-label" aria-hidden="true">
+                          Share
+                        </span>
+                        {numberLabel(payment.percent)}%
+                      </td>
+                      <td role="cell">
+                        <span className="op-cell-label" aria-hidden="true">
+                          Amount
+                        </span>
                         {money(
                           paymentAmount(
                             payment,
@@ -1325,7 +1376,10 @@ export function OfficePlatform({
                           ),
                         )}
                       </td>
-                      <td>
+                      <td role="cell">
+                        <span className="op-cell-label" aria-hidden="true">
+                          Status
+                        </span>
                         <Badge
                           tone={
                             payment.status === "paid"
@@ -1338,7 +1392,7 @@ export function OfficePlatform({
                           {humanLabel(payment.status)}
                         </Badge>
                       </td>
-                      <td>
+                      <td role="cell" className="op-cell-actions">
                         <button
                           type="button"
                           className="op-text-link"
@@ -1946,6 +2000,21 @@ export function OfficePlatform({
       <a href="#office-main" className="op-skip-link">
         Skip to content
       </a>
+      <MobilePlatformNav
+        title="Development office"
+        context={context}
+        homeHref={officeHref("overview", projectId)}
+        navigationKey={`${data.page}:${projectId ?? ""}:${data.selection.villaId ?? ""}`}
+        footer={
+          <div className="op-mobile-account">
+            <span>{data.email ?? "Your team account"}</span>
+            <strong>{data.role === "developer" ? "Developer" : "Project manager"}</strong>
+            <OfficeSignOut />
+          </div>
+        }
+      >
+        <nav aria-label="Development office">{navigationLinks}</nav>
+      </MobilePlatformNav>
       <div className="op-shell">
         <aside className="op-sidebar">
           <Link
@@ -1968,21 +2037,7 @@ export function OfficePlatform({
             </small>
           </div>
           <nav className="op-nav" aria-label="Development office">
-            {allowedNavigation.map((item) => (
-              <Link
-                href={officeHref(item.page, projectId)}
-                className={activePage === item.page ? "is-active" : ""}
-                aria-current={activePage === item.page ? "page" : undefined}
-                key={item.page}
-              >
-                <Icon name={item.icon} />
-                <span>
-                  {data.role === "pm" && item.page === "updates"
-                    ? "Your updates"
-                    : item.label}
-                </span>
-              </Link>
-            ))}
+            {navigationLinks}
           </nav>
           <div className="op-person">
             <span className="op-avatar" aria-hidden="true">
