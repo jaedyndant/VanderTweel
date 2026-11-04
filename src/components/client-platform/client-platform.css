@@ -4,7 +4,7 @@
   --paper: #f5f2ec;
   --white: #fffefa;
   --ink: #283d32;
-  --muted: #7b8078;
+  --muted: #626d62;
   --line: #deded4;
   --teak: #845b3c;
   --green: #2f4a3b;
@@ -15,9 +15,9 @@
   --badge-green: #e4eadc;
   --badge-green-ink: #52704d;
   --badge-amber: #f1e7d4;
-  --badge-amber-ink: #8a6632;
+  --badge-amber-ink: #805c2c;
   --badge-neutral: #edede7;
-  --badge-neutral-ink: #74786b;
+  --badge-neutral-ink: #626d62;
   --focus: #b18a62;
   min-height: 100svh;
   background: var(--paper);
@@ -920,6 +920,9 @@
 }
 
 @media (max-width: 700px) {
+  .client-platform .badge {
+    font-size: 11px;
+  }
   .client-platform .shell {
     display: block;
   }
@@ -1099,4 +1102,354 @@
   height: 17px;
   accent-color: var(--green);
   cursor: pointer;
+}
+
+/* Daily-use controls retain the atelier palette and give project records priority. */
+.client-platform .client-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+.client-platform .side-nav a {
+  min-height: 44px;
+}
+.client-platform .btn {
+  min-height: 44px;
+}
+.client-platform .text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.client-platform .client-signout {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.client-platform .client-signout-error {
+  color: #963d31;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.client-platform .account-sections {
+  display: grid;
+  gap: 20px;
+  max-width: 840px;
+}
+.client-platform .account-identity {
+  display: grid;
+  gap: 8px;
+  padding-block: 18px;
+  margin: 0 0 16px;
+  border-block: 1px solid var(--line);
+}
+.client-platform .account-identity dt {
+  font-size: 12px;
+  color: var(--body-copy);
+}
+.client-platform .account-identity dd {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.client-platform .account-sections .fine,
+.client-platform .account-session-copy {
+  font-size: 12px;
+  max-width: 68ch;
+}
+.client-platform .account-session-copy {
+  margin-bottom: 18px;
+}
+.client-platform .toggle-row {
+  min-height: 44px;
+  line-height: 1.6;
+}
+.client-platform .toggle-row input {
+  flex: 0 0 auto;
+}
+.client-platform .mobile-owner-account {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+.client-platform .mobile-owner-account p {
+  color: var(--ink);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.client-platform .mobile-owner-account p span {
+  display: block;
+  font-size: 12px;
+  color: var(--body-copy);
+  margin-top: 4px;
+}
+.client-platform .villa-visual {
+  margin: 0;
+  min-height: 340px;
+}
+.client-platform .villa-caption-kicker {
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+.client-platform .photo-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: white;
+  padding: 8px 0;
+  margin-top: 10px;
+  font-size: 11px;
+}
+.client-platform .villa-visual::after {
+  inset: 20% 0 0;
+  pointer-events: none;
+}
+.client-platform .villa-visual.is-empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--pale);
+  border: 1px solid var(--line);
+}
+.client-platform .villa-visual.is-empty::after {
+  display: none;
+}
+.client-platform .villa-visual.is-empty .villa-caption {
+  position: static;
+  padding: 26px;
+  color: var(--ink);
+}
+.client-platform .villa-visual.is-empty .villa-caption p {
+  color: var(--body-copy);
+}
+.client-platform .residence-photo-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 26px;
+  color: var(--body-copy);
+  font-size: 12px;
+}
+.client-platform .residence-photo-note {
+  margin-top: 16px;
+  max-width: 40ch;
+}
+.client-platform .update {
+  align-items: flex-start;
+}
+.client-platform .update-marker {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 40px;
+  flex: 0 0 auto;
+  color: var(--teak);
+}
+.client-platform .update p {
+  font-size: 12px;
+}
+.client-platform .design-reference-section {
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.client-platform .design-reference-section > summary {
+  min-height: 64px;
+  padding: 20px 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--ink);
+}
+.client-platform .design-reference-section > summary span {
+  display: block;
+  margin: 8px 0 0 17px;
+  font-size: 11px;
+  color: var(--body-copy);
+}
+.client-platform .design-reference-section > summary:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+.client-platform .design-reference-content {
+  padding-top: 4px;
+}
+.client-platform .contact-address {
+  font-size: 15px;
+  margin-top: 16px;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+.client-platform .close {
+  display: grid;
+  place-items: center;
+  top: 8px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
+}
+.client-platform .mobile-payment-ledger {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .client-platform .sidebar {
+    display: none;
+  }
+  .client-platform .page-heading {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+  }
+  .client-platform .page-heading > .btn {
+    align-self: flex-start;
+    max-width: none;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+  .client-platform .topbar {
+    padding: 12px 18px;
+  }
+  .client-platform .topbar:not(.has-residence-switcher) {
+    display: none;
+  }
+  .client-platform .topbar.has-residence-switcher > span:first-child {
+    display: none;
+  }
+  .client-platform .content {
+    padding-top: 24px;
+  }
+  .client-platform .page-heading h1 {
+    font-size: clamp(29px, 8vw, 35px);
+    line-height: 1.1;
+  }
+  .client-platform .page-heading p {
+    font-size: 13px;
+  }
+  .client-platform .villa-visual {
+    min-height: 330px;
+  }
+  .client-platform .villa-caption {
+    left: 20px;
+    bottom: 20px;
+  }
+  .client-platform .villa-visual.is-empty .villa-caption,
+  .client-platform .residence-photo-empty {
+    padding: 20px;
+  }
+  .client-platform .payment-metrics {
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--white);
+  }
+  .client-platform .payment-metrics .panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 6px 12px;
+    border: 0;
+    border-radius: 0;
+    padding: 15px 18px;
+  }
+  .client-platform .payment-metrics .panel + .panel {
+    border-top: 1px solid var(--line);
+  }
+  .client-platform .payment-metrics .label {
+    font-size: 11px;
+    color: var(--body-copy);
+  }
+  .client-platform .payment-metrics .big {
+    font-size: 24px;
+    margin: 0;
+    text-align: right;
+    max-width: 150px;
+  }
+  .client-platform .payment-metrics p {
+    grid-column: 1 / -1;
+    font-size: 11px;
+  }
+  .client-platform .desktop-payment-ledger {
+    display: none;
+  }
+  .client-platform .mobile-payment-ledger {
+    display: block;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .client-platform .mobile-payment-ledger > li {
+    padding: 20px 0 12px;
+    border-top: 1px solid var(--line);
+  }
+  .client-platform .payment-card-heading {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    align-items: baseline;
+    gap: 8px;
+  }
+  .client-platform .payment-card-heading h4 {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  .client-platform .payment-card-sequence {
+    color: var(--body-copy);
+    font-size: 11px;
+  }
+  .client-platform .payment-card-heading .badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .client-platform .payment-card-details {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    margin: 18px 0 8px;
+  }
+  .client-platform .payment-card-details dt {
+    color: var(--body-copy);
+    font-size: 11px;
+  }
+  .client-platform .payment-card-details dd {
+    margin: 5px 0 0;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+  .client-platform .payment-card-details > div + div {
+    text-align: right;
+  }
+  .client-platform .payment-card-action {
+    font-size: 12px;
+  }
+  .client-platform .account-sections {
+    gap: 16px;
+  }
+  .client-platform .account-identity dd {
+    font-size: 15px;
+  }
+  .client-platform .panel-title {
+    flex-wrap: wrap;
+  }
+  .client-platform .document .text-link {
+    font-size: 12px;
+  }
+  .client-platform .update-marker {
+    width: 24px;
+  }
+  .client-platform .gallery {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+  .client-platform .gallery img {
+    height: auto;
+    aspect-ratio: 10 / 7;
+  }
 }

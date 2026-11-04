@@ -1,4 +1,7 @@
-import type { ClientMilestone, ClientPage } from "./types";
+import type { ClientDocument, ClientMilestone, ClientPage } from "./types";
+
+// Matches the existing public contact page; easy to replace after owner review.
+export const teamContactEmail = "hello@vandertweel.com";
 
 const pages: Record<ClientPage, string> = {
   home: "/koper",
@@ -121,6 +124,31 @@ export function safeDocumentUrl(value: string): string | null {
   } catch {
     return null;
   }
+}
+
+/** Select only already-authorized shared photographs; never substitute a design image. */
+export function projectPhotos(documents: ClientDocument[]) {
+  return documents
+    .filter((item) => item.kind === "photo")
+    .map((item) => ({ ...item, safeUrl: safeDocumentUrl(item.url) }))
+    .sort((a, b) => {
+      const aTime = Date.parse(a.createdAt);
+      const bTime = Date.parse(b.createdAt);
+      return (
+        (Number.isNaN(bTime) ? 0 : bTime) - (Number.isNaN(aTime) ? 0 : aTime)
+      );
+    });
+}
+
+/** Only project context is prefilled; no buyer email or financial records leave the page. */
+export function projectContactHref(
+  email: string,
+  projectName: string,
+  villaCode: string,
+) {
+  const clean = (value: string) =>
+    value.replace(/[\u0000-\u001f\u007f]/g, " ").trim();
+  return `mailto:${encodeURIComponent(email).replace("%40", "@")}?subject=${encodeURIComponent(`${clean(projectName)} · ${clean(villaCode)}`)}`;
 }
 
 /** Quote every field and neutralize formula-leading strings before spreadsheet import. */

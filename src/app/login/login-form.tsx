@@ -39,8 +39,10 @@ export function LoginForm({
 
   return (
     <>
-      <p>Enter your email address to request a sign-in link.</p>
-      <form onSubmit={submit} aria-busy={pending}>
+      <p className="login-intro">
+        Enter your email address to request a sign-in link.
+      </p>
+      <form className="login-form" onSubmit={submit} aria-busy={pending}>
         <label htmlFor="login-email">Email address</label>
         <input
           id="login-email"
@@ -66,6 +68,7 @@ export function LoginForm({
               sign-in link. Check your spam folder too.
             </p>
             <button
+              className="login-secondary"
               type="button"
               onClick={() => {
                 setAccepted(false);
@@ -76,7 +79,7 @@ export function LoginForm({
             </button>
           </div>
         ) : (
-          <button type="submit" disabled={pending}>
+          <button className="login-primary" type="submit" disabled={pending}>
             {pending ? "Requesting sign-in link…" : "Send sign-in link"}
           </button>
         )}

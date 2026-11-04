@@ -10,11 +10,17 @@ import {
   money,
   paymentCsv,
   paymentSummary,
+  projectPhotos,
+  projectContactHref,
+  teamContactEmail,
   safeDocumentUrl,
 } from "./presentation";
-import { signOutAction, updateNotificationPreference } from "@/lib/client-platform-actions";
+import { updateNotificationPreference } from "@/lib/client-platform-actions";
 import type { ClientDocument, ClientPage, ClientPlatformData } from "./types";
 import { ResidenceSwitcher } from "./residence-switcher";
+import { MobilePlatformNav } from "@/components/platform/mobile-platform-nav";
+import { ClientIcon } from "./client-icon";
+import { ClientSignOut } from "./client-sign-out";
 import "./client-platform.css";
 
 const images = [
@@ -25,14 +31,14 @@ const images = [
   { src: "/client-platform/villa-interior.jpg", label: "Interior palette" },
   { src: "/client-platform/pool.jpg", label: "Pool inspiration" },
 ];
-const navigation: { page: ClientPage; icon: string; label: string }[] = [
-  { page: "home", icon: "⌂", label: "Overview" },
-  { page: "villa", icon: "▱", label: "Your villa" },
-  { page: "progress", icon: "◷", label: "Progress" },
-  { page: "payments", icon: "▤", label: "Payments" },
-  { page: "documents", icon: "▧", label: "Documents" },
-  { page: "updates", icon: "◫", label: "Updates" },
-  { page: "account", icon: "◍", label: "Account" },
+const navigation: { page: ClientPage; label: string }[] = [
+  { page: "home", label: "Overview" },
+  { page: "villa", label: "Your villa" },
+  { page: "progress", label: "Progress" },
+  { page: "payments", label: "Payments" },
+  { page: "documents", label: "Documents" },
+  { page: "updates", label: "Updates" },
+  { page: "account", label: "Account" },
 ];
 type Modal =
   | { kind: "contact" }
@@ -87,7 +93,6 @@ function AccountPanel({
   const [checked, setChecked] = useState(notifyEmail);
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState("");
-  const [signingOut, setSigningOut] = useState(false);
 
   async function toggle(next: boolean) {
     setChecked(next);
@@ -110,50 +115,48 @@ function AccountPanel({
         title="Sign-in and notifications."
         description="Manage how your owner platform reaches you."
       />
-      <section className="panel">
-        <div className="panel-title">
-          <h3>Signed in as</h3>
-        </div>
-        <p className="modal-data">
-          <span>Email</span>
-          <strong>{email ?? "Unavailable"}</strong>
-        </p>
-        <p className="fine">
-          Your sign-in email is set by the Van der Tweel team. Contact your
-          existing team contact to change it.
-        </p>
-      </section>
-      <section className="panel">
-        <div className="panel-title">
-          <h3>Notifications</h3>
-        </div>
-        <label className="toggle-row">
-          <input
-            type="checkbox"
-            checked={checked}
-            disabled={pending}
-            onChange={(event) => toggle(event.target.checked)}
-          />
-          <span>Email me when my team posts a construction, payment or document update</span>
-        </label>
-        {status && <p className="fine">{status}</p>}
-      </section>
-      <section className="panel">
-        <div className="panel-title">
-          <h3>Session</h3>
-        </div>
-        <button
-          type="button"
-          className="btn light"
-          disabled={signingOut}
-          onClick={() => {
-            setSigningOut(true);
-            void signOutAction();
-          }}
-        >
-          {signingOut ? "Signing out…" : "Sign out"}
-        </button>
-      </section>
+      <div className="account-sections">
+        <section className="panel">
+          <div className="panel-title">
+            <h3>Signed in as</h3>
+          </div>
+          <dl className="account-identity">
+            <dt>Email address</dt>
+            <dd>{email ?? "Unavailable"}</dd>
+          </dl>
+          <p className="fine">
+            Your sign-in email is set by the Van der Tweel team. Contact your
+            existing team contact to change it.
+          </p>
+        </section>
+        <section className="panel">
+          <div className="panel-title">
+            <h3>Notifications</h3>
+          </div>
+          <label className="toggle-row">
+            <input
+              type="checkbox"
+              checked={checked}
+              disabled={pending}
+              onChange={(event) => toggle(event.target.checked)}
+            />
+            <span>
+              Email me when my team posts a construction, payment or document
+              update
+            </span>
+          </label>
+          {status && <p className="fine">{status}</p>}
+        </section>
+        <section className="panel">
+          <div className="panel-title">
+            <h3>Session</h3>
+          </div>
+          <p className="account-session-copy">
+            Sign out when you finish using this device.
+          </p>
+          <ClientSignOut />
+        </section>
+      </div>
     </>
   );
 }
@@ -235,6 +238,61 @@ function PhotoImage({ src, alt, className, priority = false }: PhotoProps) {
   );
 }
 
+function ResidenceVisual({
+  photo,
+  villaCode,
+  projectName,
+  detail,
+  onOpen,
+}: {
+  photo: ReturnType<typeof projectPhotos>[number] | undefined;
+  villaCode: string;
+  projectName: string;
+  detail: string;
+  onOpen: (photo: { src: string; label: string }) => void;
+}) {
+  return (
+    <figure className={`villa-visual${photo?.safeUrl ? "" : " is-empty"}`}>
+      {photo?.safeUrl ? (
+        <Photo
+          src={photo.safeUrl}
+          alt={photo.label ?? `${villaCode} — shared project photograph`}
+          priority
+        />
+      ) : (
+        <div className="residence-photo-empty">
+          <ClientIcon name="image" />
+          <span>No site photos shared yet</span>
+        </div>
+      )}
+      <figcaption className="villa-caption">
+        <p className="villa-caption-kicker">{projectName}</p>
+        <h2>{villaCode}</h2>
+        <p>{detail || "Your residence at a glance"}</p>
+        {photo?.safeUrl ? (
+          <button
+            type="button"
+            className="photo-open"
+            onClick={() =>
+              onOpen({
+                src: photo.safeUrl!,
+                label: photo.label ?? "Project photograph",
+              })
+            }
+          >
+            View site photo · {dateLabel(photo.createdAt)}{" "}
+            <ClientIcon name="arrow" />
+          </button>
+        ) : (
+          <p className="residence-photo-note">
+            Your team’s project photographs will appear here.
+          </p>
+        )}
+      </figcaption>
+    </figure>
+  );
+}
+
 function DocumentList({
   items,
   villaCode,
@@ -276,12 +334,11 @@ function UpdateList({ items }: { items: ClientPlatformData["updates"] }) {
         Your team has not posted any updates yet. New notes will appear here.
       </Empty>
     );
-  return items.map((item, index) => (
+  return items.map((item) => (
     <article className="update" key={item.id}>
-      <Photo
-        src={images[index % 2].src}
-        alt="Illustrative architectural inspiration, not a site photograph"
-      />
+      <span className="update-marker" aria-hidden="true">
+        <ClientIcon name="updates" />
+      </span>
       <div>
         <small>
           {dateLabel(item.createdAt)} ·{" "}
@@ -389,7 +446,8 @@ export function ClientPlatform({
     (a, b) => a.sequence - b.sequence,
   );
   const documents = data.documents.filter((item) => item.kind !== "photo");
-  const photos = data.documents.filter((item) => item.kind === "photo");
+  const photos = projectPhotos(data.documents);
+  const latestPhoto = photos.find((item) => item.safeUrl);
   const progress = tasks.length
     ? tasks.reduce(
         (sum, task) => sum + (task.doneAt ? task.percentWeight : 0),
@@ -402,7 +460,6 @@ export function ClientPlatform({
   const [modal, setModal] = useState<Modal | null>(null);
   const [exportStatus, setExportStatus] = useState("");
   const dialog = useRef<HTMLDialogElement>(null);
-  const ownerNavigation = useRef<HTMLElement>(null);
   const dialogTitle = useId();
   const floorId = useId();
   const href = (destination: ClientPage) => clientHref(destination, villa.id);
@@ -424,14 +481,6 @@ export function ClientPlatform({
     .map((name) => name[0])
     .join("")
     .toUpperCase();
-
-  useEffect(() => {
-    if (window.matchMedia("(max-width: 700px)").matches) {
-      ownerNavigation.current
-        ?.querySelector('[aria-current="page"]')
-        ?.scrollIntoView({ block: "nearest", inline: "nearest" });
-    }
-  }, [page]);
 
   useEffect(() => {
     if (!modal) return;
@@ -489,18 +538,15 @@ export function ClientPlatform({
           }
         />
         <div className="dashboard-grid">
-          <div className="villa-visual">
-            <Photo
-              src={images[0].src}
-              alt="Illustrative contemporary pool villa, not a project photograph"
-              priority
-            />
-            <div className="villa-caption">
-              <p>YOUR RESIDENCE / {villa.projectName.toUpperCase()}</p>
-              <h2>{villa.code}</h2>
-              <p>{residenceSummary || "Your residence at a glance"}</p>
-            </div>
-          </div>
+          <ResidenceVisual
+            photo={latestPhoto}
+            villaCode={villa.code}
+            projectName={villa.projectName}
+            detail={residenceSummary}
+            onOpen={(photo) =>
+              setModal({ kind: "photo", ...photo, illustrative: false })
+            }
+          />
           <section className="panel">
             <div className="panel-title">
               <h3>Your villa at a glance</h3>
@@ -624,68 +670,15 @@ export function ClientPlatform({
           }
         />
         <div className="dashboard-grid">
-          <section className="panel">
-            <div className="panel-title">
-              <h3>Explore the layout</h3>
-              <span className="label">ILLUSTRATIVE CONCEPT</span>
-            </div>
-            <div
-              className="tabs"
-              role="tablist"
-              aria-label="Illustrative floor plan"
-              onKeyDown={(event) => {
-                if (
-                  !["ArrowLeft", "ArrowRight", "Home", "End"].includes(
-                    event.key,
-                  )
-                )
-                  return;
-                event.preventDefault();
-                const next =
-                  event.key === "Home"
-                    ? "ground"
-                    : event.key === "End"
-                      ? "upper"
-                      : floor === "ground"
-                        ? "upper"
-                        : "ground";
-                setFloor(next);
-                event.currentTarget
-                  .querySelector<HTMLButtonElement>(`[data-floor="${next}"]`)
-                  ?.focus();
-              }}
-            >
-              {(["ground", "upper"] as const).map((level) => (
-                <button
-                  type="button"
-                  key={level}
-                  id={`${floorId}-${level}`}
-                  data-floor={level}
-                  role="tab"
-                  aria-selected={floor === level}
-                  aria-controls={`${floorId}-plan`}
-                  tabIndex={floor === level ? 0 : -1}
-                  className={floor === level ? "active" : ""}
-                  onClick={() => setFloor(level)}
-                >
-                  {level === "ground" ? "Ground floor" : "Upper floor"}
-                </button>
-              ))}
-            </div>
-            <div
-              className="floorplan"
-              id={`${floorId}-plan`}
-              role="tabpanel"
-              aria-labelledby={`${floorId}-${floor}`}
-              tabIndex={0}
-            >
-              <FloorPlan upper={floor === "upper"} />
-            </div>
-            <p className="note">
-              Concept illustration only; not your villa’s approved technical
-              drawing. Refer to your project documents for confirmed dimensions.
-            </p>
-          </section>
+          <ResidenceVisual
+            photo={latestPhoto}
+            villaCode={villa.code}
+            projectName={villa.projectName}
+            detail="Project photography shared by your team"
+            onOpen={(photo) =>
+              setModal({ kind: "photo", ...photo, illustrative: false })
+            }
+          />
           <section className="panel">
             <div className="eyebrow">Your selected package</div>
             <h2>
@@ -748,32 +741,15 @@ export function ClientPlatform({
             </div>
           </section>
         </div>
-        <div className="gallery design-gallery">
-          {images.map((item) => (
-            <button
-              type="button"
-              key={item.src}
-              onClick={() =>
-                setModal({ kind: "photo", ...item, illustrative: true })
-              }
-            >
-              <Photo
-                src={item.src}
-                alt={`${item.label} — illustrative design inspiration`}
-              />
-              <p>{item.label} ↗</p>
-            </button>
-          ))}
-        </div>
-        {photos.length > 0 && (
-          <section className="panel project-photos">
-            <div className="panel-title">
-              <h3>From your site</h3>
-              <span className="label">SHARED BY YOUR TEAM</span>
-            </div>
+        <section className="panel project-photos">
+          <div className="panel-title">
+            <h3>From your site</h3>
+            <span className="label">SHARED BY YOUR TEAM</span>
+          </div>
+          {photos.length ? (
             <div className="gallery">
               {photos.map((item) => {
-                const url = safeDocumentUrl(item.url);
+                const url = item.safeUrl;
                 return (
                   <div key={item.id}>
                     {url ? (
@@ -811,8 +787,101 @@ export function ClientPlatform({
                 );
               })}
             </div>
-          </section>
-        )}
+          ) : (
+            <Empty>
+              No site photographs have been shared yet. Your team’s photos will
+              appear here.
+            </Empty>
+          )}
+        </section>
+        <details className="design-reference-section">
+          <summary>
+            Design references{" "}
+            <span>Illustrative only · not project records</span>
+          </summary>
+          <div className="design-reference-content">
+            <section className="panel">
+              <div className="panel-title">
+                <h3>Explore the layout</h3>
+                <span className="label">ILLUSTRATIVE CONCEPT</span>
+              </div>
+              <div
+                className="tabs"
+                role="tablist"
+                aria-label="Illustrative floor plan"
+                onKeyDown={(event) => {
+                  if (
+                    !["ArrowLeft", "ArrowRight", "Home", "End"].includes(
+                      event.key,
+                    )
+                  )
+                    return;
+                  event.preventDefault();
+                  const next =
+                    event.key === "Home"
+                      ? "ground"
+                      : event.key === "End"
+                        ? "upper"
+                        : floor === "ground"
+                          ? "upper"
+                          : "ground";
+                  setFloor(next);
+                  event.currentTarget
+                    .querySelector<HTMLButtonElement>(`[data-floor="${next}"]`)
+                    ?.focus();
+                }}
+              >
+                {(["ground", "upper"] as const).map((level) => (
+                  <button
+                    type="button"
+                    key={level}
+                    id={`${floorId}-${level}`}
+                    data-floor={level}
+                    role="tab"
+                    aria-selected={floor === level}
+                    aria-controls={`${floorId}-plan`}
+                    tabIndex={floor === level ? 0 : -1}
+                    className={floor === level ? "active" : ""}
+                    onClick={() => setFloor(level)}
+                  >
+                    {level === "ground" ? "Ground floor" : "Upper floor"}
+                  </button>
+                ))}
+              </div>
+              <div
+                className="floorplan"
+                id={`${floorId}-plan`}
+                role="tabpanel"
+                aria-labelledby={`${floorId}-${floor}`}
+                tabIndex={0}
+              >
+                <FloorPlan upper={floor === "upper"} />
+              </div>
+              <p className="note">
+                Concept illustration only; not your villa’s approved technical
+                drawing. Refer to your project documents for confirmed
+                dimensions.
+              </p>
+            </section>
+            <div className="gallery design-gallery">
+              {images.map((item) => (
+                <button
+                  type="button"
+                  key={item.src}
+                  onClick={() =>
+                    setModal({ kind: "photo", ...item, illustrative: true })
+                  }
+                >
+                  <Photo
+                    src={item.src}
+                    alt={`${item.label} — illustrative design inspiration`}
+                  />
+                  <p>{item.label} ↗</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </details>
       </>
     );
   } else if (page === "progress") {
@@ -942,69 +1011,121 @@ export function ClientPlatform({
             </button>
           </div>
           {milestones.length ? (
-            <div
-              className="table-wrap"
-              role="region"
-              aria-label="Payment milestone ledger; scroll horizontally to see all columns"
-              tabIndex={0}
-            >
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Milestone</th>
-                    <th scope="col">Share</th>
-                    <th scope="col">Amount</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Record</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {milestones.map((item, index) => (
-                    <tr key={item.id}>
-                      <td>
-                        <span className="ledger-sequence">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        {item.dueLabel}
-                      </td>
-                      <td>{numberLabel(item.percent)}%</td>
-                      <td className="ledger-amount">
-                        {money(milestoneAmount(item, villa.priceTotalUsd))}
-                      </td>
-                      <td>
-                        <Badge
-                          tone={
-                            item.status === "paid"
-                              ? ""
-                              : item.id === payments.next?.id
-                                ? "amber"
-                                : "neutral"
-                          }
-                        >
-                          {item.status === "paid"
-                            ? "Paid"
-                            : item.id === payments.next?.id
-                              ? "Upcoming"
-                              : "Scheduled"}
-                        </Badge>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="text-link"
-                          onClick={() =>
-                            setModal({ kind: "payment", id: item.id })
-                          }
-                          aria-label={`View payment record: ${item.dueLabel}`}
-                        >
-                          View ↗
-                        </button>
-                      </td>
+            <>
+              <div
+                className="table-wrap desktop-payment-ledger"
+                role="region"
+                aria-label="Payment milestone ledger"
+                tabIndex={0}
+              >
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">Milestone</th>
+                      <th scope="col">Share</th>
+                      <th scope="col">Amount</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Record</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {milestones.map((item, index) => (
+                      <tr key={item.id}>
+                        <td>
+                          <span className="ledger-sequence">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                          {item.dueLabel}
+                        </td>
+                        <td>{numberLabel(item.percent)}%</td>
+                        <td className="ledger-amount">
+                          {money(milestoneAmount(item, villa.priceTotalUsd))}
+                        </td>
+                        <td>
+                          <Badge
+                            tone={
+                              item.status === "paid"
+                                ? ""
+                                : item.id === payments.next?.id
+                                  ? "amber"
+                                  : "neutral"
+                            }
+                          >
+                            {item.status === "paid"
+                              ? "Paid"
+                              : item.id === payments.next?.id
+                                ? "Upcoming"
+                                : "Scheduled"}
+                          </Badge>
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            className="text-link"
+                            onClick={() =>
+                              setModal({ kind: "payment", id: item.id })
+                            }
+                            aria-label={`View payment record: ${item.dueLabel}`}
+                          >
+                            View ↗
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <ol
+                className="mobile-payment-ledger"
+                aria-label="Payment milestone ledger"
+              >
+                {milestones.map((item, index) => (
+                  <li key={item.id}>
+                    <div className="payment-card-heading">
+                      <span className="payment-card-sequence">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <h4>{item.dueLabel}</h4>
+                      <Badge
+                        tone={
+                          item.status === "paid"
+                            ? ""
+                            : item.id === payments.next?.id
+                              ? "amber"
+                              : "neutral"
+                        }
+                      >
+                        {item.status === "paid"
+                          ? "Paid"
+                          : item.id === payments.next?.id
+                            ? "Upcoming"
+                            : "Scheduled"}
+                      </Badge>
+                    </div>
+                    <dl className="payment-card-details">
+                      <div>
+                        <dt>Amount</dt>
+                        <dd>
+                          {money(milestoneAmount(item, villa.priceTotalUsd))}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Agreement share</dt>
+                        <dd>{numberLabel(item.percent)}%</dd>
+                      </div>
+                    </dl>
+                    <button
+                      type="button"
+                      className="text-link payment-card-action"
+                      onClick={() => setModal({ kind: "payment", id: item.id })}
+                      aria-label={`View payment record: ${item.dueLabel}`}
+                    >
+                      View payment record <ClientIcon name="arrow" />
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </>
           ) : (
             <Empty>Your payment schedule has not been shared yet.</Empty>
           )}
@@ -1038,7 +1159,12 @@ export function ClientPlatform({
       </>
     );
   } else if (page === "account") {
-    body = <AccountPanel email={data.account?.email ?? null} notifyEmail={data.account?.notifyEmail ?? true} />;
+    body = (
+      <AccountPanel
+        email={data.account?.email ?? null}
+        notifyEmail={data.account?.notifyEmail ?? true}
+      />
+    );
   } else {
     body = (
       <>
@@ -1076,11 +1202,7 @@ export function ClientPlatform({
             <small>YOUR RESIDENCE</small>
             {villa.projectName} · {villa.code}
           </div>
-          <nav
-            ref={ownerNavigation}
-            className="side-nav"
-            aria-label="Owner navigation"
-          >
+          <nav className="side-nav" aria-label="Owner navigation">
             {navigation.map((item) => (
               <Link
                 key={item.page}
@@ -1088,9 +1210,7 @@ export function ClientPlatform({
                 className={page === item.page ? "active" : ""}
                 aria-current={page === item.page ? "page" : undefined}
               >
-                <span className="nav-icon" aria-hidden="true">
-                  {item.icon}
-                </span>
+                <ClientIcon name={item.page} className="nav-icon" />
                 {item.label}
               </Link>
             ))}
@@ -1108,10 +1228,44 @@ export function ClientPlatform({
           </div>
         </aside>
         <main className="main" id="client-main">
-          <div className={`topbar${data.villaChoices.length > 1 ? " has-residence-switcher" : ""}`}>
+          <MobilePlatformNav
+            title="Owner platform"
+            context={`${villa.projectName} · ${villa.code}`}
+            homeHref={href("home")}
+            navigationKey={`${page}:${villa.id}`}
+            footer={
+              <div className="mobile-owner-account">
+                <p>
+                  {buyerName ?? "Owner"}
+                  <span>{data.account?.email ?? villa.code}</span>
+                </p>
+                <ClientSignOut />
+              </div>
+            }
+          >
+            <nav aria-label="Owner navigation">
+              {navigation.map((item) => (
+                <Link
+                  key={item.page}
+                  href={href(item.page)}
+                  aria-current={page === item.page ? "page" : undefined}
+                >
+                  <ClientIcon name={item.page} />
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </MobilePlatformNav>
+          <div
+            className={`topbar${data.villaChoices.length > 1 ? " has-residence-switcher" : ""}`}
+          >
             <span>Owner platform &nbsp; / &nbsp; {villa.projectName}</span>
             {data.villaChoices.length > 1 ? (
-              <ResidenceSwitcher choices={data.villaChoices} selectedVillaId={villa.id} page={page} />
+              <ResidenceSwitcher
+                choices={data.villaChoices}
+                selectedVillaId={villa.id}
+                page={page}
+              />
             ) : (
               <span className="topbar-residence">
                 {villa.code}
@@ -1124,7 +1278,7 @@ export function ClientPlatform({
             <p className="note">
               Your private owner platform · Construction, payments and records
               are shared by your project team.
-              {["home", "villa", "updates"].includes(page)
+              {page === "villa"
                 ? " Design photography and concept layouts are illustrative, not project records."
                 : ""}
             </p>
@@ -1153,25 +1307,31 @@ export function ClientPlatform({
           aria-label="Close dialog"
           onClick={() => dialog.current?.close()}
         >
-          ×
+          <ClientIcon name="close" />
         </button>
         {modal?.kind === "contact" && (
           <>
             <div className="eyebrow">Your atelier team</div>
             <h2 id={dialogTitle}>A personal connection.</h2>
             <p>
-              Please use your existing contact with the development team for
-              questions about {villa.code}.
+              Email the Van der Tweel team about {villa.code}. Your project and
+              villa will be included in the subject.
             </p>
-            <div className="task">
-              <strong>Your project, in one place</strong>
-              <p>
-                Construction updates, payment records and documents shared by
-                your team appear in this owner platform.
-              </p>
-            </div>
+            <a
+              className="btn modal-action"
+              href={projectContactHref(
+                teamContactEmail,
+                villa.projectName,
+                villa.code,
+              )}
+            >
+              <ClientIcon name="mail" />
+              Email your team
+            </a>
+            <p className="contact-address">{teamContactEmail}</p>
             <p className="note">
-              Messaging is not available in the owner platform.
+              Opens your email app; nothing is sent automatically. If no email
+              app opens, copy the address into your usual mailbox.
             </p>
           </>
         )}

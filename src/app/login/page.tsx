@@ -4,11 +4,11 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { auth } from "@/lib/auth";
 import { LoginForm } from "./login-form";
+import { LoginShell } from "./login-shell";
 import {
   authenticatedLoginDestination,
   safeLoginCallback,
 } from "./login-routing";
-import "./login.css";
 
 export const metadata: Metadata = {
   title: "Sign in · Van der Tweel",
@@ -41,11 +41,16 @@ async function LoginContent({ searchParams }: LoginPageProps) {
 
 export default function LoginPage(props: LoginPageProps) {
   return (
-    <main className="login-page" lang="en">
-      <h1>Sign in</h1>
-      <Suspense fallback={<p role="status">Preparing sign-in…</p>}>
+    <LoginShell title="Sign in">
+      <Suspense
+        fallback={
+          <p className="login-loading" role="status">
+            Preparing sign-in…
+          </p>
+        }
+      >
         <LoginContent {...props} />
       </Suspense>
-    </main>
+    </LoginShell>
   );
 }
