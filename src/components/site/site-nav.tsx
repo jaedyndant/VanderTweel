@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const LINKS = [
+  { href: "/", label: "Home" },
   { href: "/atelier", label: "The atelier" },
   { href: "/ownership", label: "Ownership" },
   { href: "/villas", label: "Villas" },
@@ -46,7 +47,6 @@ export default function SiteNav() {
               {link.label}
             </Link>
           ))}
-          <Link href="/login">Owner portal ↗</Link>
           <Link href="/contact" className="site-nav-cta">
             Arrange a viewing ↗
           </Link>
@@ -69,9 +69,6 @@ export default function SiteNav() {
             {link.label}
           </Link>
         ))}
-        <Link href="/login" onClick={() => setOpen(false)}>
-          Owner portal ↗
-        </Link>
         <Link href="/contact" onClick={() => setOpen(false)}>
           Arrange a viewing ↗
         </Link>

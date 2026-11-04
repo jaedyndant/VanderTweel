@@ -7,6 +7,17 @@ export const metadata: Metadata = {
   title: "The atelier",
   description:
     "Natural materials, lasting character: the design direction behind Cemagi Atelier.",
+  openGraph: {
+    title: "The atelier · Van der Tweel",
+    description:
+      "Natural materials, lasting character: the design direction behind Cemagi Atelier.",
+    url: "/atelier",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
+      },
+    ],
+  },
 };
 
 export default function AtelierPage() {

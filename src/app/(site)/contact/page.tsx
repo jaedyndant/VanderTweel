@@ -4,6 +4,11 @@ import Reveal from "@/components/site/reveal";
 export const metadata: Metadata = {
   title: "Arrange a viewing",
   description: "Get in touch with Van der Tweel about the Cemagi Atelier collection.",
+  openGraph: {
+    title: "Arrange a viewing · Van der Tweel",
+    description: "Get in touch with Van der Tweel about the Cemagi Atelier collection.",
+    url: "/contact",
+  },
 };
 
 const CONTACT_EMAIL = "hello@vandertweel.com";

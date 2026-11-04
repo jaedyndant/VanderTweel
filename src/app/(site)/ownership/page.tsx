@@ -7,6 +7,17 @@ export const metadata: Metadata = {
   title: "Ownership",
   description:
     "A personal approach to ownership — from first viewing to your private owner platform.",
+  openGraph: {
+    title: "Ownership · Van der Tweel",
+    description:
+      "A personal approach to ownership — from first viewing to your private owner platform.",
+    url: "/ownership",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1200&q=80",
+      },
+    ],
+  },
 };
 
 const STEPS = [

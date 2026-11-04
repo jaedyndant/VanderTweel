@@ -18,9 +18,16 @@ export async function generateMetadata({
   const { slug } = await params;
   const villa = await getPublicVillaBySlug(slug);
   if (!villa) return { title: "Villa" };
+  const title = `${villa.code} · ${villa.typeLabel ?? "Villa"}`;
+  const description = `${villa.code} at Cemagi Atelier — ${villa.typeLabel}, ${villa.plotM2}m² plot.`;
   return {
-    title: `${villa.code} · ${villa.typeLabel ?? "Villa"}`,
-    description: `${villa.code} at Cemagi Atelier — ${villa.typeLabel}, ${villa.plotM2}m² plot.`,
+    title,
+    description,
+    openGraph: {
+      title: `${title} · Van der Tweel`,
+      description,
+      url: `/villas/${slug}`,
+    },
   };
 }
 
