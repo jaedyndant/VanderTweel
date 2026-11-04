@@ -3,12 +3,12 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Reveal from "@/components/site/reveal";
 import { SITE_IMAGES, unsplash } from "@/components/site/images";
-import { getPublicVillaBySlug, getPublicVillas } from "@/lib/public-site-data";
+import { getPublicVillaBySlug } from "@/lib/public-site-data";
 
-export async function generateStaticParams() {
-  const villas = await getPublicVillas();
-  return villas.map((v) => ({ slug: v.slug }));
-}
+// Deliberately no generateStaticParams: the villa collection is read live
+// from Postgres on every request (see (site)/layout.tsx `instant = false`),
+// so this route must never attempt a build-time DB read — a CI/preview
+// build must succeed without real database credentials.
 
 export async function generateMetadata({
   params,
