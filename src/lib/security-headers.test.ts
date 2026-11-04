@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { PHASE_PRODUCTION_SERVER } from "next/constants";
 
 async function configuredHeaders(mode: "production" | "development") {
   vi.stubEnv("NODE_ENV", mode);
   vi.resetModules();
-  const { default: config } = await import("../../next.config");
+  const { default: configureNext } = await import("../../next.config");
+  const config = configureNext(PHASE_PRODUCTION_SERVER);
   const rules = await config.headers!();
   const globalRule = rules.find((rule) => rule.source === "/:path*");
   expect(globalRule, "Security headers must cover /login and protected routes").toBeDefined();

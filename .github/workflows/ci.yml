@@ -53,6 +53,11 @@ jobs:
           npm run db:migrate
           npm run db:migrate
           npm run test:integration
+          VERCEL_ENV=production node scripts/check-release-schema.mjs
+          if DATABASE_URL=postgresql://postgres:vdt-local-fixture-only@127.0.0.1:55439/postgres VERCEL_ENV=production node scripts/check-release-schema.mjs; then
+            echo "Production gate incorrectly accepted an unmigrated database"
+            exit 1
+          fi
         env:
           DATABASE_URL: postgresql://postgres:vdt-local-fixture-only@127.0.0.1:55439/vdt_completion_test
           VDT_LOCAL_TEST: '1'

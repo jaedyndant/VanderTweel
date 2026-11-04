@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
+import { execFileSync } from "node:child_process";
+import path from "node:path";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -69,4 +72,10 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default function configureNext(phase: string): NextConfig {
+  // Runs even when hosting overrides the npm build command with `next build`.
+  if (phase === PHASE_PRODUCTION_BUILD && process.env.VERCEL_ENV === "production") {
+    execFileSync(process.execPath, [path.join(process.cwd(), "scripts/check-release-schema.mjs")], { stdio: "inherit" });
+  }
+  return nextConfig;
+}

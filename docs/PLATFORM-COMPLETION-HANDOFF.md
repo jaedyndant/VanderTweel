@@ -16,6 +16,8 @@ Not added: 3D viewer, website request/intake forms, changed project facts, or em
 
 This branch requires migration `0008_platform_functional_completion.sql` **before serving its new code**. No production migration, actual customer mail or production-data change was performed during implementation.
 
+The build now checks migration 0008's exact hash and required schema using a read-only connection when `VERCEL_ENV=production`. If verification fails, the production build stops and Vercel retains the existing deployment. Merging this code therefore does not imply that the new backend is live. The gate never runs a migration automatically. Preview/local builds do not make this production check; their successful build is not schema acceptance. After migration/configuration, redeploy the reviewed commit.
+
 - Take a database backup/restore point and rehearse on an isolated staging database first. Run the existing numbered migration command; never `drizzle-kit push` against production.
 - Migration 0008 is additive. It adds tables, account display name and a unique villa-code index. Preflight duplicate codes with `SELECT code, count(*) FROM villa GROUP BY code HAVING count(*) > 1;`. Resolve any duplicates deliberately before migration. Do not delete ownership/payment records to satisfy the constraint.
 - Historical migration SQL remains unchanged. Duplicate IDs/parent links in snapshots 0003–0005 were repaired and missing snapshots 0006/0007 reconstructed. The new snapshot covers the actual schema. The new journal timestamp is greater than every historical timestamp, including their future-dated values.
