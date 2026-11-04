@@ -21,6 +21,20 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: vdt-local-fixture-only
+          POSTGRES_DB: vdt_completion_test
+        ports:
+          - 55439:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,6 +48,22 @@ jobs:
         run: npx tsc --noEmit
       - name: Unit tests
         run: npx vitest run
+      - name: Additive migrations and PostgreSQL integration tests
+        run: |
+          npm run db:migrate
+          npm run db:migrate
+          npm run test:integration
+          VERCEL_ENV=production node scripts/check-release-schema.mjs
+          if DATABASE_URL=postgresql://postgres:vdt-local-fixture-only@127.0.0.1:55439/postgres VERCEL_ENV=production node scripts/check-release-schema.mjs; then
+            echo "Production gate incorrectly accepted an unmigrated database"
+            exit 1
+          fi
+        env:
+          DATABASE_URL: postgresql://postgres:vdt-local-fixture-only@127.0.0.1:55439/vdt_completion_test
+          VDT_LOCAL_TEST: '1'
+          APP_URL: http://127.0.0.1:3029
+          MAIL_TRANSPORT: local-capture
+          LOCAL_MAIL_DIR: /tmp/vdt-ci-mail
       - name: Build
         run: npm run build
         env:

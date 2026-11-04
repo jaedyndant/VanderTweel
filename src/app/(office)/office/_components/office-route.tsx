@@ -1,7 +1,7 @@
 import "server-only";
 
 import { notFound, redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { AccessError, requireActor } from "@/lib/platform-access";
 import { getOfficePlatformData } from "@/lib/office-platform-data";
 import {
   addFileLink,
@@ -41,11 +41,11 @@ export async function OfficeRoute({
   projectSlug?: string;
   villaCode?: string;
 }) {
-  const session = await auth();
-  const user = session?.user as { id?: string; role?: string } | undefined;
-  if (!user?.id || (user.role !== "pm" && user.role !== "developer")) {
-    redirect("/login");
-  }
+  const user = await requireActor().catch((error: unknown) => {
+    if (error instanceof AccessError) return null;
+    throw error;
+  });
+  if (!user || user.role === "buyer") redirect("/login");
   if (
     user.role === "pm" &&
     (page === "buyers" || page === "payments" || page === "documents")

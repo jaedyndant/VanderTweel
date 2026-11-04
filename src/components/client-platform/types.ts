@@ -67,6 +67,7 @@ export interface ClientPlatformData {
     body: string;
     category: string | null;
     authorRoleLabel: string | null;
+    photos?: {id:string;label:string;url:string}[];
     createdAt: string;
   }[];
 }

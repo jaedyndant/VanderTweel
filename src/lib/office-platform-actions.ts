@@ -100,7 +100,7 @@ export async function toggleProgress(input: ToggleProgressInput): Promise<Office
     const tasks = detail.tasks.filter((task) => task.id === taskId && task.villaId === detail.villa.id);
     if (tasks.length !== 1) throw new InputError("This task is no longer available. Refresh the page.");
     if (Boolean(tasks[0].doneAt) !== input.expectedDone) throw new InputError("This task has changed. Refresh the page before saving.");
-    await toggleProgressTaskAction(taskId, detail.villa.code);
+    await toggleProgressTaskAction(taskId, detail.villa.code, input.expectedDone);
   });
 }
 

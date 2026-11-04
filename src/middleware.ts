@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth-config";
 import { resolveLandingPath, type Surface } from "@/lib/role-routing";
 
 // TO 9.1: authorization enforced at the API/middleware layer, never only by
@@ -11,6 +12,7 @@ const SURFACE_BY_PATH_PREFIX: Array<[string, Surface]> = [
   ["/office", "office"],
 ];
 
+const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const match = SURFACE_BY_PATH_PREFIX.find(([prefix]) => pathname.startsWith(prefix));

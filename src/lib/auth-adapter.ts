@@ -128,24 +128,13 @@ export function buildAuthAdapter(): Adapter {
       return { identifier, token, expires };
     },
     async useVerificationToken({ identifier, token }) {
-      const row = await db.query.verificationToken.findFirst({
-        where: and(
-          eq(verificationToken.identifier, normalize(identifier)),
-          eq(verificationToken.token, token)
-        ),
-      });
-      if (!row) return null;
-      // One-time use (TO 9.2): delete on successful read so it can never be
-      // replayed, regardless of whether it has expired.
-      await db
-        .delete(verificationToken)
-        .where(
-          and(
-            eq(verificationToken.identifier, row.identifier),
-            eq(verificationToken.token, row.token)
-          )
-        );
-      return row;
+      // DELETE ... RETURNING claims the token atomically. A SELECT followed by
+      // DELETE lets two concurrent callbacks consume the same magic link.
+      const [row] = await db.delete(verificationToken).where(and(
+        eq(verificationToken.identifier, normalize(identifier)),
+        eq(verificationToken.token, token),
+      )).returning();
+      return row ?? null;
     },
   };
 }

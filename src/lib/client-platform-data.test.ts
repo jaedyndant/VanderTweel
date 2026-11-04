@@ -1,3 +1,6 @@
+vi.mock("@/lib/files/service", () => ({ getManagedFilesForBuyer: vi.fn(async () => []) }));
+vi.mock("@/lib/billing/service", () => ({ getBillingDocumentsForBuyer: vi.fn(async () => []), getBillingStatusForMilestones: vi.fn(async () => new Map()) }));
+vi.mock("@/lib/platform-communication", () => ({ getBuyerMessages: vi.fn(async () => []) }));
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
@@ -129,7 +132,7 @@ describe("client platform read model", () => {
       { id: second.id, code: second.code, projectName: "Cemagi Atelier" },
     ]);
     vi.mocked(db.query.account.findFirst).mockResolvedValue({
-      id: "buyer-a", email: "owner@example.com", notifyEmail: false,
+      id: "buyer-a", email: "owner@example.com", notifyEmail: false, displayName: null,
       role: "buyer", lastLoginAt: null, createdAt: new Date(),
     });
     const result = await getClientPlatformData("buyer-a", second.id, "account");
@@ -202,7 +205,7 @@ describe("client platform read model", () => {
       paidAt: "2026-05-12T10:00:00.000Z",
     });
     expect(result?.milestones[0]).not.toHaveProperty("villaId");
-    expect(result?.documents[0]).not.toHaveProperty("uploadedBy");
+    expect(result?.documents).toEqual([]); // Legacy external links are quarantined until migrated.
     expect(getVillaProgress).not.toHaveBeenCalled();
   });
 

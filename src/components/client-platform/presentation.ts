@@ -99,6 +99,7 @@ export function paymentSummary(
 }
 
 export function safeDocumentUrl(value: string): string | null {
+  if (/^\/api\/(?:files|billing\/documents)\/[0-9a-f-]{36}$/i.test(value)) return value;
   try {
     const url = new URL(value);
     const hostname = url.hostname.toLowerCase();
@@ -177,7 +178,7 @@ export function paymentCsv(
       item.dueLabel,
       item.percent,
       milestoneAmount(item, total) ?? "Not available",
-      item.status === "paid" ? "Paid" : "Scheduled",
+      humanLabel(item.status),
       item.paidAt ?? "",
       item.expectedAt ?? "",
       item.amountUsd !== null

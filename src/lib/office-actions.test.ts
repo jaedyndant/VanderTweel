@@ -1,213 +1,156 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-vi.mock("@/lib/office-data", () => ({ getAuthorizedOfficeVilla: vi.fn() }));
-vi.mock("@/lib/notify", () => ({ notifyBuyersForVilla: vi.fn() }));
-vi.mock("@/lib/audit", () => ({ recordAudit: vi.fn() }));
-vi.mock("@/db/client", () => ({
-  db: {
-    query: {
-      progressTask: { findFirst: vi.fn() },
-      paymentMilestone: { findFirst: vi.fn() },
-    },
-    update: vi.fn(),
-    insert: vi.fn(),
-    select: vi.fn(),
-  },
+vi.mock("next/server", () => ({ after: vi.fn() }));
+vi.mock("@/lib/platform-access", () => ({
+  requireActor: vi.fn(), assertScope: vi.fn(),
+  AccessError: class AccessError extends Error { constructor(message = "Access denied.", public status = 403) { super(message); } },
 }));
+vi.mock("@/lib/platform-events", () => ({ writePlatformEvent: vi.fn() }));
+vi.mock("@/lib/platform-communication", () => ({ publishTeamMessage: vi.fn() }));
+vi.mock("@/lib/mail-outbox", () => ({ dispatchMailOutbox: vi.fn() }));
+vi.mock("@/lib/billing/service", () => ({ markBillingMilestonePaid: vi.fn() }));
+vi.mock("@/db/client", () => ({ db: { transaction: vi.fn(), select: vi.fn() } }));
 
-import { auth } from "@/lib/auth";
+import { after } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db } from "@/db/client";
-import { file, paymentMilestone, progressTask, update } from "@/db/schema";
-import { getAuthorizedOfficeVilla } from "@/lib/office-data";
-import { notifyBuyersForVilla } from "@/lib/notify";
-import { recordAudit } from "@/lib/audit";
+import { progressTask, villa as villaTable } from "@/db/schema";
+import { requireActor, assertScope, AccessError } from "@/lib/platform-access";
+import { writePlatformEvent } from "@/lib/platform-events";
+import { publishTeamMessage } from "@/lib/platform-communication";
+import { dispatchMailOutbox } from "@/lib/mail-outbox";
+import { markBillingMilestonePaid } from "@/lib/billing/service";
 import { addFileAction, createUpdateAction, markPaymentPaidAction, toggleProgressTaskAction } from "./office-actions";
 
-const now = new Date("2026-11-03T13:30:00Z");
-const villa = { id: "villa-a", code: "Villa 1" };
-const task = { id: "task-a", villaId: villa.id, phase: "Foundation", doneAt: null, doneBy: null };
-const milestone = { id: "payment-a", villaId: villa.id, status: "open", dueLabel: "Foundation", percent: "10", paidAt: null };
-const scope = { villaId: villa.id, villaCode: villa.code };
-const returning = vi.fn();
+const taskId = "11111111-1111-4111-8111-111111111111";
+const requestId = "22222222-2222-4222-8222-222222222222";
+const developer = { id: "33333333-3333-4333-8333-333333333333", role: "developer" as const, email: "dev@example.test", displayName: "Developer" };
+const villa = { id: "44444444-4444-4444-8444-444444444444", projectId: "55555555-5555-4555-8555-555555555555", code: "QA Villa" };
+const task = { id: taskId, villaId: villa.id, phase: "Foundation", doneAt: null as Date | null, doneBy: null as string | null };
+let taskRows: Array<typeof task>;
+let villaRows: Array<typeof villa>;
+const rowLock = vi.fn();
+const writeWhere = vi.fn();
 const set = vi.fn();
-const values = vi.fn();
-
-function form(fields: Record<string, string>) {
-  const data = new FormData();
-  for (const [key, value] of Object.entries({ villaCode: villa.code, ...fields })) data.set(key, value);
-  return data;
+const tx = { select: vi.fn(), update: vi.fn() };
+function select(table: unknown) {
+  return { where: vi.fn(() => {
+    const rows = table === villaTable ? villaRows : taskRows;
+    return Object.assign(Promise.resolve(rows), { for: (mode: string) => { rowLock(mode); return Promise.resolve(rows); } });
+  }) };
 }
-
-function updateForm() {
-  return form({ title: "Private update title", body: "Private buyer update", category: "Construction" });
+function form(fields: Record<string, string> = {}) {
+  const result = new FormData();
+  Object.entries({ villaCode: villa.code, requestId, title: "Foundation update", body: "Synthetic QA update body", category: "Construction", ...fields }).forEach(([key, value]) => result.set(key, value));
+  return result;
 }
-
-function fileForm() {
-  return form({ kind: "doc", url: "https://files.test/private.pdf?token=private", label: "Private contract", note: "Private document note" });
-}
-
-const mutations = [
-  { name: "progress", run: () => toggleProgressTaskAction(task.id, villa.code), targetId: task.id },
-  { name: "payment", run: () => markPaymentPaidAction(milestone.id, villa.code), targetId: milestone.id },
-  { name: "update", run: () => createUpdateAction(updateForm()), targetId: "inserted-update-a" },
-  { name: "file", run: () => addFileAction(fileForm()), targetId: "inserted-file-a" },
-];
-
 beforeEach(() => {
-  vi.resetAllMocks();
-  vi.mocked(auth).mockResolvedValue({ user: { id: "account-a", role: "developer" } } as never);
-  vi.mocked(getAuthorizedOfficeVilla).mockResolvedValue(villa as never);
-  vi.mocked(db.query.progressTask.findFirst).mockResolvedValue(task as never);
-  vi.mocked(db.query.paymentMilestone.findFirst).mockResolvedValue(milestone as never);
-  set.mockImplementation(() => ({ where: () => ({ returning }) }));
-  values.mockImplementation(() => ({ returning }));
-  vi.mocked(db.update).mockImplementation((table) => {
-    returning.mockResolvedValue([{ id: table === progressTask ? task.id : milestone.id }]);
-    return { set } as never;
+  vi.resetAllMocks(); taskRows = [{ ...task }]; villaRows = [{ ...villa }];
+  vi.mocked(requireActor).mockResolvedValue(developer);
+  vi.mocked(assertScope).mockResolvedValue({ project: { id: villa.projectId }, villa } as never);
+  tx.select.mockImplementation(() => ({ from: select }));
+  vi.mocked(db.select).mockImplementation(() => ({ from: select }) as never);
+  set.mockReturnValue({ where: writeWhere }); writeWhere.mockResolvedValue(undefined);
+  tx.update.mockReturnValue({ set });
+  vi.mocked(db.transaction).mockImplementation(async (callback) => callback(tx as never));
+  vi.mocked(markBillingMilestonePaid).mockRejectedValue(new Error("Use Billing to issue the invoice and record the payment amount, date and bank reference."));
+});
+
+describe("progress action — transactional compare-and-set boundary", () => {
+  it.each([
+    { expectedDone: false, doneAt: null, action: "progress.mark_done" },
+    { expectedDone: true, doneAt: new Date("2026-11-04T08:00:00Z"), action: "progress.reopen" },
+  ])("records $action with the same transaction and schedules delivery only after success", async ({ expectedDone, doneAt, action }) => {
+    const pm = { ...developer, role: "pm" as const };
+    vi.mocked(requireActor).mockResolvedValue(pm);
+    taskRows = [{ ...task, doneAt }];
+    await toggleProgressTaskAction(taskId, villa.code, expectedDone);
+    expect(assertScope).toHaveBeenCalledExactlyOnceWith(tx, pm, { projectId: villa.projectId, villaId: villa.id });
+    expect(rowLock).toHaveBeenCalledExactlyOnceWith("update");
+    expect(tx.update).toHaveBeenCalledExactlyOnceWith(progressTask);
+    expect(set).toHaveBeenCalledExactlyOnceWith({ doneAt: expectedDone ? null : expect.any(Date), doneBy: expectedDone ? null : pm.id });
+    expect(writePlatformEvent).toHaveBeenCalledExactlyOnceWith(tx, expect.objectContaining({ actorId: pm.id, projectId: villa.projectId, villaId: villa.id, action, targetId: taskId, notify: true, pmSafe: true, link: `/koper/voortgang?villa=${villa.id}` }));
+    expect(after).toHaveBeenCalledTimes(1); expect(dispatchMailOutbox).not.toHaveBeenCalled();
+    const callback = vi.mocked(after).mock.calls[0][0];
+    if (typeof callback !== "function") throw new Error("Expected deferred delivery callback");
+    await callback(); expect(dispatchMailOutbox).toHaveBeenCalledTimes(1);
+    expect(revalidatePath).toHaveBeenCalledWith("/office", "layout"); expect(revalidatePath).toHaveBeenCalledWith("/koper", "layout");
   });
-  vi.mocked(db.insert).mockImplementation((table) => {
-    returning.mockResolvedValue([{ id: table === update ? "inserted-update-a" : "inserted-file-a" }]);
-    return { values } as never;
+  it("refuses blind legacy toggles before starting a transaction", async () => {
+    await expect(toggleProgressTaskAction(taskId, villa.code)).rejects.toThrow(/Refresh/);
+    expect(db.transaction).not.toHaveBeenCalled(); expect(writePlatformEvent).not.toHaveBeenCalled();
+  });
+  it("rejects stale displayed state rather than undoing a concurrent user's change", async () => {
+    taskRows = [{ ...task, doneAt: new Date() }];
+    await expect(toggleProgressTaskAction(taskId, villa.code, false)).rejects.toMatchObject({ status: 409 });
+    expect(tx.update).not.toHaveBeenCalled(); expect(writePlatformEvent).not.toHaveBeenCalled(); expect(after).not.toHaveBeenCalled();
+  });
+  it("rejects a task outside the scoped residence", async () => {
+    taskRows = [];
+    await expect(toggleProgressTaskAction(taskId, villa.code, false)).rejects.toThrow(/Access/);
+    expect(tx.update).not.toHaveBeenCalled(); expect(writePlatformEvent).not.toHaveBeenCalled();
+  });
+  it("rejects a project that the PM no longer manages", async () => {
+    vi.mocked(assertScope).mockRejectedValue(new AccessError());
+    await expect(toggleProgressTaskAction(taskId, villa.code, false)).rejects.toThrow(/Access/);
+    expect(tx.update).not.toHaveBeenCalled(); expect(rowLock).not.toHaveBeenCalled();
+  });
+  it("fails the transaction if audit/outbox persistence fails, without scheduling delivery or reporting success", async () => {
+    vi.mocked(writePlatformEvent).mockRejectedValue(new Error("Outbox insert failed"));
+    await expect(toggleProgressTaskAction(taskId, villa.code, false)).rejects.toThrow("Outbox insert failed");
+    expect(db.transaction).toHaveBeenCalledTimes(1); expect(after).not.toHaveBeenCalled(); expect(revalidatePath).not.toHaveBeenCalled();
+  });
+  it("does not create an event if the state update fails", async () => {
+    writeWhere.mockRejectedValue(new Error("Write failed"));
+    await expect(toggleProgressTaskAction(taskId, villa.code, false)).rejects.toThrow("Write failed");
+    expect(writePlatformEvent).not.toHaveBeenCalled(); expect(after).not.toHaveBeenCalled();
+  });
+  it("rejects malformed task identifiers without querying a database", async () => {
+    await expect(toggleProgressTaskAction("invalid", villa.code, false)).rejects.toThrow(); expect(db.transaction).not.toHaveBeenCalled();
+  });
+  it("never lets a buyer enter the progress mutation transaction", async () => {
+    vi.mocked(requireActor).mockResolvedValue({ ...developer, role: "buyer" });
+    await expect(toggleProgressTaskAction(taskId, villa.code, false)).rejects.toThrow(/Access/); expect(db.transaction).not.toHaveBeenCalled();
   });
 });
 
-describe("back-office audit at the actual mutation boundary", () => {
-  it.each([
-    { previousStatus: "open", nextStatus: "paid", action: "payment.mark_paid", notify: true },
-    { previousStatus: "paid", nextStatus: "open", action: "payment.reopen", notify: false },
-  ])("records $action with the actual payment transition", async ({ previousStatus, nextStatus, action, notify }) => {
-    vi.mocked(db.query.paymentMilestone.findFirst).mockResolvedValue({ ...milestone, status: previousStatus } as never);
-
-    await markPaymentPaidAction(milestone.id, villa.code);
-
-    expect(db.update).toHaveBeenCalledWith(paymentMilestone);
-    expect(set).toHaveBeenCalledWith({ status: nextStatus, paidAt: notify ? expect.any(Date) : null });
-    expect(recordAudit).toHaveBeenCalledExactlyOnceWith("account-a", action, milestone.id, {
-      ...scope, previousStatus, nextStatus,
-    });
-    expect(notifyBuyersForVilla).toHaveBeenCalledTimes(notify ? 1 : 0);
+describe("legacy actions delegate to the protected domain workflows", () => {
+  it("routes payment attempts through billing and preserves the explicit-recording guard", async () => {
+    await expect(markPaymentPaidAction(taskId, villa.code)).rejects.toThrow(/Use Billing/);
+    expect(markBillingMilestonePaid).toHaveBeenCalledExactlyOnceWith(taskId, villa.code);
+    expect(db.transaction).not.toHaveBeenCalled(); expect(tx.update).not.toHaveBeenCalled(); expect(writePlatformEvent).not.toHaveBeenCalled(); expect(after).not.toHaveBeenCalled();
   });
-
-  it.each([
-    { doneAt: null, previousStatus: "open", nextStatus: "done", action: "progress.mark_done", notify: true },
-    { doneAt: now, previousStatus: "done", nextStatus: "open", action: "progress.reopen", notify: false },
-  ])("records $action for a PM with the actual progress transition", async ({ doneAt, previousStatus, nextStatus, action, notify }) => {
-    vi.mocked(auth).mockResolvedValue({ user: { id: "pm-a", role: "pm" } } as never);
-    vi.mocked(db.query.progressTask.findFirst).mockResolvedValue({ ...task, doneAt } as never);
-
-    await toggleProgressTaskAction(task.id, villa.code);
-
-    expect(db.update).toHaveBeenCalledWith(progressTask);
-    expect(set).toHaveBeenCalledWith({ doneAt: notify ? expect.any(Date) : null, doneBy: notify ? "pm-a" : null });
-    expect(recordAudit).toHaveBeenCalledExactlyOnceWith("pm-a", action, task.id, {
-      ...scope, previousStatus, nextStatus,
-    });
-    expect(notifyBuyersForVilla).toHaveBeenCalledTimes(notify ? 1 : 0);
+  it("preserves the domain authorization error for payments", async () => {
+    vi.mocked(markBillingMilestonePaid).mockRejectedValue(new AccessError());
+    await expect(markPaymentPaidAction(taskId, villa.code)).rejects.toThrow(/Access/); expect(tx.update).not.toHaveBeenCalled();
   });
-
-  it("uses the inserted update's exact ID for audit and notification without logging its text", async () => {
-    await createUpdateAction(updateForm());
-
-    expect(db.insert).toHaveBeenCalledWith(update);
-    expect(returning).toHaveBeenCalledWith({ id: update.id });
-    expect(db.select).not.toHaveBeenCalled();
-    expect(recordAudit).toHaveBeenCalledExactlyOnceWith("account-a", "update.create", "inserted-update-a", {
-      ...scope, category: "Construction",
-    });
-    expect(notifyBuyersForVilla).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({
-      villaId: villa.id, sourceType: "update", sourceId: "inserted-update-a",
-      summary: expect.stringContaining("Private buyer update"),
-    }));
-    expect(JSON.stringify(vi.mocked(recordAudit).mock.calls)).not.toContain("Private");
+  it("passes the stable update request id and authoritative residence to the transactional publisher", async () => {
+    await createUpdateAction(form());
+    expect(publishTeamMessage).toHaveBeenCalledExactlyOnceWith({ id: requestId, projectId: villa.projectId, villaId: villa.id, title: "Foundation update", body: "Synthetic QA update body", category: "Construction" });
+    expect(after).toHaveBeenCalledTimes(1); expect(dispatchMailOutbox).not.toHaveBeenCalled();
   });
-
-  it("uses the inserted file's exact ID rather than the villa ID or latest shared file", async () => {
-    await addFileAction(fileForm());
-
-    expect(db.insert).toHaveBeenCalledWith(file);
-    expect(returning).toHaveBeenCalledWith({ id: file.id });
-    expect(db.select).not.toHaveBeenCalled();
-    expect(recordAudit).toHaveBeenCalledExactlyOnceWith("account-a", "file.share_link", "inserted-file-a", {
-      ...scope, kind: "doc",
-    });
-    expect(notifyBuyersForVilla).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({
-      villaId: villa.id, sourceType: "file", sourceId: "inserted-file-a",
-    }));
-    expect(JSON.stringify(vi.mocked(recordAudit).mock.calls)).not.toMatch(/private|Private/);
+  it("does not bypass a failed publication or schedule direct delivery", async () => {
+    vi.mocked(publishTeamMessage).mockRejectedValue(new AccessError());
+    await expect(createUpdateAction(form())).rejects.toThrow(/Access/); expect(after).not.toHaveBeenCalled(); expect(revalidatePath).not.toHaveBeenCalled();
   });
-
-  it.each(mutations)("records a successful $name write before a notification failure", async ({ run, targetId }) => {
-    vi.mocked(notifyBuyersForVilla).mockRejectedValue(new Error("Notification persistence failed"));
-
-    await expect(run()).rejects.toThrow("Notification persistence failed");
-
-    expect(recordAudit).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(recordAudit).mock.calls[0][2]).toBe(targetId);
-    expect(vi.mocked(recordAudit).mock.invocationCallOrder[0]).toBeLessThan(
-      vi.mocked(notifyBuyersForVilla).mock.invocationCallOrder[0]
-    );
+  it("refuses an update for an unknown villa before publication", async () => {
+    villaRows = []; await expect(createUpdateAction(form())).rejects.toThrow(/Access/); expect(publishTeamMessage).not.toHaveBeenCalled();
   });
-
-  it.each(mutations)("does not write or audit $name without a back-office session", async ({ run }) => {
-    vi.mocked(auth).mockResolvedValue({ user: { id: "buyer-a", role: "buyer" } } as never);
-
-    await expect(run()).rejects.toThrow("Not authorized");
-
-    expect(db.update).not.toHaveBeenCalled();
-    expect(db.insert).not.toHaveBeenCalled();
-    expect(recordAudit).not.toHaveBeenCalled();
-    expect(notifyBuyersForVilla).not.toHaveBeenCalled();
+  it("blocks buyer use of the legacy update route", async () => {
+    vi.mocked(requireActor).mockResolvedValue({ ...developer, role: "buyer" });
+    await expect(createUpdateAction(form())).rejects.toThrow(/Access/); expect(db.select).not.toHaveBeenCalled(); expect(publishTeamMessage).not.toHaveBeenCalled();
   });
-
-  it.each(mutations)("does not write or audit $name for an unauthorized villa", async ({ run }) => {
-    vi.mocked(getAuthorizedOfficeVilla).mockResolvedValue(null);
-
-    await expect(run()).rejects.toThrow("Not authorized for this villa");
-
-    expect(db.update).not.toHaveBeenCalled();
-    expect(db.insert).not.toHaveBeenCalled();
-    expect(recordAudit).not.toHaveBeenCalled();
+  it("refuses external file URLs even for a developer, guiding them to private uploads", async () => {
+    await expect(addFileAction(form({ url: "https://files.example.test/private.pdf", kind: "doc" }))).rejects.toMatchObject({ status: 409, message: expect.stringContaining("private upload manager") });
+    expect(requireActor).toHaveBeenCalledExactlyOnceWith(true); expect(db.transaction).not.toHaveBeenCalled(); expect(db.select).not.toHaveBeenCalled(); expect(writePlatformEvent).not.toHaveBeenCalled();
   });
-
-  it.each(mutations)("does not audit $name when persistence fails", async ({ run }) => {
-    returning.mockRejectedValueOnce(new Error("Write failed"));
-
-    await expect(run()).rejects.toThrow("Write failed");
-
-    expect(recordAudit).not.toHaveBeenCalled();
-    expect(notifyBuyersForVilla).not.toHaveBeenCalled();
+  it("requires developer authorization even for the disabled external-file entry point", async () => {
+    vi.mocked(requireActor).mockRejectedValue(new AccessError());
+    await expect(addFileAction(form())).rejects.toThrow(/Access/); expect(requireActor).toHaveBeenCalledExactlyOnceWith(true);
   });
-
-  it.each(mutations)("does not audit $name when no row was written", async ({ run }) => {
-    returning.mockResolvedValueOnce([]);
-
-    await expect(run()).rejects.toThrow("could not be");
-
-    expect(recordAudit).not.toHaveBeenCalled();
-    expect(notifyBuyersForVilla).not.toHaveBeenCalled();
-  });
-
-  it("does not audit a payment or task belonging to another villa", async () => {
-    vi.mocked(db.query.progressTask.findFirst).mockResolvedValue({ ...task, villaId: "villa-b" } as never);
-    vi.mocked(db.query.paymentMilestone.findFirst).mockResolvedValue({ ...milestone, villaId: "villa-b" } as never);
-
-    await expect(toggleProgressTaskAction(task.id, villa.code)).rejects.toThrow("does not belong");
-    await expect(markPaymentPaidAction(milestone.id, villa.code)).rejects.toThrow("does not belong");
-
-    expect(db.update).not.toHaveBeenCalled();
-    expect(recordAudit).not.toHaveBeenCalled();
-  });
-
-  it("does not let a PM write or audit payments or files", async () => {
-    vi.mocked(auth).mockResolvedValue({ user: { id: "pm-a", role: "pm" } } as never);
-
-    await expect(markPaymentPaidAction(milestone.id, villa.code)).rejects.toThrow("Only the developer");
-    await expect(addFileAction(fileForm())).rejects.toThrow("Only the developer");
-
-    expect(db.update).not.toHaveBeenCalled();
-    expect(db.insert).not.toHaveBeenCalled();
-    expect(recordAudit).not.toHaveBeenCalled();
+  it.each([() => toggleProgressTaskAction(taskId, villa.code, false), () => createUpdateAction(form()), () => addFileAction(form())])("never accesses writes when session authentication fails", async (run) => {
+    vi.mocked(requireActor).mockRejectedValue(new AccessError("Sign in to continue.", 401));
+    await expect(run()).rejects.toMatchObject({ status: 401 }); expect(db.transaction).not.toHaveBeenCalled(); expect(publishTeamMessage).not.toHaveBeenCalled(); expect(writePlatformEvent).not.toHaveBeenCalled();
   });
 });

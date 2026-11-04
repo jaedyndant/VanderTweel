@@ -66,7 +66,8 @@ export interface OfficePayment extends OfficeRecordScope {
   expectedAt: string | null;
 }
 
-export interface OfficeUpdate extends OfficeRecordScope {
+export interface OfficeUpdate extends Omit<OfficeRecordScope, "villaId"> {
+  villaId: string | null;
   id: string;
   title: string | null;
   body: string;

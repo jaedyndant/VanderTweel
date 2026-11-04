@@ -1,0 +1,9 @@
+"use client";
+import {useEffect,useState} from 'react';
+type Note={id:string;summary:string;link:string|null;createdAt:string;readAt:string|null};
+export function BuyerNotifications(){const[notes,setNotes]=useState<Note[]>([]);const[page,setPage]=useState(0);const[more,setMore]=useState(false);const[error,setError]=useState('');const[revision,setRevision]=useState(0);
+ useEffect(()=>{const timer=setInterval(()=>setRevision(n=>n+1),20_000);return()=>clearInterval(timer);},[]);
+ useEffect(()=>{const c=new AbortController();fetch(`/api/platform/notifications?page=${page}`,{signal:c.signal}).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error);setNotes(d.notifications);setMore(d.hasMore);setError('');}).catch(e=>{if(e.name!=='AbortError')setError('Notifications could not be loaded.');});return()=>c.abort();},[page,revision]);
+ async function mark(id:string){try{const r=await fetch('/api/platform/notifications',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});if(!r.ok)throw Error();setNotes(ns=>ns.map(n=>n.id===id?{...n,readAt:new Date().toISOString()}:n));}catch{setError('Could not save. Please try again.');}}
+ return <details className="completion-notifications"><summary>Updates inbox{notes.some(n=>!n.readAt)?' · New':''}</summary>{error&&<p role="alert">{error}</p>}<button onClick={()=>setRevision(n=>n+1)}>Refresh</button>{notes.length?notes.map(n=><article key={n.id}><small>{new Date(n.createdAt).toLocaleDateString('en-GB')}{n.readAt?' · Read':' · New'}</small><p>{n.summary}</p>{n.link&&<a href={n.link}>View update →</a>} {!n.readAt&&<button onClick={()=>mark(n.id)}>Mark read</button>}</article>):<p>No notifications yet.</p>}<footer><button disabled={!page} onClick={()=>setPage(p=>p-1)}>Previous</button><span>Page {page+1}</span><button disabled={!more} onClick={()=>setPage(p=>p+1)}>Next</button></footer></details>;
+}

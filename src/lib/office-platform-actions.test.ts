@@ -80,7 +80,7 @@ describe("office presentation action adapters", () => {
   it("permits an assigned PM to complete a task through the unchanged backend", async () => {
     session("pm");
     expect(await toggleProgress({ ...scope, taskId: "task-a", expectedDone: false })).toEqual({ ok: true });
-    expect(toggleProgressTaskAction).toHaveBeenCalledWith("task-a", "Villa 1");
+    expect(toggleProgressTaskAction).toHaveBeenCalledWith("task-a", "Villa 1", false);
     expect(getVillaForOffice).toHaveBeenCalledWith("account-a", "pm", "Villa 1");
     expect(revalidatePath).toHaveBeenCalledWith("/(office)", "layout");
   });

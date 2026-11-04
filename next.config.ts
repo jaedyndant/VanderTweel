@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
+import { execFileSync } from "node:child_process";
+import path from "node:path";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -33,7 +36,9 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' https: data:",
       "font-src 'self' data:",
-      "connect-src 'self'",
+      // Direct uploads use the official @vercel/blob API. Permit only its
+      // exact root and descendants; private downloads remain same-origin.
+      "connect-src 'self' https://vercel.com/api/blob https://vercel.com/api/blob/",
       "object-src 'none'",
       "frame-ancestors 'none'",
       "base-uri 'self'",
@@ -46,6 +51,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  outputFileTracingIncludes: {
+    "/api/billing/documents/*": ["./src/lib/billing/fonts/*"],
+  },
   turbopack: {
     rules: {
       "*.css": {
@@ -64,4 +72,10 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default function configureNext(phase: string): NextConfig {
+  // Runs even when hosting overrides the npm build command with `next build`.
+  if (phase === PHASE_PRODUCTION_BUILD && process.env.VERCEL_ENV === "production") {
+    execFileSync(process.execPath, [path.join(process.cwd(), "scripts/check-release-schema.mjs")], { stdio: "inherit" });
+  }
+  return nextConfig;
+}
