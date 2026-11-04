@@ -10,8 +10,14 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="site-hero">
-        <div className="site-wrap site-hero-grid">
+      <section className="site-hero-full">
+        <img
+          className="site-hero-full-img"
+          src={unsplash(SITE_IMAGES.heroVilla, { w: 1920, q: 85 })}
+          alt="Modern tropical villa with infinity pool at dusk, overlooking Cemagi, Bali"
+        />
+        <div className="site-hero-full-overlay" aria-hidden="true" />
+        <div className="site-wrap site-hero-full-content">
           <Reveal as="header">
             <p className="site-eyebrow">
               Cemagi, Bali <span className="muted">/ A collection of two</span>
@@ -29,20 +35,13 @@ export default async function HomePage() {
               <Link href="/villas" className="site-btn site-btn-primary">
                 Explore Cemagi Atelier ↓
               </Link>
-              <Link href="/contact" className="site-btn site-btn-outline">
+              <Link href="/contact" className="site-btn site-btn-outline site-btn-outline-dark">
                 Arrange a viewing ↗
               </Link>
             </div>
           </Reveal>
-
-          <Reveal className="site-hero-media" delay={120}>
-            <span className="site-hero-tag">Cemagi Atelier — Collection 01</span>
-            <img
-              src={unsplash(SITE_IMAGES.heroVilla, { w: 1200 })}
-              alt="Modern tropical villa with infinity pool at dusk, Bali"
-            />
-          </Reveal>
         </div>
+        <span className="site-hero-full-scroll" aria-hidden="true">Scroll ↓</span>
       </section>
 
       <section className="site-section">

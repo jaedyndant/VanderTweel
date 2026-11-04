@@ -8,6 +8,16 @@ import { getPublicVillas } from "@/lib/public-site-data";
 export const metadata: Metadata = {
   title: "The villa collection",
   description: "The Cemagi Atelier villa collection — currently in build.",
+  openGraph: {
+    title: "The villa collection · Van der Tweel",
+    description: "The Cemagi Atelier villa collection — currently in build.",
+    url: "/villas",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1200&q=80",
+      },
+    ],
+  },
 };
 
 export default async function VillasPage() {
