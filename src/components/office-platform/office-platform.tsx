@@ -37,6 +37,11 @@ import type {
 import { OfficeSignOut } from "./office-sign-out";
 import { MobilePlatformNav } from "../platform/mobile-platform-nav";
 import "./office-platform.css";
+import { FileManager } from "./file-manager";
+import { BillingManager } from "./billing-manager";
+import { ManagementPanel } from "./management-panel";
+import { CommunicationPanel } from "./communication-panel";
+import "./completion-panels.css";
 
 type Modal =
   | { kind: "villa"; id: string }
@@ -767,6 +772,7 @@ export function OfficePlatform({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [completionProject, setCompletionProject] = useState("");
   const [villaFilter, setVillaFilter] = useState("");
   const [villaStatus, setVillaStatus] = useState("all");
   const [paymentStatus, setPaymentStatus] = useState("all");
@@ -861,16 +867,7 @@ export function OfficePlatform({
       setBusy(false);
     }
   }
-  const publishButton = (
-    <button
-      className="op-btn"
-      type="button"
-      disabled={!data.villas.length}
-      onClick={() => open({ kind: "publish" })}
-    >
-      New site update +
-    </button>
-  );
+  const publishButton = <Link className="op-btn" href={selectedVilla ? `/office/villas/${encodeURIComponent(selectedVilla.code)}/updates` : officeHref("updates", projectId)}>New site update +</Link>;
   const availableVillas = data.villas.filter(
     (villa) => !villaFilter || villa.id === villaFilter,
   );
@@ -1664,6 +1661,21 @@ export function OfficePlatform({
     );
   }
 
+  const workProjectId = projectId ?? (data.projects.some(p => p.id === completionProject) ? completionProject : data.projects[0]?.id);
+  const workVillas = data.villas.filter(v => v.projectId === workProjectId);
+  const projectPicker = !projectId && data.projects.length > 1 ? <label className="completion-project">Development<select value={workProjectId} onChange={e=>setCompletionProject(e.target.value)}>{data.projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label> : null;
+  if (data.role === "developer" && ["buyers", "villas"].includes(data.page)) {
+    content = <ManagementPanel projects={data.projects} villas={data.villas} />;
+  } else if (data.role === "developer" && data.page === "payments") {
+    content = workProjectId ? <>{projectPicker}<BillingManager key={workProjectId} projectId={workProjectId} villas={workVillas} /></> : <Empty>No development is available.</Empty>;
+  } else if (data.role === "developer" && data.page === "documents") {
+    content = workProjectId ? <>{projectPicker}<Heading eyebrow="Private records" title="An orderly archive." description="Upload privately, then choose what to share with owners." /><FileManager key={`${workProjectId}:${selectedVilla?.id}`} projectId={workProjectId} villaId={selectedVilla?.id} canManageDocuments /></> : <Empty>No development is available.</Empty>;
+  } else if (data.page === "updates") {
+    content = workProjectId ? <>{projectPicker}<CommunicationPanel key={workProjectId} projectId={workProjectId} villaId={selectedVilla?.id} villas={workVillas} role={data.role}/><section className="completion-section"><FileManager key={`${workProjectId}:${selectedVilla?.id}`} projectId={workProjectId} villaId={selectedVilla?.id} canManageDocuments={data.role === "developer"}/></section></> : <Empty>No development is available.</Empty>;
+  } else if (data.page === "villa" && selectedVilla) {
+    content = <>{content}<section className="completion-section"><FileManager projectId={selectedVilla.projectId} villaId={selectedVilla.id} canManageDocuments={data.role === "developer"}/></section></>;
+  }
+
   const modalVilla =
     modal?.kind === "villa"
       ? data.villas.find((villa) => villa.id === modal.id)
@@ -1804,50 +1816,7 @@ export function OfficePlatform({
           </p>
         ) : null}
         <div className="op-dialog-actions">
-          {modal.kind === "payment-confirm" ? (
-            <button
-              className="op-btn"
-              type="button"
-              disabled={busy || changed}
-              onClick={() =>
-                run(
-                  () =>
-                    actions.togglePayment({
-                      villaId: modalPayment.villaId,
-                      villaCode: modalPayment.villaCode,
-                      projectId: modalPayment.projectId,
-                      milestoneId: modalPayment.id,
-                      expectedPaid: modal.expected,
-                    }),
-                  modal.expected
-                    ? "Payment record reopened."
-                    : "Payment recorded as paid.",
-                )
-              }
-            >
-              {busy
-                ? "Saving…"
-                : modal.expected
-                  ? "Confirm reopen →"
-                  : "Confirm payment received →"}
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="op-btn"
-              onClick={() =>
-                open({
-                  kind: "payment-confirm",
-                  id: modalPayment.id,
-                  expected: modalPayment.status === "paid",
-                })
-              }
-            >
-              {modalPayment.status === "paid"
-                ? "Reopen payment record →"
-                : "Mark as paid →"}
-            </button>
-          )}
+          <Link className="op-btn" href={`/office/betalingen?projectId=${modalPayment.projectId}`}>Open billing & receipts →</Link>
           <button
             className="op-btn op-btn-light"
             disabled={busy}

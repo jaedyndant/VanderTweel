@@ -1,3 +1,4 @@
+vi.mock("@/lib/platform-communication",()=>({getOfficeMessageSummaries:vi.fn(async()=>[])}));
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));

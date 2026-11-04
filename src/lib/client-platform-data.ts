@@ -4,6 +4,9 @@ import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { account, project } from "@/db/schema";
+import { getManagedFilesForBuyer } from "@/lib/files/service";
+import { getBillingDocumentsForBuyer, getBillingStatusForMilestones } from "@/lib/billing/service";
+import { getBuyerMessages } from "@/lib/platform-communication";
 import {
   getOwnedVillaChoicesForAccount,
   getPaymentSchedule,
@@ -72,6 +75,12 @@ export const getClientPlatformData = cache(
     if (needsFilesAndPayments && payments?.villa.id !== villa.id) return null;
     if (!villaChoices.some((choice) => choice.id === villa.id)) return null;
 
+    const [managedFiles, billingDocs, statuses, messages] = await Promise.all([
+      needsFilesAndPayments ? getManagedFilesForBuyer(accountId, villa.id) : [],
+      needsFilesAndPayments ? getBillingDocumentsForBuyer(accountId, villa.id) : [],
+      page === "home" || page === "payments" ? getBillingStatusForMilestones(accountId, villa.id) : new Map<string,string>(),
+      page === "home" || page === "updates" ? getBuyerMessages(accountId, villa.id) : [],
+    ]);
     return {
       buyerName: overview.buyerName,
       villaChoices,
@@ -110,14 +119,14 @@ export const getClientPlatformData = cache(
         id: milestone.id,
         percent: numeric(milestone.percent)!,
         dueLabel: milestone.dueLabel,
-        status: milestone.status,
+        status: statuses.get(milestone.id) ?? milestone.status,
         paidAt: iso(milestone.paidAt),
         sequence: milestone.sequence,
         amountUsd: numeric(milestone.amountUsd),
         note: milestone.note,
         expectedAt: iso(milestone.expectedAt),
       })),
-      documents: (payments?.documents ?? []).map((document) => ({
+      documents: [...managedFiles, ...billingDocs].map((document) => ({
         id: document.id,
         kind: document.kind,
         url: document.url,
@@ -126,14 +135,15 @@ export const getClientPlatformData = cache(
         createdAt: document.createdAt.toISOString(),
       })),
       updates: (page === "home" || page === "updates"
-        ? (progress?.updates ?? [])
+        ? messages.slice(0,30)
         : []
-      ).map((entry) => ({
+      ).sort((a,b)=>b.createdAt.getTime()-a.createdAt.getTime()).map((entry) => ({
         id: entry.id,
         title: entry.title,
         body: entry.body,
         category: entry.category,
         authorRoleLabel: entry.authorRoleLabel,
+        photos: "photos" in entry ? entry.photos : [],
         createdAt: entry.createdAt.toISOString(),
       })),
     };

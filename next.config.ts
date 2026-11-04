@@ -33,7 +33,9 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' https: data:",
       "font-src 'self' data:",
-      "connect-src 'self'",
+      // Direct uploads use the official @vercel/blob API. Permit only its
+      // exact root and descendants; private downloads remain same-origin.
+      "connect-src 'self' https://vercel.com/api/blob https://vercel.com/api/blob/",
       "object-src 'none'",
       "frame-ancestors 'none'",
       "base-uri 'self'",
@@ -46,6 +48,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  outputFileTracingIncludes: {
+    "/api/billing/documents/*": ["./src/lib/billing/fonts/*"],
+  },
   turbopack: {
     rules: {
       "*.css": {

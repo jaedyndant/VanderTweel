@@ -17,6 +17,9 @@ import {
 } from "./presentation";
 import { updateNotificationPreference } from "@/lib/client-platform-actions";
 import type { ClientDocument, ClientPage, ClientPlatformData } from "./types";
+import { BuyerNotifications } from "./notifications";
+import { BuyerMessageFeed } from "./message-feed";
+import "../office-platform/completion-panels.css";
 import { ResidenceSwitcher } from "./residence-switcher";
 import { MobilePlatformNav } from "@/components/platform/mobile-platform-nav";
 import { ClientIcon } from "./client-icon";
@@ -347,6 +350,7 @@ function UpdateList({ items }: { items: ClientPlatformData["updates"] }) {
         </small>
         <h4>{item.title ?? "A note from your team"}</h4>
         <p>{item.body}</p>
+        {item.photos?.length ? <div className="update-photos">{item.photos.map(photo=><a key={photo.id} href={photo.url} target="_blank" rel="noreferrer"><img src={photo.url} alt={photo.label} loading="lazy"/></a>)}</div> : null}
       </div>
     </article>
   ));
@@ -436,7 +440,9 @@ function FloorPlan({ upper }: { upper: boolean }) {
 export function ClientPlatform({
   data,
   page,
+  preview = false,
 }: {
+  preview?: boolean;
   data: ClientPlatformData;
   page: ClientPage;
 }) {
@@ -462,7 +468,8 @@ export function ClientPlatform({
   const dialog = useRef<HTMLDialogElement>(null);
   const dialogTitle = useId();
   const floorId = useId();
-  const href = (destination: ClientPage) => clientHref(destination, villa.id);
+  const href = (destination: ClientPage) => preview ? `/office/preview/${villa.id}?page=${destination}` : clientHref(destination, villa.id);
+  const visibleNavigation = navigation.filter(item=>!preview || item.page!=="account");
   const openDocument = (item: ClientDocument) =>
     setModal({ kind: "document", id: item.id });
   // Resolve selected records from the latest server props, not a stale modal snapshot.
@@ -1051,11 +1058,7 @@ export function ClientPlatform({
                                   : "neutral"
                             }
                           >
-                            {item.status === "paid"
-                              ? "Paid"
-                              : item.id === payments.next?.id
-                                ? "Upcoming"
-                                : "Scheduled"}
+                            {humanLabel(item.status === "next" ? "upcoming" : item.status)}
                           </Badge>
                         </td>
                         <td>
@@ -1095,11 +1098,7 @@ export function ClientPlatform({
                               : "neutral"
                         }
                       >
-                        {item.status === "paid"
-                          ? "Paid"
-                          : item.id === payments.next?.id
-                            ? "Upcoming"
-                            : "Scheduled"}
+                        {humanLabel(item.status === "next" ? "upcoming" : item.status)}
                       </Badge>
                     </div>
                     <dl className="payment-card-details">
@@ -1174,7 +1173,7 @@ export function ClientPlatform({
           description="A regular view into your villa’s progress and design."
         />
         <section className="panel">
-          <UpdateList items={data.updates} />
+          {preview ? <UpdateList items={data.updates} /> : <BuyerMessageFeed villaId={villa.id} initial={data.updates} />}
         </section>
       </>
     );
@@ -1203,7 +1202,7 @@ export function ClientPlatform({
             {villa.projectName} · {villa.code}
           </div>
           <nav className="side-nav" aria-label="Owner navigation">
-            {navigation.map((item) => (
+            {visibleNavigation.map((item) => (
               <Link
                 key={item.page}
                 href={href(item.page)}
@@ -1239,12 +1238,12 @@ export function ClientPlatform({
                   {buyerName ?? "Owner"}
                   <span>{data.account?.email ?? villa.code}</span>
                 </p>
-                <ClientSignOut />
+                {!preview && <ClientSignOut />}
               </div>
             }
           >
             <nav aria-label="Owner navigation">
-              {navigation.map((item) => (
+              {visibleNavigation.map((item) => (
                 <Link
                   key={item.page}
                   href={href(item.page)}
@@ -1260,7 +1259,7 @@ export function ClientPlatform({
             className={`topbar${data.villaChoices.length > 1 ? " has-residence-switcher" : ""}`}
           >
             <span>Owner platform &nbsp; / &nbsp; {villa.projectName}</span>
-            {data.villaChoices.length > 1 ? (
+            {!preview && data.villaChoices.length > 1 ? (
               <ResidenceSwitcher
                 choices={data.villaChoices}
                 selectedVillaId={villa.id}
@@ -1274,6 +1273,7 @@ export function ClientPlatform({
             )}
           </div>
           <div className="content">
+            {!preview && <BuyerNotifications />}
             {body}
             <p className="note">
               Your private owner platform · Construction, payments and records

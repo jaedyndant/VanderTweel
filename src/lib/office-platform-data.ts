@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
+import { getOfficeMessageSummaries } from "@/lib/platform-communication";
 import { auth } from "@/lib/auth";
 import { safeDocumentUrl } from "@/components/client-platform/presentation";
 import {
@@ -134,6 +135,7 @@ const readOfficePlatformData = cache(async (
   const needsTasks = ["overview", "villas", "project", "villa", "progress"].includes(page);
   const needsPayments = ["overview", "villas", "project", "villa", "payments"].includes(page);
   const needsUpdates = ["overview", "project", "villa", "updates"].includes(page);
+  const newUpdates = needsUpdates ? await getOfficeMessageSummaries(scopedProjects.map(p=>p.id),selectedVilla?.id) : [];
   const needsFiles = ["villa", "documents"].includes(page);
 
   let buyers: OfficePlatformData["buyers"] = role === "developer" ? [] : null;
@@ -194,7 +196,7 @@ const readOfficePlatformData = cache(async (
         note: payment.note,
         expectedAt: iso(payment.expectedAt),
       }))) : []) : null,
-    updates: needsUpdates ? authorized.flatMap((detail) => detail.updates
+    updates: needsUpdates ? [...newUpdates, ...authorized.flatMap((detail) => detail.updates
       // No category-only filter: the existing feed has no trusted content
       // classification. PMs receive only construction text they authored.
       .filter((entry) => role === "developer" ||
@@ -207,7 +209,7 @@ const readOfficePlatformData = cache(async (
         category: entry.category,
         authorRoleLabel: entry.authorRoleLabel,
         createdAt: entry.createdAt.toISOString(),
-      }))).sort((a, b) => b.createdAt.localeCompare(a.createdAt)) : [],
+      })))].sort((a, b) => b.createdAt.localeCompare(a.createdAt)) : [],
     files: role === "developer" ? (needsFiles ? authorized.flatMap((detail) =>
       (detail.files ?? []).map((file) => ({
         ...scope(detail),

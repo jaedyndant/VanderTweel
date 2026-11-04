@@ -46,12 +46,23 @@ describe("framework-compatible security headers", () => {
     expect(directives.get("default-src")).toEqual(["'self'"]);
     expect(directives.get("base-uri")).toEqual(["'self'"]);
     expect(directives.get("form-action")).toEqual(["'self'"]);
-    expect(directives.get("connect-src")).toEqual(["'self'"]);
+    expect(directives.get("connect-src")).toEqual(["'self'", "https://vercel.com/api/blob", "https://vercel.com/api/blob/"]);
     expect(headers.get("X-Frame-Options")).toBe("DENY");
     expect(headers.get("X-Content-Type-Options")).toBe("nosniff");
     expect(headers.get("Referrer-Policy")).toBe("strict-origin-when-cross-origin");
     expect(headers.get("Permissions-Policy")).toBe("camera=(), microphone=(), geolocation=()");
     expect(headers.get("Strict-Transport-Security")).toBe("max-age=63072000; includeSubDomains; preload");
+  });
+
+  it("permits only the official direct-upload API without broadening external connections", async () => {
+    const { directives } = await configuredHeaders("production");
+    const sources = directives.get("connect-src")!;
+    expect(sources).not.toContain("https:");
+    expect(sources).not.toContain("https://vercel.com");
+    expect(sources.some(source => source.includes("*"))).toBe(false);
+    // Both forms matter: SDK requests use the root and trailing-slash paths.
+    expect(sources).toContain("https://vercel.com/api/blob");
+    expect(sources).toContain("https://vercel.com/api/blob/");
   });
 
   it("allows React development diagnostics while keeping the production source restrictions", async () => {

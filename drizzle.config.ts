@@ -1,7 +1,7 @@
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: "./src/db/schema.ts",
+  schema: ["./src/db/schema.ts", "./src/db/*-schema.ts"],
   out: "./drizzle", // genummerde migratiebestanden, nooit direct schema aanpassen (PvA 4.6.5)
   dialect: "postgresql",
   dbCredentials: {

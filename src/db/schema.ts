@@ -22,6 +22,7 @@ export const account = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     email: varchar("email", { length: 320 }).notNull(),
+    displayName: varchar("display_name", { length: 200 }),
     role: varchar("role", { length: 20 }).notNull(), // 'buyer' | 'pm' | 'developer'
     notifyEmail: boolean("notify_email").default(true).notNull(),
     lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
@@ -62,7 +63,7 @@ export const villa = pgTable(
     buildStarted: timestamp("build_started", { withTimezone: true }),
     handoverExpected: timestamp("handover_expected", { withTimezone: true }),
   },
-  (t) => [index("villa_project_id_idx").on(t.projectId)]
+  (t) => [index("villa_project_id_idx").on(t.projectId), uniqueIndex("villa_code_unique").on(t.code)]
 );
 
 // -- buyer (koper) ------------------------------------------------------

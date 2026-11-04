@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { AccessError, requireActor } from "@/lib/platform-access";
 import { getClientPlatformData } from "@/lib/client-platform-data";
 import { ClientPlatform } from "@/components/client-platform/client-platform";
 import type { ClientPage } from "@/components/client-platform/types";
@@ -15,9 +15,11 @@ export async function ClientRoute({
   page: ClientPage;
   searchParams: ClientSearchParams;
 }) {
-  const session = await auth();
-  const user = session?.user as { id?: string; role?: string } | undefined;
-  if (!user?.id || user.role !== "buyer") redirect("/login");
+  const user = await requireActor().catch((error: unknown) => {
+    if (error instanceof AccessError) return null;
+    throw error;
+  });
+  if (!user || user.role !== "buyer") redirect("/login");
 
   const { villa: requestedVillaId } = await searchParams;
   if (Array.isArray(requestedVillaId)) notFound();
