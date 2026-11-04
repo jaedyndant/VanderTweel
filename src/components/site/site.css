@@ -121,12 +121,13 @@
 }
 .site-nav-cta {
   background: var(--paper);
-  color: var(--ink);
+  color: var(--ink) !important;
   border-radius: 999px;
   padding: 10px 18px;
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
+  opacity: 1 !important;
 }
 .site-nav-toggle {
   display: none;
