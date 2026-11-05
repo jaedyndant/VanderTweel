@@ -357,6 +357,13 @@
   line-height: 1.2;
   min-width: 0;
 }
+.office-platform .op-panel-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+}
 .office-platform .op-panel-title > .op-text-link {
   flex-shrink: 0;
 }
@@ -768,6 +775,25 @@
   gap: 17px;
   padding: 23px 0;
   border-top: 1px solid var(--op-line);
+}
+.office-platform .op-task-row-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-width: 150px;
+}
+.office-platform .op-task-row-actions .op-btn {
+  white-space: nowrap;
+}
+.office-platform .op-btn-danger {
+  border-color: #b24c3f;
+  color: #b24c3f;
+}
+.office-platform .op-btn-danger:not(:disabled):hover {
+  background: #b24c3f;
+  color: var(--op-white);
 }
 .office-platform .op-task-number {
   display: grid;

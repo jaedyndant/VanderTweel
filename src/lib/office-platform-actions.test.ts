@@ -6,15 +6,19 @@ vi.mock("@/lib/audit", () => ({ recordAudit: vi.fn() }));
 vi.mock("@/lib/office-data", () => ({ getProjectsOverview: vi.fn(), getProjectDetail: vi.fn(), getVillaForOffice: vi.fn() }));
 vi.mock("@/lib/office-actions", () => ({
   toggleProgressTaskAction: vi.fn(), markPaymentPaidAction: vi.fn(), createUpdateAction: vi.fn(), addFileAction: vi.fn(),
+  createProgressTaskAction: vi.fn(), updateProgressTaskAction: vi.fn(), deleteProgressTaskAction: vi.fn(),
 }));
 
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { recordAudit } from "@/lib/audit";
 import { getProjectDetail, getProjectsOverview, getVillaForOffice } from "@/lib/office-data";
-import { addFileAction, createUpdateAction, markPaymentPaidAction, toggleProgressTaskAction } from "@/lib/office-actions";
-import { addFileLink, publishUpdate, togglePayment, toggleProgress } from "./office-platform-actions";
-import type { AddFileLinkInput, PublishUpdateInput } from "@/components/office-platform/types";
+import {
+  addFileAction, createProgressTaskAction, createUpdateAction, deleteProgressTaskAction,
+  markPaymentPaidAction, toggleProgressTaskAction, updateProgressTaskAction,
+} from "@/lib/office-actions";
+import { addFileLink, deleteProgressTask, publishUpdate, saveProgressTask, togglePayment, toggleProgress } from "./office-platform-actions";
+import type { AddFileLinkInput, PublishUpdateInput, SaveProgressTaskInput } from "@/components/office-platform/types";
 
 const date = new Date("2026-10-30T13:00:00Z");
 const project = { id: "project-a", slug: "cemagi", name: "Cemagi Atelier", brandLocked: true, createdAt: date };
@@ -24,6 +28,7 @@ const villa = { id: "villa-a", projectId: project.id, code: "Villa 1", plotM2: n
 const scope = { villaId: villa.id, villaCode: villa.code, projectId: project.id };
 const updateInput: PublishUpdateInput = { ...scope, title: "Foundation", body: "Foundation completed.", category: "Construction" };
 const fileInput: AddFileLinkInput = { ...scope, label: "Progress image", url: "https://files.example-cdn.com/photo.jpg", note: "Foundation", kind: "photo" };
+const saveInput: SaveProgressTaskInput = { ...scope, phase: "Roofing", detail: "Trusses and tiles", period: "Sep 2026", percentWeight: 15, sequence: 3 };
 
 function detail(): NonNullable<Awaited<ReturnType<typeof getVillaForOffice>>> {
   return { villa, project, buyerName: null, updates: [], files: [],
@@ -166,5 +171,50 @@ describe("office presentation action adapters", () => {
     vi.mocked(getVillaForOffice).mockResolvedValue(data);
     expect((await togglePayment({ ...scope, milestoneId: "payment-a", expectedPaid: false })).ok).toBe(false);
     expect(markPaymentPaidAction).toHaveBeenCalledTimes(1);
+  });
+
+  it("lets both pm and developer create a construction phase, buyer is rejected", async () => {
+    for (const role of ["developer", "pm"]) {
+      session(role);
+      expect(await saveProgressTask(saveInput)).toEqual({ ok: true });
+    }
+    expect(createProgressTaskAction).toHaveBeenCalledTimes(2);
+    expect(createProgressTaskAction).toHaveBeenCalledWith("Villa 1", {
+      phase: "Roofing", detail: "Trusses and tiles", period: "Sep 2026", percentWeight: 15, sequence: 3,
+    });
+    session("buyer");
+    expect((await saveProgressTask(saveInput)).ok).toBe(false);
+    expect((await deleteProgressTask({ ...scope, taskId: "task-a" })).ok).toBe(false);
+    expect(createProgressTaskAction).toHaveBeenCalledTimes(2);
+  });
+
+  it("routes an existing taskId to update rather than create, and deletes by id", async () => {
+    expect(await saveProgressTask({ ...saveInput, taskId: "task-a" })).toEqual({ ok: true });
+    expect(updateProgressTaskAction).toHaveBeenCalledWith("task-a", "Villa 1", {
+      phase: "Roofing", detail: "Trusses and tiles", period: "Sep 2026", percentWeight: 15, sequence: 3,
+    });
+    expect(createProgressTaskAction).not.toHaveBeenCalled();
+    expect(await deleteProgressTask({ ...scope, taskId: "task-a" })).toEqual({ ok: true });
+    expect(deleteProgressTaskAction).toHaveBeenCalledWith("task-a", "Villa 1");
+  });
+
+  it("rejects an out-of-range weight, blank phase name and non-integer sequence before writing", async () => {
+    expect((await saveProgressTask({ ...saveInput, percentWeight: 150 })).ok).toBe(false);
+    expect((await saveProgressTask({ ...saveInput, percentWeight: -5 })).ok).toBe(false);
+    expect((await saveProgressTask({ ...saveInput, phase: "  " })).ok).toBe(false);
+    expect((await saveProgressTask({ ...saveInput, sequence: 1.5 })).ok).toBe(false);
+    expect((await saveProgressTask(null as unknown as SaveProgressTaskInput)).ok).toBe(false);
+    expect(createProgressTaskAction).not.toHaveBeenCalled();
+    expect(updateProgressTaskAction).not.toHaveBeenCalled();
+  });
+
+  it("refuses to edit or delete a task that no longer belongs to this residence", async () => {
+    const data = detail();
+    data.tasks[0].villaId = "villa-b";
+    vi.mocked(getVillaForOffice).mockResolvedValue(data);
+    expect((await saveProgressTask({ ...saveInput, taskId: "task-a" })).ok).toBe(false);
+    expect((await deleteProgressTask({ ...scope, taskId: "task-a" })).ok).toBe(false);
+    expect(updateProgressTaskAction).not.toHaveBeenCalled();
+    expect(deleteProgressTaskAction).not.toHaveBeenCalled();
   });
 });

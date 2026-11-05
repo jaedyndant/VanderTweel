@@ -12,6 +12,69 @@ import { publishTeamMessage } from "@/lib/platform-communication";
 import { dispatchMailOutbox } from "@/lib/mail-outbox";
 import { markBillingMilestonePaid } from "@/lib/billing/service";
 
+const progressTaskInputSchema = z.object({
+  phase: z.string().trim().min(1).max(120),
+  detail: z.string().trim().max(2000).nullable().transform((value) => value || null),
+  period: z.string().trim().max(60).nullable().transform((value) => value || null),
+  percentWeight: z.union([z.string(), z.number()])
+    .transform((value) => String(value).trim())
+    .refine((value) => /^\d{1,3}(?:\.\d{1,2})?$/.test(value) && Number(value) <= 100, "Enter a progress weight between 0 and 100 with at most two decimal places."),
+  sequence: z.coerce.number().int().min(0).max(9999),
+});
+
+export async function createProgressTaskAction(villaCode: string, input: unknown) {
+  const actor = await requireActor();
+  if (actor.role === "buyer") throw new AccessError();
+  const parsed = progressTaskInputSchema.parse(input);
+  await db.transaction(async (tx) => {
+    const [row] = await tx.select().from(villa).where(eq(villa.code, villaCode));
+    if (!row) throw new AccessError();
+    await assertScope(tx, actor, { projectId: row.projectId, villaId: row.id });
+    const [created] = await tx.insert(progressTask).values({
+      villaId: row.id, phase: parsed.phase, detail: parsed.detail, period: parsed.period,
+      percentWeight: parsed.percentWeight, sequence: parsed.sequence,
+    }).returning();
+    await writePlatformEvent(tx, { actorId: actor.id, projectId: row.projectId, villaId: row.id, action: "progress.create", targetId: created.id, summary: `${row.code}: construction phase "${parsed.phase}" added.`, notify: false, pmSafe: true, link: `/koper/voortgang?villa=${row.id}` });
+  });
+  revalidatePath("/office", "layout"); revalidatePath("/koper", "layout");
+}
+
+export async function updateProgressTaskAction(taskId: string, villaCode: string, input: unknown) {
+  z.uuid().parse(taskId);
+  const actor = await requireActor();
+  if (actor.role === "buyer") throw new AccessError();
+  const parsed = progressTaskInputSchema.parse(input);
+  await db.transaction(async (tx) => {
+    const [row] = await tx.select().from(villa).where(eq(villa.code, villaCode));
+    if (!row) throw new AccessError();
+    await assertScope(tx, actor, { projectId: row.projectId, villaId: row.id });
+    const [task] = await tx.select().from(progressTask).where(and(eq(progressTask.id, taskId), eq(progressTask.villaId, row.id))).for("update");
+    if (!task) throw new AccessError();
+    await tx.update(progressTask).set({
+      phase: parsed.phase, detail: parsed.detail, period: parsed.period,
+      percentWeight: parsed.percentWeight, sequence: parsed.sequence,
+    }).where(eq(progressTask.id, taskId));
+    await writePlatformEvent(tx, { actorId: actor.id, projectId: row.projectId, villaId: row.id, action: "progress.update", targetId: taskId, summary: `${row.code}: construction phase "${parsed.phase}" updated.`, notify: false, pmSafe: true, link: `/koper/voortgang?villa=${row.id}` });
+  });
+  revalidatePath("/office", "layout"); revalidatePath("/koper", "layout");
+}
+
+export async function deleteProgressTaskAction(taskId: string, villaCode: string) {
+  z.uuid().parse(taskId);
+  const actor = await requireActor();
+  if (actor.role === "buyer") throw new AccessError();
+  await db.transaction(async (tx) => {
+    const [row] = await tx.select().from(villa).where(eq(villa.code, villaCode));
+    if (!row) throw new AccessError();
+    await assertScope(tx, actor, { projectId: row.projectId, villaId: row.id });
+    const [task] = await tx.select().from(progressTask).where(and(eq(progressTask.id, taskId), eq(progressTask.villaId, row.id))).for("update");
+    if (!task) throw new AccessError();
+    await tx.delete(progressTask).where(eq(progressTask.id, taskId));
+    await writePlatformEvent(tx, { actorId: actor.id, projectId: row.projectId, villaId: row.id, action: "progress.delete", targetId: taskId, summary: `${row.code}: construction phase "${task.phase}" removed.`, notify: false, pmSafe: true, link: `/koper/voortgang?villa=${row.id}` });
+  });
+  revalidatePath("/office", "layout"); revalidatePath("/koper", "layout");
+}
+
 export async function toggleProgressTaskAction(taskId: string, villaCode: string, expectedDone?: boolean) {
   z.uuid().parse(taskId);
   const actor = await requireActor();

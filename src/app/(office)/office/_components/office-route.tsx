@@ -5,7 +5,9 @@ import { AccessError, requireActor } from "@/lib/platform-access";
 import { getOfficePlatformData } from "@/lib/office-platform-data";
 import {
   addFileLink,
+  deleteProgressTask,
   publishUpdate,
+  saveProgressTask,
   togglePayment,
   toggleProgress,
 } from "@/lib/office-platform-actions";
@@ -21,6 +23,8 @@ export type OfficeSearchParams = Promise<{
 
 const officeActions: OfficeActionHandlers = {
   toggleProgress,
+  saveProgressTask,
+  deleteProgressTask,
   togglePayment,
   publishUpdate,
   addFileLink,

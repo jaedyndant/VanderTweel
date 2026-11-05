@@ -5,9 +5,12 @@ import { auth } from "@/lib/auth";
 import { safeDocumentUrl } from "@/components/client-platform/presentation";
 import {
   addFileAction,
+  createProgressTaskAction,
   createUpdateAction,
+  deleteProgressTaskAction,
   markPaymentPaidAction,
   toggleProgressTaskAction,
+  updateProgressTaskAction,
 } from "@/lib/office-actions";
 import {
   getProjectDetail,
@@ -16,10 +19,12 @@ import {
 } from "@/lib/office-data";
 import type {
   AddFileLinkInput,
+  DeleteProgressTaskInput,
   OfficeActionResult,
   OfficeRecordScope,
   OfficeRole,
   PublishUpdateInput,
+  SaveProgressTaskInput,
   TogglePaymentInput,
   ToggleProgressInput,
 } from "@/components/office-platform/types";
@@ -101,6 +106,50 @@ export async function toggleProgress(input: ToggleProgressInput): Promise<Office
     if (tasks.length !== 1) throw new InputError("This task is no longer available. Refresh the page.");
     if (Boolean(tasks[0].doneAt) !== input.expectedDone) throw new InputError("This task has changed. Refresh the page before saving.");
     await toggleProgressTaskAction(taskId, detail.villa.code, input.expectedDone);
+  });
+}
+
+function percent(value: unknown, label: string): number {
+  if (typeof value !== "number" || Number.isNaN(value) || value < 0 || value > 100) throw new InputError(`${label} must be between 0 and 100.`);
+  return value;
+}
+
+function sequence(value: unknown, label: string): number {
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value > 9999) throw new InputError(`${label} must be a whole number.`);
+  return value;
+}
+
+export async function saveProgressTask(input: SaveProgressTaskInput): Promise<OfficeActionResult> {
+  return result(async () => {
+    object(input);
+    const phase = text(input.phase, "Phase name", 120);
+    const detail = text(input.detail, "Detail", 2000, false);
+    const period = text(input.period, "Expected period", 60, false);
+    const percentWeight = percent(input.percentWeight, "Progress weight");
+    const seq = sequence(input.sequence, "Build order");
+    const user = await officeSession();
+    const detailScope = await scopedVilla(user, input);
+    const payload = { phase, detail, period, percentWeight, sequence: seq };
+    if (input.taskId) {
+      const taskId = text(input.taskId, "Construction phase", 120);
+      const tasks = detailScope.tasks.filter((task) => task.id === taskId && task.villaId === detailScope.villa.id);
+      if (tasks.length !== 1) throw new InputError("This construction phase is no longer available. Refresh the page.");
+      await updateProgressTaskAction(taskId, detailScope.villa.code, payload);
+    } else {
+      await createProgressTaskAction(detailScope.villa.code, payload);
+    }
+  });
+}
+
+export async function deleteProgressTask(input: DeleteProgressTaskInput): Promise<OfficeActionResult> {
+  return result(async () => {
+    object(input);
+    const taskId = text(input.taskId, "Construction phase", 120);
+    const user = await officeSession();
+    const detail = await scopedVilla(user, input);
+    const tasks = detail.tasks.filter((task) => task.id === taskId && task.villaId === detail.villa.id);
+    if (tasks.length !== 1) throw new InputError("This construction phase is no longer available. Refresh the page.");
+    await deleteProgressTaskAction(taskId, detail.villa.code);
   });
 }
 

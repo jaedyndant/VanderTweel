@@ -121,6 +121,19 @@ export interface ToggleProgressInput extends OfficeRecordScope {
   expectedDone: boolean;
 }
 
+export interface SaveProgressTaskInput extends OfficeRecordScope {
+  taskId?: string;
+  phase: string;
+  detail: string;
+  period: string;
+  percentWeight: number;
+  sequence: number;
+}
+
+export interface DeleteProgressTaskInput extends OfficeRecordScope {
+  taskId: string;
+}
+
 export interface TogglePaymentInput extends OfficeRecordScope {
   milestoneId: string;
   expectedPaid: boolean;
@@ -142,6 +155,8 @@ export interface AddFileLinkInput extends OfficeRecordScope {
 /** Supplied as props, allowing browser QA to inject fixture-only handlers. */
 export interface OfficeActionHandlers {
   toggleProgress: (input: ToggleProgressInput) => Promise<OfficeActionResult>;
+  saveProgressTask: (input: SaveProgressTaskInput) => Promise<OfficeActionResult>;
+  deleteProgressTask: (input: DeleteProgressTaskInput) => Promise<OfficeActionResult>;
   togglePayment: (input: TogglePaymentInput) => Promise<OfficeActionResult>;
   publishUpdate: (input: PublishUpdateInput) => Promise<OfficeActionResult>;
   addFileLink: (input: AddFileLinkInput) => Promise<OfficeActionResult>;

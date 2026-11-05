@@ -48,6 +48,9 @@ type Modal =
   | { kind: "payment"; id: string }
   | { kind: "payment-confirm"; id: string; expected: boolean }
   | { kind: "progress-confirm"; id: string; expected: boolean }
+  | { kind: "progress-create" }
+  | { kind: "progress-edit"; id: string }
+  | { kind: "progress-delete"; id: string }
   | { kind: "update"; id: string }
   | { kind: "file"; id: string }
   | { kind: "publish" }
@@ -752,6 +755,144 @@ function FileForm({
             type="submit"
           >
             {busy ? "Saving…" : "Share file link →"}
+          </button>
+        </fieldset>
+      </form>
+    </>
+  );
+}
+
+function ProgressTaskForm({
+  actions,
+  run,
+  busy,
+  error,
+  titleId,
+  villa,
+  task,
+}: {
+  actions: OfficeActionHandlers;
+  run: RunAction;
+  busy: boolean;
+  error: string | null;
+  titleId: string;
+  villa: OfficeVilla;
+  task?: OfficeTask;
+}) {
+  const id = useId();
+  const [phase, setPhase] = useState(task?.phase ?? "");
+  const [detail, setDetail] = useState(task?.detail ?? "");
+  const [period, setPeriod] = useState(task?.period ?? "");
+  const [percentWeight, setPercentWeight] = useState(
+    task ? String(task.percentWeight) : "",
+  );
+  const [sequence, setSequence] = useState(
+    task ? String(task.sequence) : "",
+  );
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy) return;
+    await run(
+      () =>
+        actions.saveProgressTask({
+          villaId: villa.id,
+          villaCode: villa.code,
+          projectId: villa.projectId,
+          taskId: task?.id,
+          phase,
+          detail,
+          period,
+          percentWeight: Number(percentWeight),
+          sequence: Number(sequence),
+        }),
+      task
+        ? "Construction phase updated."
+        : "Construction phase added. The buyer's progress view updates automatically.",
+    );
+  }
+  return (
+    <>
+      <div className="op-eyebrow">Construction · {villa.code}</div>
+      <h2 id={titleId}>{task ? "Edit this phase." : "Add a construction phase."}</h2>
+      <p>
+        This appears immediately on the buyer&apos;s build progress view.
+        Posting a site update never ticks off a phase automatically — mark it
+        complete here when the work is actually finished.
+      </p>
+      <form onSubmit={submit} aria-busy={busy}>
+        <fieldset disabled={busy}>
+          <label htmlFor={`${id}-phase`}>Phase name</label>
+          <input
+            id={`${id}-phase`}
+            value={phase}
+            onChange={(event) => setPhase(event.target.value)}
+            required
+            maxLength={120}
+            placeholder="Foundation & groundwork"
+          />
+          <label htmlFor={`${id}-detail`}>
+            Detail <span className="op-muted">(optional)</span>
+          </label>
+          <textarea
+            id={`${id}-detail`}
+            maxLength={2000}
+            value={detail}
+            onChange={(event) => setDetail(event.target.value)}
+            placeholder="What this phase covers"
+          />
+          <label htmlFor={`${id}-period`}>
+            Expected period <span className="op-muted">(optional)</span>
+          </label>
+          <input
+            id={`${id}-period`}
+            value={period}
+            onChange={(event) => setPeriod(event.target.value)}
+            maxLength={60}
+            placeholder="Jun - Jul 2026"
+          />
+          <label htmlFor={`${id}-weight`}>Progress weight (%)</label>
+          <input
+            id={`${id}-weight`}
+            type="number"
+            inputMode="decimal"
+            min="0"
+            max="100"
+            step="0.01"
+            value={percentWeight}
+            onChange={(event) => setPercentWeight(event.target.value)}
+            required
+          />
+          <p className="op-form-hint">
+            Share of total build progress this phase represents. Weights
+            across all phases for this residence should add up to 100%.
+          </p>
+          <label htmlFor={`${id}-sequence`}>Build order</label>
+          <input
+            id={`${id}-sequence`}
+            type="number"
+            inputMode="numeric"
+            min="0"
+            max="9999"
+            step="1"
+            value={sequence}
+            onChange={(event) => setSequence(event.target.value)}
+            required
+          />
+          {error ? (
+            <p className="op-form-error" role="alert">
+              {error}
+            </p>
+          ) : null}
+          <button
+            className="op-btn op-submit"
+            disabled={busy || !phase.trim() || !percentWeight || !sequence}
+            type="submit"
+          >
+            {busy
+              ? "Saving…"
+              : task
+                ? "Save changes →"
+                : "Add phase →"}
           </button>
         </fieldset>
       </form>
@@ -1575,10 +1716,19 @@ export function OfficePlatform({
         {jumpLinks}
         <section className="op-panel">
           <PanelTitle title="Construction progress">
-            <Badge tone="neutral">
-              {data.tasks.filter((task) => task.doneAt).length} of{" "}
-              {data.tasks.length} complete
-            </Badge>
+            <div className="op-panel-title-actions">
+              <Badge tone="neutral">
+                {data.tasks.filter((task) => task.doneAt).length} of{" "}
+                {data.tasks.length} complete
+              </Badge>
+              <button
+                type="button"
+                className="op-btn op-btn-light op-btn-small"
+                onClick={() => open({ kind: "progress-create" })}
+              >
+                Add phase +
+              </button>
+            </div>
           </PanelTitle>
           <div className="op-progress-summary">
             <span>
@@ -1619,19 +1769,35 @@ export function OfficePlatform({
                         : ""}
                     </small>
                   </div>
-                  <button
-                    className="op-btn op-btn-light op-btn-small"
-                    type="button"
-                    onClick={() =>
-                      open({
-                        kind: "progress-confirm",
-                        id: task.id,
-                        expected: !!task.doneAt,
-                      })
-                    }
-                  >
-                    {task.doneAt ? "Reopen task" : "Mark complete"}
-                  </button>
+                  <div className="op-task-row-actions">
+                    <button
+                      className="op-btn op-btn-light op-btn-small"
+                      type="button"
+                      onClick={() =>
+                        open({
+                          kind: "progress-confirm",
+                          id: task.id,
+                          expected: !!task.doneAt,
+                        })
+                      }
+                    >
+                      {task.doneAt ? "Reopen task" : "Mark complete"}
+                    </button>
+                    <button
+                      className="op-btn op-btn-light op-btn-small"
+                      type="button"
+                      onClick={() => open({ kind: "progress-edit", id: task.id })}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="op-btn op-btn-light op-btn-small op-btn-danger"
+                      type="button"
+                      onClick={() => open({ kind: "progress-delete", id: task.id })}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </article>
               ))}
             </div>
@@ -1687,7 +1853,7 @@ export function OfficePlatform({
       ? data.payments?.find((payment) => payment.id === modal.id)
       : undefined;
   const modalTask =
-    modal?.kind === "progress-confirm"
+    modal && ["progress-confirm", "progress-edit", "progress-delete"].includes(modal.kind) && "id" in modal
       ? data.tasks.find((task) => task.id === modal.id)
       : undefined;
   const modalUpdate =
@@ -1887,6 +2053,84 @@ export function OfficePlatform({
               : modal.expected
                 ? "Confirm reopen →"
                 : "Confirm completion →"}
+          </button>
+          <button
+            className="op-btn op-btn-light"
+            type="button"
+            disabled={busy}
+            onClick={close}
+          >
+            Cancel
+          </button>
+        </div>
+      </>
+    );
+  } else if (modal?.kind === "progress-create" && selectedVilla) {
+    dialogContent = (
+      <ProgressTaskForm
+        actions={actions}
+        run={run}
+        busy={busy}
+        error={error}
+        titleId={titleId}
+        villa={selectedVilla}
+      />
+    );
+  } else if (modal?.kind === "progress-edit" && modalTask) {
+    const taskVilla = data.villas.find((item) => item.id === modalTask.villaId);
+    if (taskVilla)
+      dialogContent = (
+        <ProgressTaskForm
+          actions={actions}
+          run={run}
+          busy={busy}
+          error={error}
+          titleId={titleId}
+          villa={taskVilla}
+          task={modalTask}
+        />
+      );
+  } else if (modal?.kind === "progress-delete" && modalTask) {
+    dialogContent = (
+      <>
+        <div className="op-eyebrow">Construction · {modalTask.villaCode}</div>
+        <h2 id={titleId}>Remove this phase?</h2>
+        <Metadata
+          rows={[
+            ["Task", modalTask.phase],
+            ["Progress weight", `${numberLabel(modalTask.percentWeight)}%`],
+            ["Status", modalTask.doneAt ? "Completed" : "Open"],
+          ]}
+        />
+        <p className="op-confirm-copy">
+          This permanently removes the phase from the build progress list on
+          both the office and buyer views. It does not affect payment
+          records.
+        </p>
+        {error ? (
+          <p className="op-form-error" role="alert">
+            {error}
+          </p>
+        ) : null}
+        <div className="op-dialog-actions">
+          <button
+            type="button"
+            className="op-btn op-btn-danger"
+            disabled={busy}
+            onClick={() =>
+              run(
+                () =>
+                  actions.deleteProgressTask({
+                    villaId: modalTask.villaId,
+                    villaCode: modalTask.villaCode,
+                    projectId: modalTask.projectId,
+                    taskId: modalTask.id,
+                  }),
+                "Construction phase removed.",
+              )
+            }
+          >
+            {busy ? "Removing…" : "Remove phase →"}
           </button>
           <button
             className="op-btn op-btn-light"

@@ -21,7 +21,7 @@ import { writePlatformEvent } from "@/lib/platform-events";
 import { publishTeamMessage } from "@/lib/platform-communication";
 import { dispatchMailOutbox } from "@/lib/mail-outbox";
 import { markBillingMilestonePaid } from "@/lib/billing/service";
-import { addFileAction, createUpdateAction, markPaymentPaidAction, toggleProgressTaskAction } from "./office-actions";
+import { addFileAction, createProgressTaskAction, createUpdateAction, deleteProgressTaskAction, markPaymentPaidAction, toggleProgressTaskAction, updateProgressTaskAction } from "./office-actions";
 
 const taskId = "11111111-1111-4111-8111-111111111111";
 const requestId = "22222222-2222-4222-8222-222222222222";
@@ -33,7 +33,10 @@ let villaRows: Array<typeof villa>;
 const rowLock = vi.fn();
 const writeWhere = vi.fn();
 const set = vi.fn();
-const tx = { select: vi.fn(), update: vi.fn() };
+const insertValues = vi.fn();
+const insertReturning = vi.fn();
+const deleteWhere = vi.fn();
+const tx = { select: vi.fn(), update: vi.fn(), insert: vi.fn(), delete: vi.fn() };
 function select(table: unknown) {
   return { where: vi.fn(() => {
     const rows = table === villaTable ? villaRows : taskRows;
@@ -53,6 +56,11 @@ beforeEach(() => {
   vi.mocked(db.select).mockImplementation(() => ({ from: select }) as never);
   set.mockReturnValue({ where: writeWhere }); writeWhere.mockResolvedValue(undefined);
   tx.update.mockReturnValue({ set });
+  insertValues.mockReturnValue({ returning: insertReturning });
+  insertReturning.mockResolvedValue([{ id: "new-task-id" }]);
+  tx.insert.mockReturnValue({ values: insertValues });
+  deleteWhere.mockResolvedValue(undefined);
+  tx.delete.mockReturnValue({ where: deleteWhere });
   vi.mocked(db.transaction).mockImplementation(async (callback) => callback(tx as never));
   vi.mocked(markBillingMilestonePaid).mockRejectedValue(new Error("Use Billing to issue the invoice and record the payment amount, date and bank reference."));
 });
@@ -152,5 +160,66 @@ describe("legacy actions delegate to the protected domain workflows", () => {
   it.each([() => toggleProgressTaskAction(taskId, villa.code, false), () => createUpdateAction(form()), () => addFileAction(form())])("never accesses writes when session authentication fails", async (run) => {
     vi.mocked(requireActor).mockRejectedValue(new AccessError("Sign in to continue.", 401));
     await expect(run()).rejects.toMatchObject({ status: 401 }); expect(db.transaction).not.toHaveBeenCalled(); expect(publishTeamMessage).not.toHaveBeenCalled(); expect(writePlatformEvent).not.toHaveBeenCalled();
+  });
+});
+
+describe("construction phase CRUD — PM/Dev can dynamically manage the progress bar", () => {
+  const payload = { phase: "Roofing", detail: "Trusses and tiles", period: "Sep 2026", percentWeight: "15", sequence: 3 };
+
+  it("inserts a new phase inside the scoped transaction and never notifies the buyer directly", async () => {
+    await createProgressTaskAction(villa.code, payload);
+    expect(assertScope).toHaveBeenCalledExactlyOnceWith(tx, developer, { projectId: villa.projectId, villaId: villa.id });
+    expect(tx.insert).toHaveBeenCalledExactlyOnceWith(progressTask);
+    expect(insertValues).toHaveBeenCalledExactlyOnceWith({ villaId: villa.id, phase: "Roofing", detail: "Trusses and tiles", period: "Sep 2026", percentWeight: "15", sequence: 3 });
+    expect(writePlatformEvent).toHaveBeenCalledExactlyOnceWith(tx, expect.objectContaining({ actorId: developer.id, action: "progress.create", notify: false, pmSafe: true }));
+    expect(revalidatePath).toHaveBeenCalledWith("/office", "layout"); expect(revalidatePath).toHaveBeenCalledWith("/koper", "layout");
+  });
+
+  it("lets an assigned pm create, update and delete phases", async () => {
+    const pm = { ...developer, role: "pm" as const };
+    vi.mocked(requireActor).mockResolvedValue(pm);
+    await createProgressTaskAction(villa.code, payload);
+    await updateProgressTaskAction(taskId, villa.code, payload);
+    await deleteProgressTaskAction(taskId, villa.code);
+    expect(assertScope).toHaveBeenCalledTimes(3);
+    expect(tx.update).toHaveBeenCalledExactlyOnceWith(progressTask);
+    expect(set).toHaveBeenCalledExactlyOnceWith({ phase: "Roofing", detail: "Trusses and tiles", period: "Sep 2026", percentWeight: "15", sequence: 3 });
+    expect(tx.delete).toHaveBeenCalledExactlyOnceWith(progressTask);
+  });
+
+  it("rejects malformed phase input before touching the database", async () => {
+    await expect(createProgressTaskAction(villa.code, { ...payload, percentWeight: "150" })).rejects.toThrow();
+    await expect(createProgressTaskAction(villa.code, { ...payload, phase: "" })).rejects.toThrow();
+    await expect(createProgressTaskAction(villa.code, { ...payload, sequence: 1.5 })).rejects.toThrow();
+    await expect(updateProgressTaskAction("not-a-uuid", villa.code, payload)).rejects.toThrow();
+    expect(db.transaction).not.toHaveBeenCalled();
+  });
+
+  it("rejects an unknown residence code before starting a transaction", async () => {
+    villaRows = [];
+    await expect(createProgressTaskAction(villa.code, payload)).rejects.toThrow(/Access/);
+    expect(tx.insert).not.toHaveBeenCalled();
+  });
+
+  it("refuses to update or delete a phase outside the scoped residence, row-locking first", async () => {
+    taskRows = [];
+    await expect(updateProgressTaskAction(taskId, villa.code, payload)).rejects.toThrow(/Access/);
+    await expect(deleteProgressTaskAction(taskId, villa.code)).rejects.toThrow(/Access/);
+    expect(rowLock).toHaveBeenCalledWith("update");
+    expect(tx.update).not.toHaveBeenCalled(); expect(tx.delete).not.toHaveBeenCalled();
+  });
+
+  it("never lets a buyer reach the phase-management transaction", async () => {
+    vi.mocked(requireActor).mockResolvedValue({ ...developer, role: "buyer" });
+    await expect(createProgressTaskAction(villa.code, payload)).rejects.toThrow(/Access/);
+    await expect(updateProgressTaskAction(taskId, villa.code, payload)).rejects.toThrow(/Access/);
+    await expect(deleteProgressTaskAction(taskId, villa.code)).rejects.toThrow(/Access/);
+    expect(db.transaction).not.toHaveBeenCalled();
+  });
+
+  it("rejects a project the PM no longer manages before any write", async () => {
+    vi.mocked(assertScope).mockRejectedValue(new AccessError());
+    await expect(createProgressTaskAction(villa.code, payload)).rejects.toThrow(/Access/);
+    expect(tx.insert).not.toHaveBeenCalled();
   });
 });
