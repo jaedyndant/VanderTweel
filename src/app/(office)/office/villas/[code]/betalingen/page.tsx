@@ -15,7 +15,7 @@ export default async function OfficeVillaPaymentsPage({
   return (
     <OfficeRoute
       page="payments"
-      villaCode={code}
+      villaCode={decodeURIComponent(code)}
       searchParams={searchParams}
     />
   );

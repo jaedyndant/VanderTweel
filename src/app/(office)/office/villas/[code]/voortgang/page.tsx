@@ -15,7 +15,7 @@ export default async function OfficeVillaProgressPage({
   return (
     <OfficeRoute
       page="progress"
-      villaCode={code}
+      villaCode={decodeURIComponent(code)}
       searchParams={searchParams}
     />
   );
