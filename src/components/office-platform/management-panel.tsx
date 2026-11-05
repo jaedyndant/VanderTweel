@@ -9,6 +9,7 @@ export interface ManagementPanelProps {
   projects: { id: string; name: string }[];
   villas: { id: string; code: string; projectId: string }[];
   initialData?: ManagementData;
+  fixedTab?: "accounts" | "residences";
 }
 
 function dateLabel(value: string | null) {
@@ -21,14 +22,14 @@ function deliveryLabel(account: ManagedAccount) {
   return labels[account.invitation.state];
 }
 
-export function ManagementPanel({ projects, villas, initialData }: ManagementPanelProps) {
+export function ManagementPanel({ projects, villas, initialData, fixedTab }: ManagementPanelProps) {
   const router = useRouter();
   const [data, setData] = useState<ManagementData | null>(initialData ?? null);
   const [loading, setLoading] = useState(!initialData);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
-  const [tab, setTab] = useState<"accounts" | "residences">("accounts");
+  const [tab, setTab] = useState<"accounts" | "residences">(fixedTab ?? "accounts");
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteAccount, setInviteAccount] = useState<ManagedAccount | null>(null);
   const [role, setRole] = useState<"buyer" | "pm">("buyer");
@@ -56,6 +57,10 @@ export function ManagementPanel({ projects, villas, initialData }: ManagementPan
     void load(controller.signal);
     return () => controller.abort();
   }, [initialData, load]);
+
+  useEffect(() => {
+    if (fixedTab) { setTab(fixedTab); setSearch(""); setError(""); setNotice(""); }
+  }, [fixedTab]);
 
   async function save(path: string, body: Record<string, unknown>, action: string) {
     if (requestBusy.current) return false;
@@ -119,13 +124,13 @@ export function ManagementPanel({ projects, villas, initialData }: ManagementPan
 
   return <section className="op-management" aria-label="Account and residence management">
     <div className="opm-heading">
-      <div><span className="opm-eyebrow">Developer workspace</span><h2>People & residences</h2><p>Manage assigned access and the details your team works with.</p></div>
+      <div><span className="opm-eyebrow">Developer workspace</span><h2>{fixedTab === "residences" ? "Residence details" : fixedTab === "accounts" ? "People & access" : "People & residences"}</h2><p>{fixedTab === "residences" ? "The residences your team works with." : fixedTab === "accounts" ? "Everyone with access to the platform, and what they can see." : "Manage assigned access and the details your team works with."}</p></div>
       <button type="button" className="opm-button opm-button-quiet" disabled={loading || Boolean(busy)} onClick={() => { setError(""); void load(); }}> {loading ? "Refreshing…" : "Refresh"}</button>
     </div>
-    <div className="opm-tabs" role="group" aria-label="Management sections">
+    {!fixedTab ? <div className="opm-tabs" role="group" aria-label="Management sections">
       <button type="button" aria-pressed={tab === "accounts"} onClick={() => { setTab("accounts"); setSearch(""); setError(""); setNotice(""); }}>People & access <span>{data?.accounts.length ?? "—"}</span></button>
       <button type="button" aria-pressed={tab === "residences"} onClick={() => { setTab("residences"); setSearch(""); setError(""); setNotice(""); }}>Residence details <span>{data?.villas.length ?? "—"}</span></button>
-    </div>
+    </div> : null}
     {error ? <p className="opm-message opm-message-error" role="alert">{error}</p> : null}
     {notice ? <p className="opm-message" role="status">{notice}</p> : null}
     <div className="opm-toolbar">

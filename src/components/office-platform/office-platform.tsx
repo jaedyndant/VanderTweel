@@ -60,8 +60,8 @@ const navigation: {
   developerOnly?: boolean;
 }[] = [
   { page: "overview", label: "Overview", icon: "overview" },
-  { page: "villas", label: "Villas", icon: "villa" },
-  { page: "buyers", label: "Clients", icon: "people", developerOnly: true },
+  { page: "villas", label: "Residences", icon: "villa" },
+  { page: "buyers", label: "CRM", icon: "people", developerOnly: true },
   { page: "payments", label: "Payments", icon: "payment", developerOnly: true },
   { page: "updates", label: "Site updates", icon: "clock" },
   { page: "documents", label: "Documents", icon: "file", developerOnly: true },
@@ -1665,7 +1665,7 @@ export function OfficePlatform({
   const workVillas = data.villas.filter(v => v.projectId === workProjectId);
   const projectPicker = !projectId && data.projects.length > 1 ? <label className="completion-project">Development<select value={workProjectId} onChange={e=>setCompletionProject(e.target.value)}>{data.projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label> : null;
   if (data.role === "developer" && ["buyers", "villas"].includes(data.page)) {
-    content = <ManagementPanel projects={data.projects} villas={data.villas} />;
+    content = <ManagementPanel projects={data.projects} villas={data.villas} fixedTab={data.page === "villas" ? "residences" : "accounts"} />;
   } else if (data.role === "developer" && data.page === "payments") {
     content = workProjectId ? <>{projectPicker}<BillingManager key={workProjectId} projectId={workProjectId} villas={workVillas} /></> : <Empty>No development is available.</Empty>;
   } else if (data.role === "developer" && data.page === "documents") {
