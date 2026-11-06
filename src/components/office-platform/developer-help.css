@@ -1,0 +1,259 @@
+.office-platform .office-help {
+  --oph-space: 24px;
+  --oph-section-space: 44px;
+  --oph-reading-width: 68ch;
+  --oph-radius: 4px;
+  min-width: 0;
+}
+.office-platform .oph-heading {
+  align-items: flex-start;
+}
+.office-platform .oph-heading .op-btn {
+  flex: none;
+  white-space: nowrap;
+}
+.office-platform .oph-workflow {
+  padding: var(--oph-space) 0;
+  margin-bottom: var(--oph-section-space);
+  border-block: 1px solid var(--op-line);
+}
+.office-platform .oph-workflow h2 {
+  font-size: 24px;
+  line-height: 1.2;
+  margin-bottom: var(--oph-space);
+}
+.office-platform .oph-workflow ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--oph-space);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.office-platform .oph-workflow li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+.office-platform .oph-step {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--op-line);
+  border-radius: 50%;
+  color: var(--op-green);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.office-platform .oph-workflow strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  padding-top: 4px;
+}
+.office-platform .oph-workflow li p {
+  color: var(--op-muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 5px;
+}
+.office-platform .oph-workflow .oph-workflow-note {
+  margin-top: var(--oph-space);
+  font-size: 13px;
+  color: var(--op-muted);
+}
+.office-platform .oph-layout {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.8fr) minmax(0, 2.8fr);
+  gap: var(--oph-section-space);
+  align-items: start;
+}
+.office-platform .oph-index {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.office-platform .oph-index > span {
+  margin-bottom: 12px;
+}
+.office-platform .oph-index a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--op-line);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.office-platform .oph-index a:hover {
+  color: var(--op-teak);
+}
+.office-platform .oph-index > p {
+  color: var(--op-muted);
+  font-size: 12px;
+  margin-top: 16px;
+}
+.office-platform .oph-sections {
+  min-width: 0;
+  display: grid;
+  gap: var(--oph-section-space);
+}
+.office-platform .oph-sections > section {
+  scroll-margin-top: var(--oph-space);
+}
+.office-platform .oph-section-heading {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--op-line);
+}
+.office-platform .oph-section-heading h2 {
+  font-size: 28px;
+  line-height: 1.2;
+}
+.office-platform .oph-section-heading p {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--op-muted);
+}
+.office-platform .oph-question {
+  border-bottom: 1px solid var(--op-line);
+}
+.office-platform .oph-question summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 64px;
+  padding-block: 20px;
+}
+.office-platform .oph-question summary::-webkit-details-marker {
+  display: none;
+}
+.office-platform .oph-question summary h3 {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.office-platform .oph-question summary svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.office-platform .oph-question summary:hover {
+  color: var(--op-teak);
+}
+.office-platform .oph-question summary:focus-visible {
+  outline: 3px solid var(--op-focus);
+  outline-offset: 4px;
+  border-radius: var(--oph-radius);
+}
+.office-platform .oph-question[open] .oph-plus {
+  display: none;
+}
+.office-platform .oph-answer {
+  max-width: var(--oph-reading-width);
+  padding-bottom: var(--oph-space);
+  overflow-wrap: anywhere;
+  color: var(--op-muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+.office-platform .oph-answer p {
+  color: var(--op-muted);
+  line-height: inherit;
+}
+.office-platform .oph-answer > * + * {
+  margin-top: 16px;
+}
+.office-platform .oph-answer strong {
+  color: var(--op-ink);
+  font-weight: 500;
+}
+.office-platform .oph-answer a {
+  color: var(--op-green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.office-platform .oph-answer a:hover {
+  color: var(--op-teak);
+}
+.office-platform .oph-answer ol {
+  list-style: decimal outside;
+  padding-left: 22px;
+  margin-block: 0;
+}
+.office-platform .oph-answer li + li {
+  margin-top: 12px;
+}
+.office-platform .oph-answer li::marker {
+  color: var(--op-teak);
+}
+.office-platform .oph-answer .oph-note {
+  border-left: 2px solid var(--op-teak);
+  padding-left: 16px;
+}
+.office-platform .oph-statuses {
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+.office-platform .oph-statuses > div {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 16px;
+}
+.office-platform .oph-statuses dt {
+  color: var(--op-ink);
+  font-weight: 500;
+}
+.office-platform .oph-statuses dd {
+  margin: 0;
+}
+@media (max-width: 1100px) {
+  .office-platform .oph-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .office-platform .oph-index {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--oph-space);
+  }
+  .office-platform .oph-index > span,
+  .office-platform .oph-index > p {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 760px) {
+  .office-platform .oph-workflow ol {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+}
+@media (max-width: 700px) {
+  .office-platform .oph-sections > section {
+    scroll-margin-top: 96px;
+  }
+}
+@media (max-width: 480px) {
+  .office-platform .office-help {
+    --oph-section-space: 36px;
+  }
+  .office-platform .oph-index {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .office-platform .oph-question summary {
+    gap: 12px;
+  }
+  .office-platform .oph-statuses > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}

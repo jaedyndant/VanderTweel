@@ -8,6 +8,7 @@ export type OfficePage =
   | "updates"
   | "documents"
   | "account"
+  | "help"
   | "project"
   | "villa"
   | "progress";

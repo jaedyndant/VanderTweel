@@ -9,6 +9,7 @@ const routes = {
   updates: "/office/updates",
   documents: "/office/documenten",
   account: "/office/account",
+  help: "/office/help",
 } as const;
 
 export function officeHref(page: OfficePage, projectId?: string | null) {

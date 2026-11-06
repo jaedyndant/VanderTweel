@@ -79,15 +79,15 @@ const readOfficePlatformData = cache(async (
   villaCode: string | undefined,
   projectId: string | undefined,
 ): Promise<OfficePlatformData | null> => {
-  // Account details belong to the authenticated person, not a villa. Resolve
-  // the current database identity and permitted navigation only: no billing,
-  // owner directory, files or construction records are needed on this page.
-  if (page === "account") {
+  // Account and Help need only the current database identity and permitted
+  // navigation. Do not fetch billing, owners, files or construction records.
+  if (page === "account" || page === "help") {
     const actor = await requireActor().catch((error: unknown) => {
       if (error instanceof AccessError) return null;
       throw error;
     });
-    if (!actor || actor.role === "buyer" || villaCode !== undefined) return null;
+    if (!actor || actor.role === "buyer" ||
+        (page === "help" && actor.role !== "developer") || villaCode !== undefined) return null;
     const projects = await getProjectsOverview(actor.id, actor.role);
     if (new Set(projects.map((project) => project.id)).size !== projects.length ||
         new Set(projects.map((project) => project.slug)).size !== projects.length) return null;

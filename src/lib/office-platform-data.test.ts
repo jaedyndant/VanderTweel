@@ -65,6 +65,55 @@ beforeEach(() => {
 });
 
 describe("office presentation authorization and serialization", () => {
+  it("loads Help with fresh developer identity and navigation only", async () => {
+    const output = await getOfficePlatformData("help", { projectId: project.id });
+    expect(output).toMatchObject({ page: "help", role: "developer", email: "current@example.test",
+      selection: { projectId: project.id, villaId: null, villaCode: null },
+      villas: [], buyers: [], tasks: [], payments: [], updates: [], files: [] });
+    expect(requireActor).toHaveBeenCalledOnce();
+    expect(auth).not.toHaveBeenCalled();
+    expect(getProjectsOverview).toHaveBeenCalledWith("developer-a", "developer");
+    expect(getProjectDetail).not.toHaveBeenCalled();
+    expect(getVillaForOffice).not.toHaveBeenCalled();
+    expect(getBuyersDirectory).not.toHaveBeenCalled();
+    expect(getOfficeMessageSummaries).not.toHaveBeenCalled();
+    expect(JSON.stringify(output)).not.toContain("SECRET");
+  });
+
+  it("keeps Help available before a developer has any projects", async () => {
+    vi.mocked(getProjectsOverview).mockResolvedValue([]);
+    expect(await getOfficePlatformData("help")).toMatchObject({ page: "help", role: "developer", projects: [],
+      selection: { projectId: null, villaId: null, villaCode: null } });
+    expect(getProjectDetail).not.toHaveBeenCalled();
+    expect(getVillaForOffice).not.toHaveBeenCalled();
+  });
+
+  it.each(["pm", "buyer"] as const)("denies Help to a current %s despite a stale developer session", async (role) => {
+    session("developer");
+    vi.mocked(requireActor).mockResolvedValue({ id: "changed-account", role, email: "current@example.test", displayName: null });
+    expect(await getOfficePlatformData("help")).toBeNull();
+    expect(getProjectsOverview).not.toHaveBeenCalled();
+    expect(getProjectDetail).not.toHaveBeenCalled();
+    expect(getVillaForOffice).not.toHaveBeenCalled();
+  });
+
+  it("denies Help when the account has been deleted or access is missing", async () => {
+    vi.mocked(requireActor).mockRejectedValue(new AccessError());
+    expect(await getOfficePlatformData("help")).toBeNull();
+    expect(getProjectsOverview).not.toHaveBeenCalled();
+  });
+
+  it("rejects unknown, mismatched and residence-specific Help selections", async () => {
+    expect(await getOfficePlatformData("help", { projectId: "other-project" })).toBeNull();
+    expect(await getOfficePlatformData("help", { projectId: "" })).toBeNull();
+    expect(await getOfficePlatformData("help", { projectId: project.id, projectSlug: "other" })).toBeNull();
+    expect(await getOfficePlatformData("help", { villaCode: villa.code })).toBeNull();
+    expect(getProjectDetail).not.toHaveBeenCalled();
+    expect(getVillaForOffice).not.toHaveBeenCalled();
+    expect(getBuyersDirectory).not.toHaveBeenCalled();
+    expect(getOfficeMessageSummaries).not.toHaveBeenCalled();
+  });
+
   it("loads current account identity and navigation without fetching customer records", async () => {
     const output = await getOfficePlatformData("account", { projectId: project.id });
     expect(output).toMatchObject({ page: "account", role: "developer", email: "current@example.test", displayName: "Team Member",

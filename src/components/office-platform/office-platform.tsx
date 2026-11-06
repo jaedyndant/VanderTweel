@@ -69,6 +69,7 @@ const navigation: {
   { page: "payments", label: "Payments", icon: "payment", developerOnly: true },
   { page: "updates", label: "Site updates", icon: "clock" },
   { page: "documents", label: "Documents", icon: "file", developerOnly: true },
+  { page: "help", label: "Help", icon: "help", developerOnly: true },
   { page: "account", label: "Account", icon: "people" },
 ];
 
@@ -104,6 +105,11 @@ function Icon({ name }: { name: string }) {
         <>
           <circle cx="12" cy="12" r="8" />
           <path d="M12 6v6l4 2" />
+        </>
+      ) : name === "help" ? (
+        <>
+          <circle cx="12" cy="12" r="8" />
+          <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4M12 16h.01" />
         </>
       ) : name === "file" ? (
         <>
@@ -953,9 +959,11 @@ function ProgressTaskForm({
 export function OfficePlatform({
   data,
   actions,
+  helpContent,
 }: {
   data: OfficePlatformData;
   actions: OfficeActionHandlers;
+  helpContent?: ReactNode;
 }) {
   const router = useRouter();
   const [modal, setModal] = useState<Modal | null>(null);
@@ -975,7 +983,7 @@ export function OfficePlatform({
     (villa) => villa.id === data.selection.villaId,
   );
   const project = data.projects.find((item) => item.id === projectId);
-  const residenceCount = data.page === "account"
+  const residenceCount = data.page === "account" || data.page === "help"
     ? (project?.villaCount ?? data.projects.reduce((sum, item) => sum + item.villaCount, 0))
     : data.villas.length;
   const context = selectedVilla
@@ -1885,6 +1893,8 @@ export function OfficePlatform({
   const projectPicker = !projectId && data.projects.length > 1 ? <label className="completion-project">Development<select value={workProjectId} onChange={e=>setCompletionProject(e.target.value)}>{data.projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label> : null;
   if (data.page === "account") {
     content = <AccountPage data={data} />;
+  } else if (data.page === "help" && data.role === "developer") {
+    content = helpContent;
   } else if (data.role === "developer" && ["buyers", "villas"].includes(data.page)) {
     content = <ManagementPanel projects={data.projects} villas={data.villas} fixedTab={data.page === "villas" ? "residences" : "accounts"} />;
   } else if (data.role === "developer" && data.page === "payments") {
