@@ -7,6 +7,7 @@ export type OfficePage =
   | "payments"
   | "updates"
   | "documents"
+  | "account"
   | "project"
   | "villa"
   | "progress";
@@ -97,6 +98,7 @@ export interface OfficePlatformData {
   page: OfficePage;
   role: OfficeRole;
   email: string | null;
+  displayName?: string | null;
   projects: OfficeProject[];
   villas: OfficeVilla[];
   buyers: OfficeBuyer[] | null;

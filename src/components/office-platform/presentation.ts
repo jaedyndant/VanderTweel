@@ -8,6 +8,7 @@ const routes = {
   payments: "/office/betalingen",
   updates: "/office/updates",
   documents: "/office/documenten",
+  account: "/office/account",
 } as const;
 
 export function officeHref(page: OfficePage, projectId?: string | null) {

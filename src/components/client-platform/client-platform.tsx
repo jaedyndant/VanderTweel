@@ -22,6 +22,7 @@ import { BuyerMessageFeed } from "./message-feed";
 import "../office-platform/completion-panels.css";
 import { ResidenceSwitcher } from "./residence-switcher";
 import { MobilePlatformNav } from "@/components/platform/mobile-platform-nav";
+import { BrandMark } from "@/components/brand/brand-mark";
 import { ClientIcon } from "./client-icon";
 import { ClientSignOut } from "./client-sign-out";
 import "./client-platform.css";
@@ -87,9 +88,11 @@ function ProgressBar({
 }
 
 function AccountPanel({
+  name,
   email,
   notifyEmail,
 }: {
+  name: string | null;
   email: string | null;
   notifyEmail: boolean;
 }) {
@@ -121,11 +124,14 @@ function AccountPanel({
       <div className="account-sections">
         <section className="panel">
           <div className="panel-title">
-            <h3>Signed in as</h3>
+            <h2>Signed in as</h2>
           </div>
           <dl className="account-identity">
+            {name && <><dt>Name</dt><dd>{name}</dd></>}
             <dt>Email address</dt>
             <dd>{email ?? "Unavailable"}</dd>
+            <dt>Role</dt>
+            <dd>Owner</dd>
           </dl>
           <p className="fine">
             Your sign-in email is set by the Van der Tweel team. Contact your
@@ -134,7 +140,7 @@ function AccountPanel({
         </section>
         <section className="panel">
           <div className="panel-title">
-            <h3>Notifications</h3>
+            <h2>Notifications</h2>
           </div>
           <label className="toggle-row">
             <input
@@ -152,7 +158,7 @@ function AccountPanel({
         </section>
         <section className="panel">
           <div className="panel-title">
-            <h3>Session</h3>
+            <h2>Session</h2>
           </div>
           <p className="account-session-copy">
             Sign out when you finish using this device.
@@ -481,14 +487,6 @@ export function ClientPlatform({
     modal?.kind === "payment"
       ? milestones.find((item) => item.id === modal.id)
       : null;
-  const initials = (buyerName ?? "Owner")
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((name) => name[0])
-    .join("")
-    .toUpperCase();
-
   useEffect(() => {
     if (!modal) return;
     const element = dialog.current;
@@ -1160,6 +1158,7 @@ export function ClientPlatform({
   } else if (page === "account") {
     body = (
       <AccountPanel
+        name={buyerName}
         email={data.account?.email ?? null}
         notifyEmail={data.account?.notifyEmail ?? true}
       />
@@ -1191,7 +1190,7 @@ export function ClientPlatform({
             href={href("home")}
             aria-label="Van der Tweel owner platform home"
           >
-            <span className="mark" aria-hidden="true" />
+            <BrandMark className="mark" />
             <span>
               <strong>Van der Tweel</strong>
               <small>Bali · Development atelier</small>
@@ -1214,17 +1213,6 @@ export function ClientPlatform({
               </Link>
             ))}
           </nav>
-          <div className="side-bottom">
-            <div className="person">
-              <span className="avatar" aria-hidden="true">
-                {initials}
-              </span>
-              <span>
-                {buyerName ?? "Owner"}
-                <small>Owner · {villa.code}</small>
-              </span>
-            </div>
-          </div>
         </aside>
         <main className="main" id="client-main">
           <MobilePlatformNav
@@ -1232,15 +1220,6 @@ export function ClientPlatform({
             context={`${villa.projectName} · ${villa.code}`}
             homeHref={href("home")}
             navigationKey={`${page}:${villa.id}`}
-            footer={
-              <div className="mobile-owner-account">
-                <p>
-                  {buyerName ?? "Owner"}
-                  <span>{data.account?.email ?? villa.code}</span>
-                </p>
-                {!preview && <ClientSignOut />}
-              </div>
-            }
           >
             <nav aria-label="Owner navigation">
               {visibleNavigation.map((item) => (

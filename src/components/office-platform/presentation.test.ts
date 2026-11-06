@@ -114,6 +114,8 @@ describe("office navigation and file links", () => {
       "/office/betalingen?projectId=a%20%26%20b",
     );
     expect(officeHref("documents", "")).toBe("/office/documenten");
+    expect(officeHref("account", "a & b")).toBe("/office/account?projectId=a%20%26%20b");
+    expect(officeHref("account")).toBe("/office/account");
   });
 
   it("permits HTTP(S) file links but never executable or embedded-credential URLs", () => {

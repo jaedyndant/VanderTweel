@@ -91,7 +91,7 @@
 .office-platform .op-brand {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 10px;
 }
 .office-platform .op-brand strong {
   font:
@@ -110,21 +110,9 @@
 }
 .office-platform .op-mark {
   display: block;
-  width: 9px;
+  width: auto;
   flex-shrink: 0;
   height: 33px;
-  border: 2px solid currentColor;
-  border-bottom: 0;
-  border-radius: 19px 19px 0 0;
-  position: relative;
-}
-.office-platform .op-mark::after {
-  content: "";
-  position: absolute;
-  inset: 6px 1px 0;
-  border: 1px solid currentColor;
-  border-bottom: 0;
-  border-radius: 12px 12px 0 0;
 }
 .office-platform .op-workspace {
   border-block: 1px solid var(--op-line);
@@ -174,39 +162,6 @@
   color: var(--op-green);
   font-weight: 600;
 }
-.office-platform .op-person {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: auto;
-  padding-top: 35px;
-  min-width: 0;
-}
-.office-platform .op-person > div {
-  min-width: 0;
-}
-.office-platform .op-avatar {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #d9dfd0;
-  font-size: 9px;
-}
-.office-platform .op-person strong {
-  display: block;
-  font-size: 10px;
-  font-weight: 500;
-  overflow-wrap: anywhere;
-}
-.office-platform .op-person small {
-  display: block;
-  color: var(--op-muted);
-  font-size: 9px;
-  margin-top: 4px;
-}
 .office-platform .op-main-wrap {
   min-width: 0;
 }
@@ -233,14 +188,40 @@
 .office-platform .op-topbar strong {
   font-weight: 400;
 }
-.office-platform .op-topbar .op-badge {
-  flex-shrink: 0;
+.office-platform .op-account-sections {
+  display: grid;
+  gap: 22px;
+  max-width: 740px;
 }
-.office-platform .op-account-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-left: auto;
+.office-platform .op-account-identity {
+  display: grid;
+  gap: 18px;
+  margin: 0 0 20px;
+}
+.office-platform .op-account-identity > div {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+.office-platform .op-account-identity dt {
+  color: var(--op-muted);
+  font-size: 12px;
+}
+.office-platform .op-account-identity dd {
+  color: var(--op-ink);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.office-platform .op-account-copy {
+  color: var(--op-muted);
+  font-size: 13px;
+  line-height: 1.7;
+  max-width: 60ch;
+}
+.office-platform .op-account-session-copy {
+  margin-bottom: 18px;
 }
 .office-platform .op-signout {
   flex-shrink: 0;
@@ -1049,24 +1030,6 @@
   }
   .office-platform .op-shell {
     min-height: calc(100svh - 73px);
-  }
-  .office-platform .op-mobile-account {
-    border-top: 1px solid var(--op-line);
-    padding-top: 20px;
-    display: grid;
-    gap: 8px;
-  }
-  .office-platform .op-mobile-account strong {
-    color: var(--op-ink);
-    font-size: 12px;
-    font-weight: 500;
-  }
-  .office-platform .op-mobile-account .op-signout {
-    margin-top: 8px;
-    max-width: none;
-  }
-  .office-platform .op-mobile-account .op-signout-button {
-    width: 100%;
   }
   .office-platform .op-content {
     padding: 26px 18px 45px;
