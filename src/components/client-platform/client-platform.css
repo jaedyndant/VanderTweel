@@ -99,23 +99,30 @@
   font-weight: 700;
 }
 .client-platform .brand {
-  display: flex;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 27px minmax(0, 1fr);
+  gap: 10px;
   align-items: center;
-  white-space: nowrap;
+  min-width: 0;
 }
 .client-platform .brand strong {
   font:
     25px / normal var(--font-client-serif, "Newsreader"),
     Georgia,
     serif;
+  white-space: nowrap;
 }
 .client-platform .brand small {
+  grid-column: 1 / -1;
   display: block;
-  font-size: 8px;
-  letter-spacing: 2.4px;
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  margin-top: 4px;
+}
+.client-platform .brand small span {
+  display: inline-block;
+  white-space: nowrap;
 }
 .client-platform .mark {
   display: block;
@@ -173,6 +180,7 @@
   min-height: 100svh;
 }
 .client-platform .sidebar {
+  min-width: 0;
   background: var(--sidebar);
   border-right: 1px solid var(--line);
   padding: 30px 22px;

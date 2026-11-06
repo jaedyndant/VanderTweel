@@ -89,9 +89,11 @@
   gap: 34px;
 }
 .office-platform .op-brand {
-  display: flex;
+  display: grid;
+  grid-template-columns: 27px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 .office-platform .op-brand strong {
   font:
@@ -101,11 +103,15 @@
   white-space: nowrap;
 }
 .office-platform .op-brand small {
+  grid-column: 1 / -1;
   display: block;
-  font-size: 7px;
-  letter-spacing: 2px;
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  margin-top: 4px;
+}
+.office-platform .op-brand small span {
+  display: inline-block;
   white-space: nowrap;
 }
 .office-platform .op-mark {
@@ -989,10 +995,6 @@
   }
   .office-platform .op-brand strong {
     font-size: 18px;
-  }
-  .office-platform .op-brand small {
-    font-size: 6px;
-    letter-spacing: 1.6px;
   }
   .office-platform .op-content {
     padding: 28px 23px 50px;
