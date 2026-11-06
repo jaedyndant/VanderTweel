@@ -67,23 +67,11 @@
 }
 
 .login-page .login-brand-mark {
-  position: relative;
   display: block;
   flex: 0 0 auto;
   width: 27px;
-  height: 33px;
-  border: 2px solid currentColor;
-  border-bottom: 0;
-  border-radius: 19px 19px 0 0;
-}
-
-.login-page .login-brand-mark::after {
-  content: "";
-  position: absolute;
-  inset: 6px 6px 0;
-  border: 1px solid currentColor;
-  border-bottom: 0;
-  border-radius: 12px 12px 0 0;
+  height: auto;
+  aspect-ratio: 27 / 33;
 }
 
 .login-page .login-header-label,

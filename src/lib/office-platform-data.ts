@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { getOfficeMessageSummaries } from "@/lib/platform-communication";
 import { auth } from "@/lib/auth";
+import { AccessError, requireActor } from "@/lib/platform-access";
 import { safeDocumentUrl } from "@/components/client-platform/presentation";
 import {
   getBuyersDirectory,
@@ -78,6 +79,38 @@ const readOfficePlatformData = cache(async (
   villaCode: string | undefined,
   projectId: string | undefined,
 ): Promise<OfficePlatformData | null> => {
+  // Account details belong to the authenticated person, not a villa. Resolve
+  // the current database identity and permitted navigation only: no billing,
+  // owner directory, files or construction records are needed on this page.
+  if (page === "account") {
+    const actor = await requireActor().catch((error: unknown) => {
+      if (error instanceof AccessError) return null;
+      throw error;
+    });
+    if (!actor || actor.role === "buyer" || villaCode !== undefined) return null;
+    const projects = await getProjectsOverview(actor.id, actor.role);
+    if (new Set(projects.map((project) => project.id)).size !== projects.length ||
+        new Set(projects.map((project) => project.slug)).size !== projects.length) return null;
+    const selectedProject = projects.find((project) =>
+      (projectSlug === undefined || project.slug === projectSlug) &&
+      (projectId === undefined || project.id === projectId));
+    const hasSelection = projectSlug !== undefined || projectId !== undefined;
+    if (hasSelection && !selectedProject) return null;
+    return {
+      page,
+      role: actor.role,
+      email: actor.email,
+      displayName: actor.displayName,
+      projects: projects.map(({ id, name, slug, villaCount }) => ({ id, name, slug, villaCount })),
+      villas: [],
+      buyers: actor.role === "developer" ? [] : null,
+      tasks: [],
+      payments: actor.role === "developer" ? [] : null,
+      updates: [],
+      files: actor.role === "developer" ? [] : null,
+      selection: { projectId: hasSelection ? selectedProject!.id : null, villaId: null, villaCode: null },
+    };
+  }
   const session = await auth();
   const user = session?.user as { id?: string; role?: string; email?: string | null } | undefined;
   if (!user?.id || (user.role !== "pm" && user.role !== "developer")) return null;

@@ -78,7 +78,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 18px 0;
+  padding-block: 18px;
 }
 .site-brand {
   display: flex;
@@ -86,8 +86,10 @@
   gap: 10px;
 }
 .site-brand-mark {
-  width: 28px;
-  height: 28px;
+  display: block;
+  width: 27px;
+  height: auto;
+  aspect-ratio: 27 / 33;
   flex: none;
 }
 .site-brand-text {
@@ -152,7 +154,7 @@
   display: none;
   flex-direction: column;
   gap: 2px;
-  padding: 0 0 18px;
+  padding-block: 0 18px;
   font-size: 15px;
 }
 .site-nav-mobile a,
@@ -548,6 +550,8 @@
   flex-wrap: wrap;
   gap: 16px;
 }
+.site-footer-brand .site-brand-name { font-size: 18px; }
+.site-footer-brand .site-brand-sub { color: var(--muted); }
 .site-footer-links {
   display: flex;
   gap: 20px;

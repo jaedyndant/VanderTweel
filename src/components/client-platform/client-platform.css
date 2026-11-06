@@ -119,20 +119,10 @@
 }
 .client-platform .mark {
   display: block;
+  flex: 0 0 auto;
   width: 27px;
-  height: 33px;
-  border: 2px solid currentColor;
-  border-bottom: 0;
-  border-radius: 19px 19px 0 0;
-  position: relative;
-}
-.client-platform .mark::after {
-  content: "";
-  position: absolute;
-  inset: 6px 6px 0;
-  border: 1px solid currentColor;
-  border-bottom: 0;
-  border-radius: 12px 12px 0 0;
+  height: auto;
+  aspect-ratio: 27 / 33;
 }
 .client-platform .btn {
   display: inline-flex;
@@ -233,33 +223,6 @@
   text-align: center;
   font-size: 15px;
   flex-shrink: 0;
-}
-.client-platform .side-bottom {
-  margin-top: auto;
-  padding-top: 40px;
-}
-.client-platform .person {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 11px;
-  overflow-wrap: anywhere;
-}
-.client-platform .avatar {
-  background: #dedfce;
-  width: 33px;
-  height: 33px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  font-size: 10px;
-  flex-shrink: 0;
-}
-.client-platform .person small {
-  display: block;
-  color: var(--muted);
-  margin-top: 4px;
-  font-size: 9px;
 }
 .client-platform .main {
   min-width: 0;
@@ -933,8 +896,7 @@
     gap: 15px;
   }
   .client-platform .sidebar .brand,
-  .client-platform .workspace-label,
-  .client-platform .side-bottom {
+  .client-platform .workspace-label {
     display: none;
   }
   .client-platform .side-nav {
@@ -1137,6 +1099,10 @@
   gap: 20px;
   max-width: 840px;
 }
+.client-platform .account-sections .panel-title h2 {
+  font-size: 25px;
+  letter-spacing: normal;
+}
 .client-platform .account-identity {
   display: grid;
   gap: 8px;
@@ -1168,22 +1134,6 @@
 }
 .client-platform .toggle-row input {
   flex: 0 0 auto;
-}
-.client-platform .mobile-owner-account {
-  display: grid;
-  gap: 18px;
-  min-width: 0;
-}
-.client-platform .mobile-owner-account p {
-  color: var(--ink);
-  font-size: 14px;
-  overflow-wrap: anywhere;
-}
-.client-platform .mobile-owner-account p span {
-  display: block;
-  font-size: 12px;
-  color: var(--body-copy);
-  margin-top: 4px;
 }
 .client-platform .villa-visual {
   margin: 0;

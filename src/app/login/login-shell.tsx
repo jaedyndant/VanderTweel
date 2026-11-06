@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { clientSans, clientSerif } from "@/fonts";
+import { BrandMark } from "@/components/brand/brand-mark";
 import "./login.css";
 
 export function LoginShell({
@@ -17,7 +18,7 @@ export function LoginShell({
     >
       <header className="login-header">
         <Link className="login-brand" href="/" aria-label="Van der Tweel website">
-          <span className="login-brand-mark" aria-hidden="true" />
+          <BrandMark className="login-brand-mark" />
           <span>Van der Tweel</span>
         </Link>
         <span className="login-header-label">Project portal</span>

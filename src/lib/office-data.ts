@@ -70,7 +70,10 @@ export async function getProjectsOverview(accountId: string, role: OfficeRole) {
   const accessibleIds = await getAccessibleProjectIds(accountId, role);
   if (accessibleIds.length === 0) return [];
   const projects = await db.query.project.findMany({ where: inArray(project.id, accessibleIds) });
-  const villas = await db.query.villa.findMany({ where: inArray(villa.projectId, accessibleIds) });
+  const villas = await db.query.villa.findMany({
+    where: inArray(villa.projectId, accessibleIds),
+    columns: { id: true, projectId: true },
+  });
   return projects.map((p) => ({
     ...p,
     villaCount: villas.filter((v) => v.projectId === p.id).length,

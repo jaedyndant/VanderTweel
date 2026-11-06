@@ -61,7 +61,7 @@ vi.mock("@/db/client", () => {
 });
 
 import { db } from "@/db/client";
-import { getAuthorizedOfficeVilla, getVillaForOffice, getBuyersDirectory } from "./office-data";
+import { getAuthorizedOfficeVilla, getVillaForOffice, getBuyersDirectory, getProjectsOverview } from "./office-data";
 
 const ACCOUNT_PM = "11111111-1111-1111-1111-111111111111";
 const ACCOUNT_DEV = "22222222-2222-2222-2222-222222222222";
@@ -86,6 +86,20 @@ function mockVilla(id: string, projectId: string) {
     code: "Villa X",
   });
 }
+
+describe("getProjectsOverview — minimal navigation data", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("counts a PM's residences without querying financial or customer fields", async () => {
+    mockPmManagingOnlyProjectA();
+    vi.mocked(db.query.project.findMany).mockResolvedValue([{ id: PROJECT_A, name: "Atelier", slug: "atelier" }] as never);
+    vi.mocked(db.query.villa.findMany).mockResolvedValue([{ id: VILLA_IN_A, projectId: PROJECT_A }] as never);
+    expect(await getProjectsOverview(ACCOUNT_PM, "pm")).toMatchObject([{ id: PROJECT_A, villaCount: 1 }]);
+    expect(db.query.villa.findMany).toHaveBeenCalledWith(expect.objectContaining({ columns: { id: true, projectId: true } }));
+    expect(db.query.paymentMilestone.findMany).not.toHaveBeenCalled();
+    expect(db.query.buyer.findMany).not.toHaveBeenCalled();
+  });
+});
 
 describe("getAuthorizedOfficeVilla — pm scoping, end to end", () => {
   beforeEach(() => vi.clearAllMocks());

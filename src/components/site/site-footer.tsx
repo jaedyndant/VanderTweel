@@ -1,17 +1,17 @@
 import Link from "next/link";
+import { BrandMark } from "@/components/brand/brand-mark";
 
 export default function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="site-wrap site-footer-inner">
-        <div>
-          <div className="site-brand-name serif" style={{ fontSize: 18 }}>
-            Van der Tweel
-          </div>
-          <div className="site-brand-sub" style={{ color: "var(--muted)" }}>
-            Bali &middot; Development atelier
-          </div>
-        </div>
+        <Link href="/" className="site-brand site-footer-brand">
+          <BrandMark className="site-brand-mark" />
+          <span className="site-brand-text">
+            <span className="site-brand-name serif">Van der Tweel</span>
+            <span className="site-brand-sub">Bali &middot; Development atelier</span>
+          </span>
+        </Link>
 
         <nav className="site-footer-links" aria-label="Footer">
           <Link href="/atelier">The atelier</Link>

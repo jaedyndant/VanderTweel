@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { BrandMark } from "@/components/brand/brand-mark";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -19,18 +20,7 @@ export default function SiteNav() {
     <header className="site-nav">
       <div className="site-wrap site-nav-inner">
         <Link href="/" className="site-brand" onClick={() => setOpen(false)}>
-          <svg
-            viewBox="0 0 28 28"
-            className="site-brand-mark"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M6 22V13c0-4.4 3.6-8 8-8s8 3.6 8 8v9"
-              stroke="currentColor"
-              strokeWidth="1.6"
-            />
-          </svg>
+          <BrandMark className="site-brand-mark" />
           <span className="site-brand-text">
             <span className="site-brand-name serif">Van der Tweel</span>
             <span className="site-brand-sub">Bali &middot; Development atelier</span>

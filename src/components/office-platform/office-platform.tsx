@@ -36,6 +36,7 @@ import type {
 } from "./types";
 import { OfficeSignOut } from "./office-sign-out";
 import { MobilePlatformNav } from "../platform/mobile-platform-nav";
+import { BrandMark } from "@/components/brand/brand-mark";
 import "./office-platform.css";
 import { FileManager } from "./file-manager";
 import { BillingManager } from "./billing-manager";
@@ -68,6 +69,7 @@ const navigation: {
   { page: "payments", label: "Payments", icon: "payment", developerOnly: true },
   { page: "updates", label: "Site updates", icon: "clock" },
   { page: "documents", label: "Documents", icon: "file", developerOnly: true },
+  { page: "account", label: "Account", icon: "people" },
 ];
 
 function Icon({ name }: { name: string }) {
@@ -172,6 +174,54 @@ function Heading({
 
 function Empty({ children }: { children: ReactNode }) {
   return <p className="op-empty">{children}</p>;
+}
+
+function AccountPage({ data }: { data: OfficePlatformData }) {
+  return (
+    <>
+      <Heading
+        eyebrow="Your account"
+        title="Sign-in and access."
+        description="Your team account and current session."
+      />
+      <div className="op-account-sections">
+        <section className="op-panel" aria-labelledby="office-account-identity">
+          <div className="op-panel-title">
+            <h2 id="office-account-identity">Signed in as</h2>
+          </div>
+          <dl className="op-account-identity">
+            {data.displayName ? (
+              <div>
+                <dt>Name</dt>
+                <dd>{data.displayName}</dd>
+              </div>
+            ) : null}
+            <div>
+              <dt>Email address</dt>
+              <dd>{data.email ?? "Unavailable"}</dd>
+            </div>
+            <div>
+              <dt>Role</dt>
+              <dd>{data.role === "developer" ? "Developer" : "Project manager"}</dd>
+            </div>
+          </dl>
+          <p className="op-account-copy">
+            Your sign-in details and access are managed by the Van der Tweel team.
+            Contact your existing team contact if anything needs to change.
+          </p>
+        </section>
+        <section className="op-panel" aria-labelledby="office-account-session">
+          <div className="op-panel-title">
+            <h2 id="office-account-session">Session</h2>
+          </div>
+          <p className="op-account-copy op-account-session-copy">
+            Sign out when you finish using this device.
+          </p>
+          <OfficeSignOut />
+        </section>
+      </div>
+    </>
+  );
 }
 
 function Metric({
@@ -925,6 +975,9 @@ export function OfficePlatform({
     (villa) => villa.id === data.selection.villaId,
   );
   const project = data.projects.find((item) => item.id === projectId);
+  const residenceCount = data.page === "account"
+    ? (project?.villaCount ?? data.projects.reduce((sum, item) => sum + item.villaCount, 0))
+    : data.villas.length;
   const context = selectedVilla
     ? `${selectedVilla.projectName} · ${selectedVilla.code}`
     : (project?.name ??
@@ -1830,7 +1883,9 @@ export function OfficePlatform({
   const workProjectId = projectId ?? (data.projects.some(p => p.id === completionProject) ? completionProject : data.projects[0]?.id);
   const workVillas = data.villas.filter(v => v.projectId === workProjectId);
   const projectPicker = !projectId && data.projects.length > 1 ? <label className="completion-project">Development<select value={workProjectId} onChange={e=>setCompletionProject(e.target.value)}>{data.projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label> : null;
-  if (data.role === "developer" && ["buyers", "villas"].includes(data.page)) {
+  if (data.page === "account") {
+    content = <AccountPage data={data} />;
+  } else if (data.role === "developer" && ["buyers", "villas"].includes(data.page)) {
     content = <ManagementPanel projects={data.projects} villas={data.villas} fixedTab={data.page === "villas" ? "residences" : "accounts"} />;
   } else if (data.role === "developer" && data.page === "payments") {
     content = workProjectId ? <>{projectPicker}<BillingManager key={workProjectId} projectId={workProjectId} villas={workVillas} /></> : <Empty>No development is available.</Empty>;
@@ -2218,13 +2273,6 @@ export function OfficePlatform({
         context={context}
         homeHref={officeHref("overview", projectId)}
         navigationKey={`${data.page}:${projectId ?? ""}:${data.selection.villaId ?? ""}`}
-        footer={
-          <div className="op-mobile-account">
-            <span>{data.email ?? "Your team account"}</span>
-            <strong>{data.role === "developer" ? "Developer" : "Project manager"}</strong>
-            <OfficeSignOut />
-          </div>
-        }
       >
         <nav aria-label="Development office">{navigationLinks}</nav>
       </MobilePlatformNav>
@@ -2235,7 +2283,7 @@ export function OfficePlatform({
             className="op-brand"
             aria-label="Van der Tweel development office"
           >
-            <span className="op-mark" aria-hidden="true" />
+            <BrandMark className="op-mark" />
             <span>
               <strong>Van der Tweel</strong>
               <small>Bali · Development atelier</small>
@@ -2245,43 +2293,19 @@ export function OfficePlatform({
             <span>Active development</span>
             <strong>{context}</strong>
             <small>
-              {data.villas.length} residence
-              {data.villas.length === 1 ? "" : "s"} within your access
+              {residenceCount} residence
+              {residenceCount === 1 ? "" : "s"} within your access
             </small>
           </div>
           <nav className="op-nav" aria-label="Development office">
             {navigationLinks}
           </nav>
-          <div className="op-person">
-            <span className="op-avatar" aria-hidden="true">
-              {data.role === "developer" ? "DO" : "PM"}
-            </span>
-            <div>
-              <strong>
-                {data.email ??
-                  (data.role === "developer"
-                    ? "Development team"
-                    : "Project team")}
-              </strong>
-              <small>
-                {data.role === "developer"
-                  ? "Development office"
-                  : "Project manager"}
-              </small>
-            </div>
-          </div>
         </aside>
         <div className="op-main-wrap">
           <div className="op-topbar">
             <span>
               Development office <i>/</i> <strong>{context}</strong>
             </span>
-            <div className="op-account-controls">
-              <Badge tone="neutral">
-                {data.role === "developer" ? "Developer" : "Project manager"}
-              </Badge>
-              <OfficeSignOut />
-            </div>
           </div>
           <main id="office-main" className="op-content" tabIndex={-1}>
             {data.projects.length > 1 ? (

@@ -3,6 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
+vi.mock("@/lib/platform-access", () => ({
+  requireActor: vi.fn(),
+  AccessError: class AccessError extends Error {},
+}));
 vi.mock("@/lib/office-data", () => ({
   getProjectsOverview: vi.fn(),
   getProjectDetail: vi.fn(),
@@ -11,6 +15,8 @@ vi.mock("@/lib/office-data", () => ({
 }));
 
 import { auth } from "@/lib/auth";
+import { AccessError, requireActor } from "@/lib/platform-access";
+import { getOfficeMessageSummaries } from "@/lib/platform-communication";
 import { getBuyersDirectory, getProjectDetail, getProjectsOverview, getVillaForOffice } from "@/lib/office-data";
 import { getOfficePlatformData } from "./office-platform-data";
 
@@ -50,6 +56,7 @@ function session(role = "developer") {
 beforeEach(() => {
   vi.resetAllMocks();
   session();
+  vi.mocked(requireActor).mockResolvedValue({ id: "developer-a", role: "developer", email: "current@example.test", displayName: "Team Member" });
   vi.mocked(getProjectsOverview).mockResolvedValue([{ ...project, villaCount: 1 }]);
   vi.mocked(getProjectDetail).mockResolvedValue({ project, villas: [{ ...villa, buyerName: "Buyer A" }] });
   vi.mocked(getVillaForOffice).mockResolvedValue(detail());
@@ -58,6 +65,46 @@ beforeEach(() => {
 });
 
 describe("office presentation authorization and serialization", () => {
+  it("loads current account identity and navigation without fetching customer records", async () => {
+    const output = await getOfficePlatformData("account", { projectId: project.id });
+    expect(output).toMatchObject({ page: "account", role: "developer", email: "current@example.test", displayName: "Team Member",
+      selection: { projectId: project.id, villaId: null, villaCode: null },
+      villas: [], buyers: [], tasks: [], payments: [], updates: [], files: [] });
+    expect(output?.projects).toEqual([{ id: project.id, name: project.name, slug: project.slug, villaCount: 1 }]);
+    expect(getProjectDetail).not.toHaveBeenCalled();
+    expect(getVillaForOffice).not.toHaveBeenCalled();
+    expect(getBuyersDirectory).not.toHaveBeenCalled();
+    expect(getOfficeMessageSummaries).not.toHaveBeenCalled();
+    expect(JSON.stringify(output)).not.toContain("SECRET");
+  });
+
+  it("makes account and sign-out available to a PM without project assignments", async () => {
+    vi.mocked(requireActor).mockResolvedValue({ id: "pm-a", role: "pm", email: "pm@example.test", displayName: null });
+    vi.mocked(getProjectsOverview).mockResolvedValue([]);
+    const output = await getOfficePlatformData("account");
+    expect(output).toMatchObject({ page: "account", role: "pm", email: "pm@example.test", displayName: null,
+      projects: [], buyers: null, payments: null, files: null });
+    expect(getProjectsOverview).toHaveBeenCalledWith("pm-a", "pm");
+    expect(getProjectDetail).not.toHaveBeenCalled();
+    expect(getVillaForOffice).not.toHaveBeenCalled();
+  });
+
+  it("rechecks account access rather than trusting a stale session role", async () => {
+    vi.mocked(requireActor).mockRejectedValueOnce(new AccessError());
+    expect(await getOfficePlatformData("account")).toBeNull();
+    vi.mocked(requireActor).mockResolvedValueOnce({ id: "buyer-a", role: "buyer", email: "buyer@example.test", displayName: null });
+    expect(await getOfficePlatformData("account")).toBeNull();
+    expect(getProjectsOverview).not.toHaveBeenCalled();
+  });
+
+  it("does not broaden an unauthorized account project selection", async () => {
+    expect(await getOfficePlatformData("account", { projectId: "other-project" })).toBeNull();
+    expect(await getOfficePlatformData("account", { projectId: "" })).toBeNull();
+    expect(await getOfficePlatformData("account", { projectId: project.id, projectSlug: "other" })).toBeNull();
+    expect(getProjectDetail).not.toHaveBeenCalled();
+    expect(getVillaForOffice).not.toHaveBeenCalled();
+  });
+
   it("rejects missing, buyer and unknown sessions before requesting data", async () => {
     vi.mocked(auth).mockResolvedValue(null as never);
     expect(await getOfficePlatformData("overview")).toBeNull();

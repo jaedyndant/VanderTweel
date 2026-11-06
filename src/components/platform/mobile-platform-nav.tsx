@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { BrandMark } from "@/components/brand/brand-mark";
 import "./mobile-platform-nav.css";
 
 /** One compact mobile shell for both platforms; each caller owns its allowed links. */
@@ -87,7 +88,7 @@ export function MobilePlatformNav({
     <div className="platform-mobile-nav">
       <header className="pmn-bar">
         <Link className="pmn-brand" href={homeHref} aria-label={`${title} home`}>
-          <span className="pmn-mark" aria-hidden="true" />
+          <BrandMark className="pmn-mark" />
           <span>
             <strong>Van der Tweel</strong>
             <span>{title}</span>
@@ -127,9 +128,12 @@ export function MobilePlatformNav({
         }}
       >
         <div className="pmn-drawer-heading">
-          <div>
-            <span className="pmn-eyebrow">Van der Tweel</span>
-            <h2 id={`${id}-title`}>{title}</h2>
+          <div className="pmn-drawer-brand">
+            <BrandMark className="pmn-mark" />
+            <div>
+              <span className="pmn-eyebrow">Van der Tweel</span>
+              <h2 id={`${id}-title`}>{title}</h2>
+            </div>
           </div>
           <button type="button" className="pmn-close" onClick={close} aria-label="Close menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
