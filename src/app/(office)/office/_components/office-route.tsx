@@ -12,6 +12,7 @@ import {
   toggleProgress,
 } from "@/lib/office-platform-actions";
 import { OfficePlatform } from "@/components/office-platform/office-platform";
+import { DeveloperHelp } from "@/components/office-platform/developer-help";
 import type {
   OfficeActionHandlers,
   OfficePage,
@@ -52,7 +53,7 @@ export async function OfficeRoute({
   if (!user || user.role === "buyer") redirect("/login");
   if (
     user.role === "pm" &&
-    (page === "buyers" || page === "payments" || page === "documents")
+    (page === "buyers" || page === "payments" || page === "documents" || page === "help")
   ) {
     notFound();
   }
@@ -73,5 +74,11 @@ export async function OfficeRoute({
   });
   if (!data) notFound();
 
-  return <OfficePlatform data={data} actions={officeActions} />;
+  return <OfficePlatform
+    data={data}
+    actions={officeActions}
+    helpContent={page === "help" && data.role === "developer"
+      ? <DeveloperHelp projectId={data.selection.projectId} />
+      : undefined}
+  />;
 }

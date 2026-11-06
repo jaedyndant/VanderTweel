@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ManagedAccount, ManagedVilla, ManagementData } from "@/lib/management/types";
+import { villaHref } from "./presentation";
 import "./management-panel.css";
 
 export interface ManagementPanelProps {
-  projects: { id: string; name: string }[];
+  projects: { id: string; name: string; slug?: string }[];
   villas: { id: string; code: string; projectId: string }[];
   initialData?: ManagementData;
   fixedTab?: "accounts" | "residences";
@@ -189,7 +191,26 @@ export function ManagementPanel({ projects, villas, initialData, fixedTab }: Man
     {tab === "residences" ? <div className="opm-residences" aria-busy={loading}>
       {!data && loading ? <p className="opm-empty">Loading residences…</p> : null}
       {data && !filteredVillas.length ? <p className="opm-empty">{query ? "No residences match this search." : "No residences yet. Add the first residence to an existing project."}</p> : null}
-      {filteredVillas.map((villa) => <article className="opm-residence" key={villa.id}><div><strong>{villa.code}</strong><span>{projects.find((project) => project.id === villa.projectId)?.name}</span></div><span className="opm-tag">{villa.status.replaceAll("_", " ")}</span><div className="opm-row-actions"><a className="opm-button opm-button-quiet" href={`/office/preview/${encodeURIComponent(villa.id)}`}>View as buyer</a><button type="button" className="opm-button opm-button-quiet" disabled={Boolean(busy)} onClick={() => setEditingVilla(villa)}>Edit details</button></div></article>)}
+      {filteredVillas.map((villa) => {
+        const project = projects.find((item) => item.id === villa.projectId);
+        return <article className="opm-residence" key={villa.id}>
+          <div>
+            <strong>{villa.code}</strong>
+            {project?.slug ? <Link
+              className="opm-project-link"
+              href={`/office/projecten/${encodeURIComponent(project.slug)}?projectId=${encodeURIComponent(project.id)}`}
+              aria-label={`Open project ${project.name}`}
+            >{project.name}<span aria-hidden="true">↗</span></Link> : <span>{project?.name}</span>}
+          </div>
+          <span className="opm-tag">{villa.status.replaceAll("_", " ")}</span>
+          <div className="opm-row-actions">
+            <Link className="opm-button" href={villaHref(villa)} aria-label={`Open residence ${villa.code}`}>
+              Open residence <span aria-hidden="true">→</span>
+            </Link>
+            <button type="button" className="opm-button opm-button-quiet" disabled={Boolean(busy)} aria-label={`Edit details for ${villa.code}`} onClick={() => setEditingVilla(villa)}>Edit details</button>
+          </div>
+        </article>;
+      })}
     </div> : null}
     <p className="opm-footnote">Access is added only after a successful save. Invitation delivery does not prove a first sign-in. “Not recorded yet” can also mean an older account whose earlier sign-ins were not tracked.</p>
   </section>;

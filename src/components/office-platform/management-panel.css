@@ -3,7 +3,7 @@
 .op-management .opm-eyebrow { display: block; color: var(--opm-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; }
 .op-management .opm-heading h2 { font-size: clamp(27px, 3vw, 36px); }
 .op-management .opm-heading p { margin-top: 8px; }
-.op-management .opm-button { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: 11px 17px; border: 1px solid var(--opm-green); border-radius: 3px; background: var(--opm-green); color: var(--opm-paper); font-size: 12px; font-weight: 600; line-height: 1.5; text-align: center; }
+.op-management .opm-button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; padding: 11px 17px; border: 1px solid var(--opm-green); border-radius: 3px; background: var(--opm-green); color: var(--opm-paper); font-size: 12px; font-weight: 600; line-height: 1.5; text-align: center; }
 .op-management .opm-button:hover:not(:disabled) { filter: brightness(.92); }
 .op-management .opm-button-quiet { background: transparent; color: var(--opm-green); border-color: var(--opm-line); }
 .op-management .opm-tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--opm-line); }
@@ -38,9 +38,12 @@
 .op-management dd small { display: block; color: var(--opm-muted); font-size: 11px; margin-top: 3px; }
 .op-management .opm-row-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .op-management .opm-person .opm-row-actions { grid-column: 1 / -1; }
-.op-management .opm-residence { display: flex; align-items: center; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--opm-line); }
-.op-management .opm-residence > div:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.op-management .opm-residence > div:first-child span { display: block; font-size: 12px; color: var(--opm-muted); margin-top: 5px; }
+.op-management .opm-residence { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--opm-line); }
+.op-management .opm-residence > div:first-child { flex: 1 1 140px; min-width: 0; overflow-wrap: anywhere; }
+.op-management .opm-residence > div:first-child > span { display: block; font-size: 12px; color: var(--opm-muted); margin-top: 5px; }
+.op-management .opm-project-link { display: flex; align-items: center; gap: 8px; width: fit-content; max-width: 100%; min-height: 44px; color: var(--opm-muted); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.op-management .opm-project-link:hover { color: var(--opm-green); }
+.op-management .opm-project-link > span { flex-shrink: 0; }
 .op-management .opm-empty { padding: 25px 0; }
 .op-management .opm-error-text { color: var(--opm-error); }
 .op-management .opm-footnote { font-size: 11px; max-width: 95ch; }
