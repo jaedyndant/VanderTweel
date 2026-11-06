@@ -1,5 +1,27 @@
 # Platform functional completion
 
+> **2026-11-05 update — two things shipped after this doc was written:**
+> 1. **Construction-phase CRUD.** PM/developer can now create, edit and
+>    delete progress-task phases (not just toggle complete/reopen).
+>    `src/lib/office-actions.ts` (`progressTaskInputSchema`,
+>    `createProgressTaskAction`, `updateProgressTaskAction`,
+>    `deleteProgressTaskAction`), wired through
+>    `office-platform-actions.ts` → `office-route.tsx` →
+>    `office-platform.tsx` (`ProgressTaskForm` + 3 new modal kinds).
+> 2. **Villa-code URL decode fix.** Next.js 16 doesn't auto-decode
+>    percent-encoded `[code]` route params. Villa codes with a space
+>    (`"Villa 1"` → `"Villa%201"` in the URL) never matched the stored
+>    code, so `getOfficePlatformData` returned `null` and the page silently
+>    404'd. This broke "Open residence", "Review tasks", and every entry
+>    point into the construction progress page. Fixed with
+>    `decodeURIComponent(code)` in all 5 villa subpage routes
+>    (`page.tsx`, `voortgang/`, `betalingen/`, `updates/`, `bestanden/`).
+>    **If you add a new villa-scoped route, copy this pattern or you'll
+>    reintroduce the bug.**
+>
+> Both are committed to `main` and deployed to production. Full session
+> log and verification steps are in chat history, not duplicated here.
+
 Branch: `feat/platform-functional-completion`, based on `12b0543` (PR #28).
 
 ## Implemented

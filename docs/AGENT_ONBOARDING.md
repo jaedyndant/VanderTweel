@@ -4,9 +4,10 @@ This file is the single source of truth for any AI agent (or human) joining
 this project. Read this before touching code. If anything here conflicts
 with what you were told elsewhere, this file + `/docs` win.
 
-For the agreed 30 October MS3/MS4/MS5 frontend integration branch, CI rollout
-and isolated staging acceptance plan, also read
-[INTEGRATION_MS3_MS4_MS5.md](INTEGRATION_MS3_MS4_MS5.md).
+[INTEGRATION_MS3_MS4_MS5.md](INTEGRATION_MS3_MS4_MS5.md) and
+[OFFICE_PLATFORM_FRONTEND.md](OFFICE_PLATFORM_FRONTEND.md) document the
+MS3/MS4/MS5 integration that merged into `main` on 2026-10-30 — kept here
+as historical design record, not an active plan.
 
 ## 1. What this project is
 
@@ -57,7 +58,8 @@ whole villa row (only the buyer's own villa).
 - Drizzle ORM on Neon Postgres. Schema: `src/db/schema.ts`. Migrations:
   `drizzle/*.sql`, numbered, tracked in `drizzle/meta/_journal.json`.
 - Auth.js (NextAuth v5, beta) — magic-link via Resend, **no passwords, no
-  self-registration**, database session strategy (not JWT).
+  self-registration**, JWT session strategy (switched from database
+  sessions in PR #17, 2026-11-02 — Edge middleware can't hit the DB).
 - React Three Fiber (Three.js) for the 3D villa view — not raw WebGL. Not
   built yet (MS6).
 - Vercel hosting, Sentry error tracking.
@@ -132,27 +134,42 @@ agents/developers on one repo. It is not optional.
   similar auth-bypass route for any future testing need — use a real
   magic-link sign-in or a throwaway test session instead.
 
-## 4. Current state (as of 2026-10-28)
+## 4. Current state (as of 2026-11-05)
 
-Merged PRs, in order: #1 project foundation/schema, #2 MS2 login + role
-routing, #3 MS3 koper-app (own villa / progress / payment schedule), #4
-dev-login backdoor, #5 migration hardening for the MS2 account seed.
+Everything below is merged to `main` and deployed to production. All
+feature branches have been squash-merged and deleted — `main` is the only
+branch in the repo (local and `origin`). Don't go looking for old
+milestone branches; they're gone, their content lives in `main`'s history.
 
-- **MS1, MS2, MS3: done**, verified against the real deployed database and
-  real deployed auth (not just staging) as of today.
-- **MS4 (back-office basisschermen): not started.** `/office` is currently
-  a one-screen stub that only confirms the logged-in account and role.
-  This is the next milestone: 9 developer screens, 3 PM screens (no money,
-  no contract files for PM).
-- MS5 (team→buyer notification coupling), MS6 (3D villa), MS7 (public
-  site + forms), MS8 (testing/security/handover) not started.
-- 28/28 unit tests passing (`npx vitest run`): auth adapter, role routing,
-  koper data scoping. CI runs typecheck + lint + tests + build on every PR
-  against `main`.
+- **MS1–MS5: done.** Public site, koper-app, full back-office (developer +
+  PM), team→buyer notification coupling, billing, private files,
+  management (invitations/assignments), project communication — all live.
+  Construction-phase CRUD (create/edit/delete progress tasks, not just
+  toggle complete) shipped 2026-11-05.
+- **MS6 (3D villa view), MS7 forms beyond what's built: not started.**
+- Session strategy is **JWT**, not database (PR #17) — Edge middleware
+  can't reach Postgres, this was a hard requirement, not a preference.
+- Auth dev-login backdoor (PR #4) was removed in PR #18 and never
+  reintroduced. Don't add a similar bypass.
+- Security hardening done: headers, cookie hardening, DB-backed rate
+  limiting, audit log (PR #19).
+- 265+ unit/integration tests passing (`npx vitest run` / `npm test`). CI
+  runs typecheck + lint + tests + build on every PR against `main`.
 - Live production: `https://van-der-tweel-eight.vercel.app`. Real seed
   data: Villa 1 (Marcus Oduya, project "Row A"), Villa 3 (Emma Larsen),
   each with their own payment milestones and progress tasks, confirmed
   isolated from each other.
+- **Known-fixed gotcha:** Next.js 16 does not auto-decode percent-encoded
+  dynamic route segments. Any `[code]`-style param that can contain a
+  space (villa codes like `"Villa 1"`) must be passed through
+  `decodeURIComponent()` before being used in a lookup, or the lookup
+  silently misses and the page 404s with no visible error. Fixed across
+  all 5 villa subpages 2026-11-05 — if you add a new villa-scoped route,
+  copy that pattern, don't re-introduce the bug.
+- See [PLATFORM-COMPLETION-HANDOFF.md](PLATFORM-COMPLETION-HANDOFF.md) for
+  the detailed production-prerequisites checklist (private Blob store,
+  mail scheduler, billing settings, etc.) — read it before touching
+  billing/files/management code or doing a real production rollout step.
 
 ## 5. Before you write code
 

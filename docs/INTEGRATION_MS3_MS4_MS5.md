@@ -1,5 +1,9 @@
 # MS3 / MS4 / MS5 integration workflow
 
+> **Status: completed, merged into `main` on 2026-10-30 (PR #13).** Kept as
+> a historical record of the staging/acceptance plan that was followed,
+> not an active checklist — don't re-run this setup for new work.
+
 Agreed on 30 October 2026. This is the scoped integration plan alongside the
 [agent onboarding](AGENT_ONBOARDING.md), PvA and TO. It does not authorize a
 production release, production data changes, or unrelated backend work.

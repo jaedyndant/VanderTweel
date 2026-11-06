@@ -1,5 +1,9 @@
 # Login flow regression fix
 
+> **Status: merged into `main`, resolved.** Fix branch `fix/ms3-ms4-ms5-login-flow`
+> was merged via the `integration/ms3-ms4-ms5` → `main` PR. Kept as a
+> historical record of the bug and fix, not an active task.
+
 ## Reproduced blocker
 
 The previous login form posted directly to `/api/auth/signin/resend` without

@@ -1,8 +1,17 @@
 # MS4 backoffice frontend
 
+> **Historical design record.** This merged into `main` on 2026-10-30 (PR
+> #13) and has since been extended: private files/billing/management/
+> communication (PR #29, 2026-11-04), construction-phase CRUD (2026-11-05),
+> and a villa-code URL decode fix (2026-11-05, see
+> [AGENT_ONBOARDING.md §4](AGENT_ONBOARDING.md)). The "deliberate
+> differences" section below describing task authoring/percentage editing
+> as unavailable is **no longer accurate** — that's now built. Treat this
+> file as the original MS4 scope/rationale, not current capability.
+
 ## Scope and integration
 
-This feature targets `integration/ms3-ms4-ms5`, not `main`. It uses the approved
+This feature originally targeted `integration/ms3-ms4-ms5`, now `main`. It uses the approved
 Van der Tweel demo office as the visual reference: Newsreader and DM Sans,
 warm paper, forest-green accents, the sidebar, editorial headings and tables.
 The public website, buyer frontend, schema, original data/actions, auth and
