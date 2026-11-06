@@ -1191,10 +1191,11 @@ export function ClientPlatform({
             aria-label="Van der Tweel owner platform home"
           >
             <BrandMark className="mark" />
-            <span>
-              <strong>Van der Tweel</strong>
-              <small>Bali · Development atelier</small>
-            </span>
+            <strong>Van der Tweel</strong>
+            <small>
+              <span>Bali ·</span>{" "}
+              <span>Development atelier</span>
+            </small>
           </Link>
           <div className="workspace-label">
             <small>YOUR RESIDENCE</small>

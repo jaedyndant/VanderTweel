@@ -2284,10 +2284,11 @@ export function OfficePlatform({
             aria-label="Van der Tweel development office"
           >
             <BrandMark className="op-mark" />
-            <span>
-              <strong>Van der Tweel</strong>
-              <small>Bali · Development atelier</small>
-            </span>
+            <strong>Van der Tweel</strong>
+            <small>
+              <span>Bali ·</span>{" "}
+              <span>Development atelier</span>
+            </small>
           </Link>
           <div className="op-workspace">
             <span>Active development</span>
