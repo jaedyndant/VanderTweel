@@ -18,7 +18,6 @@ export default function SiteFooter() {
           <Link href="/ownership">Ownership</Link>
           <Link href="/villas">Villas</Link>
           <Link href="/contact">Contact</Link>
-          <Link href="/login">Owner portal ↗</Link>
         </nav>
 
         <div className="site-footer-fine">

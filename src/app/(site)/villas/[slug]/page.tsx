@@ -136,23 +136,6 @@ export default async function VillaDetailPage({
           </Reveal>
         </div>
       </section>
-
-      <section className="site-section site-section-dark">
-        <div className="site-wrap site-cta-band">
-          <Reveal>
-            <h2 className="site-h2">Follow {villa.code}&rsquo;s progress.</h2>
-            <p className="site-body" style={{ maxWidth: "46ch" }}>
-              Owners see live construction updates, payment milestones and
-              documents in their private owner platform.
-            </p>
-          </Reveal>
-          <Reveal delay={120}>
-            <Link href="/login" className="site-btn site-btn-paper">
-              Owner portal ↗
-            </Link>
-          </Reveal>
-        </div>
-      </section>
     </>
   );
 }

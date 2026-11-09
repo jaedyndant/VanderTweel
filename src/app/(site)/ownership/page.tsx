@@ -76,11 +76,6 @@ export default function OwnershipPage() {
               documents in one calm, organized space — built specifically for
               Van der Tweel owners.
             </p>
-            <div className="site-cta-row">
-              <Link href="/login" className="site-btn site-btn-paper">
-                Owner portal ↗
-              </Link>
-            </div>
           </Reveal>
           <Reveal delay={100} className="site-media">
             <img

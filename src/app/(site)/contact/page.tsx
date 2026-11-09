@@ -50,14 +50,6 @@ export default function ContactPage() {
               Email us to arrange a viewing ↗
             </a>
           </div>
-
-          <p className="site-body" style={{ marginTop: 24, fontSize: 14, color: "var(--muted)" }}>
-            Already an owner? Sign in to your{" "}
-            <a href="/login" style={{ color: "var(--teak)", fontWeight: 600 }}>
-              owner portal
-            </a>{" "}
-            for live updates on your residence.
-          </p>
         </Reveal>
       </div>
     </section>
