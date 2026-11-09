@@ -22,8 +22,6 @@ export default function SiteFooter() {
 
         <div className="site-footer-fine">
           &copy; 2026 Van der Tweel &middot; Cemagi Atelier
-          <br />
-          Photography is illustrative.
         </div>
       </div>
     </footer>
