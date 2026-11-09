@@ -508,20 +508,6 @@
   margin-top: auto;
   padding-top: 16px;
 }
-.site-villa-card-body .status-pill {
-  display: inline-flex;
-  align-self: flex-start;
-  background: #e4eadc;
-  color: #52704d;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 5px 10px;
-  border-radius: 999px;
-  margin-bottom: 12px;
-}
-
 /* -- CTA band ----------------------------------------------------------*/
 .site-cta-band {
   display: flex;
