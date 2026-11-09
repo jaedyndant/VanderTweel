@@ -2,13 +2,6 @@ import Link from "next/link";
 import { unsplash } from "./images";
 import type { PublicVilla } from "@/lib/public-site-data";
 
-const STATUS_LABEL: Record<string, string> = {
-  on_schedule: "On schedule",
-  planned: "Planned",
-  delayed: "Delayed",
-  complete: "Complete",
-};
-
 function formatHandover(iso: string | null): string {
   if (!iso) return "Handover TBC";
   return new Date(iso).toLocaleDateString("en-US", {
@@ -34,9 +27,6 @@ export default function VillaCard({
         />
       </div>
       <div className="site-villa-card-body">
-        <span className="status-pill">
-          {STATUS_LABEL[villa.status] ?? villa.status}
-        </span>
         <h3 className="serif">{villa.code}</h3>
         <div className="type">
           {villa.typeLabel} &middot; {villa.plotM2}m&sup2; plot
